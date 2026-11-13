@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppSidebar from "./components/AppSidebar.vue";
+import FlashingBanner from "./components/FlashingBanner.vue";
 import StatusBar from "./components/StatusBar.vue";
 </script>
 
@@ -7,6 +8,7 @@ import StatusBar from "./components/StatusBar.vue";
   <div class="shell">
     <AppSidebar class="shell-sidebar" />
     <main class="shell-main">
+      <FlashingBanner />
       <RouterView />
     </main>
     <StatusBar class="shell-status" />

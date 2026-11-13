@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ALPHA_BOARDS, ALPHA_TEXTS, type AlphaText } from "@bf-migrate/core";
-import { CircleAlert, CircleCheck, Cpu, FlaskConical, LoaderCircle, Upload } from "lucide-vue-next";
-import { computed, onBeforeUnmount, ref, shallowRef, watch } from "vue";
+import { ChevronDown, ChevronRight, CircleAlert, CircleCheck, Cpu, FlaskConical, LoaderCircle, PackageCheck, TriangleAlert, Upload } from "lucide-vue-next";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import AlphaImageFacts from "../components/AlphaImageFacts.vue";
 import { ALPHA_PHOTOS } from "../data/alpha-photos";
+import { ALPHA_HD_FIRMWARE } from "../data/hosted-firmware";
 import { DEMO_SCENARIOS, createDemoSource, type DemoScenarioId } from "../demo/alpha-probe";
 import { demoAlphaFirmware } from "../demo/alpha-firmware";
 import { useAlphaStore, type AlphaStep } from "../stores/alpha";
@@ -30,12 +31,8 @@ const STAGES: { label: string; steps: AlphaStep[] }[] = [
 ];
 
 const stageIndex = computed(() => STAGES.findIndex((stage) => stage.steps.includes(alpha.step)));
-const PROBE_STAGE = STAGES.findIndex((stage) => stage.steps.includes("probe"));
 /** Steps that must finish before the pilot can go anywhere else. */
 const BUSY: readonly AlphaStep[] = ["connecting", "working"];
-
-/** The furthest stage reached since the chip was last read. Reading a chip again starts it over. */
-const reached = shallowRef<{ readings: unknown; index: number }>({ readings: undefined, index: 0 });
 
 const introChecked = ref(false);
 // The ticks are the pilot's own checklist: kept when moving between steps, and never required.
@@ -57,25 +54,13 @@ watch(
   { immediate: true },
 );
 
-watch(
-  [() => alpha.step, () => alpha.readings],
-  ([, readings]) => {
-    const same = reached.value.readings === readings;
-    reached.value = { readings, index: same ? Math.max(reached.value.index, stageIndex.value) : stageIndex.value };
-  },
-  { immediate: true },
-);
-
 /**
- * The stages up to choosing the ST-Link always open. The later ones work on the connected
- * chip, so they open only once the flow has reached them on that chip, and Unlock only while
- * the chip is still locked.
+ * Every stage opens at any time, done or not, except while the chip is being connected
+ * or written. Inside a stage, a button whose action needs something not yet done stays
+ * grey and says what is missing; the store checks the same things again.
  */
 function canOpen(index: number): boolean {
-  if (index === stageIndex.value || BUSY.includes(alpha.step)) return false;
-  if (index <= PROBE_STAGE) return true;
-  if (!alpha.session || index > reached.value.index) return false;
-  return !STAGES[index]!.steps.includes("unlock") || locked.value;
+  return index !== stageIndex.value && !BUSY.includes(alpha.step);
 }
 
 function openStage(index: number): void {
@@ -105,6 +90,38 @@ const usbBusy = computed(() => alpha.usbStep === "working" || alpha.usbStep === 
 const usbPercent = computed(() => (alpha.usbProgress?.total ? Math.round((alpha.usbProgress.done / alpha.usbProgress.total) * 100) : undefined));
 const locked = computed(() => alpha.classification?.kind === "locked");
 const atLevel0WithFirmware = computed(() => alpha.classification?.kind === "programmed" || alpha.classification?.kind === "unknown");
+
+const NEED_PROBE = "Connect the ST-Link to the board (stage 3).";
+const NEED_FIRMWARE = "Choose the firmware (stage 6).";
+
+/** What the one-way step still needs. Its button stays grey until this is empty. */
+const unlockNeeds = computed(() => {
+  const needs: string[] = [];
+  if (!alpha.session || !alpha.classification) needs.push(NEED_PROBE);
+  else if (!locked.value) needs.push("This chip is not locked, so there is nothing to unlock. Go to Write.");
+  if (!alpha.reportSaved) needs.push("Save the board report (stage 5).");
+  if (!alpha.chosen?.check.ok) needs.push(NEED_FIRMWARE);
+  return needs;
+});
+
+/** What writing still needs. */
+const writeNeeds = computed(() => {
+  const needs: string[] = [];
+  const found = alpha.classification;
+  if (!alpha.session || !found) needs.push(NEED_PROBE);
+  else if (found.kind === "locked") needs.push("Unlock the chip first (stage 7).");
+  else if (found.kind === "wrong-chip" || found.kind === "protected") needs.push(`This board cannot be written: ${found.title.toLowerCase()}.`);
+  if (!alpha.chosen?.check.ok) needs.push(NEED_FIRMWARE);
+  return needs;
+});
+
+/**
+ * A migrated board on USB needs only the card at the top, so the ST-Link steps fold away.
+ * They stay open while an ST-Link session is in use.
+ */
+const showMigration = ref(false);
+const migrationFoldable = computed(() => alpha.migratedOverUsb && !alpha.session && !BUSY.includes(alpha.step));
+const migrationHidden = computed(() => migrationFoldable.value && !showMigration.value);
 
 function paragraphs(text: AlphaText): readonly string[] {
   return text.paragraphs;
@@ -173,15 +190,23 @@ function kb(bytes: number): string {
       <p class="muted lead">It runs Betaflight as TMOTORG4ALPHAHD. Betaflight's own firmware list does not carry this board yet, so new firmware comes from a file. It is written over USB, keeping your settings. No ST-Link is needed.</p>
       <AlphaImageFacts v-if="alpha.usbChosen" :image="alpha.usbChosen" />
       <div class="actions">
-        <button class="btn" :disabled="usbBusy" @click="usbFileInput?.click()"><Upload :size="15" /> Choose a .hex file</button>
+        <button class="btn" :disabled="usbBusy || alpha.hostedLoading" @click="alpha.chooseHosted('usb')"><PackageCheck :size="15" /> Use fc-migrate's build ({{ ALPHA_HD_FIRMWARE.release }})</button>
+        <button class="btn" :disabled="usbBusy || alpha.hostedLoading" @click="usbFileInput?.click()"><Upload :size="15" /> Choose a .hex file</button>
         <button v-if="alpha.usbStep === 'permission'" class="btn btn-primary" @click="alpha.grantDfuPermission()">Allow access to the bootloader</button>
         <button v-else class="btn btn-primary" :disabled="!alpha.usbChosen?.check.ok || usbBusy" @click="alpha.flashOverUsb()">Flash over USB</button>
       </div>
+      <div v-if="usbBusy" class="notice notice-danger"><TriangleAlert :size="18" /><span>Writing firmware. Do not close or change this browser tab, and keep the USB cable plugged in until it says the new firmware is running.</span></div>
       <p v-if="alpha.usbMessage && alpha.usbStep !== 'failed'" class="muted">{{ alpha.usbMessage }}<template v-if="usbPercent !== undefined"> ({{ usbPercent }}%)</template></p>
       <div v-if="alpha.usbStep === 'done'" class="notice"><CircleCheck :size="18" /><span>The new firmware is running.</span></div>
       <div v-if="alpha.usbStep === 'failed'" class="notice notice-danger"><CircleAlert :size="18" /><span>{{ alpha.usbMessage }}</span></div>
     </section>
 
+    <button v-if="migrationFoldable" class="btn fold" :aria-expanded="showMigration" @click="showMigration = !showMigration">
+      <component :is="showMigration ? ChevronDown : ChevronRight" :size="16" />
+      {{ showMigration ? "Hide the ST-Link migration steps" : "Migrating another Alpha still on its original firmware? Show the ST-Link steps" }}
+    </button>
+
+    <template v-if="!migrationHidden">
     <div v-if="alpha.simulated" class="notice notice-warn simulated">
       <FlaskConical :size="18" />
       <span><strong>SIMULATED.</strong> No hardware is involved. This walks through the real procedure against a simulated ST-Link and chip.</span>
@@ -304,6 +329,15 @@ function kb(bytes: number): string {
       </div>
     </section>
 
+    <section v-else-if="alpha.step === 'confirm-chip'" class="card step">
+      <h2>{{ ALPHA_TEXTS.confirmChip.title }}</h2>
+      <p class="muted">No chip has been read yet. Connect the ST-Link in stage 3, and the chip's details appear here.</p>
+      <div class="actions">
+        <button class="btn btn-primary" disabled>Yes, this is the board</button>
+        <button class="btn" @click="alpha.goTo('probe')">Go to stage 3</button>
+      </div>
+    </section>
+
     <section v-else-if="alpha.step === 'stopped' && alpha.classification" class="card step">
       <h2>{{ alpha.classification.title }}</h2>
       <p>{{ alpha.classification.detail }}</p>
@@ -318,9 +352,11 @@ function kb(bytes: number): string {
       <h2>{{ ALPHA_TEXTS.report.title }}</h2>
       <p v-for="text in paragraphs(ALPHA_TEXTS.report)" :key="text">{{ text }}</p>
       <div class="actions">
-        <button class="btn" @click="alpha.saveReport()">Save the board report</button>
-        <button class="btn btn-primary" :disabled="!alpha.reportSaved" @click="alpha.confirm('report'), alpha.goTo('firmware')">Continue</button>
+        <button class="btn" :disabled="!alpha.readings" @click="alpha.saveReport()">Save the board report</button>
+        <button class="btn btn-primary" @click="alpha.reportSaved && alpha.confirm('report'), alpha.goTo('firmware')">Continue</button>
       </div>
+      <p v-if="!alpha.readings" class="muted small">Saving needs a chip that has been read: {{ NEED_PROBE }}</p>
+      <div v-else-if="!alpha.reportSaved" class="notice notice-warn"><CircleAlert :size="18" /><span>Not saved yet. Unlocking stays closed until the report is saved.</span></div>
     </section>
 
     <!-- 6. Firmware -->
@@ -328,6 +364,7 @@ function kb(bytes: number): string {
       <h2>{{ ALPHA_TEXTS.firmware.title }}</h2>
       <p v-for="text in paragraphs(ALPHA_TEXTS.firmware)" :key="text">{{ text }}</p>
       <div class="actions">
+        <button class="btn" :disabled="alpha.hostedLoading" @click="alpha.chooseHosted('stlink')"><PackageCheck :size="15" /> Use fc-migrate's build ({{ ALPHA_HD_FIRMWARE.release }})</button>
         <button class="btn" @click="fileInput?.click()"><Upload :size="15" /> Choose a .hex file</button>
         <button v-if="alpha.simulated" class="btn" @click="useDemoFirmware()">Use the demo firmware</button>
       </div>
@@ -358,8 +395,14 @@ function kb(bytes: number): string {
         <input v-model="typed" class="input mono" autocomplete="off" spellcheck="false" :aria-label="`Type ${ALPHA_TEXTS.unlock.typed}`" />
       </label>
       <div class="actions">
-        <button class="btn btn-danger" :disabled="typed.trim() !== ALPHA_TEXTS.unlock.typed" @click="alpha.unlock(typed)">Erase and unlock</button>
+        <button class="btn btn-danger" :disabled="unlockNeeds.length > 0 || typed.trim() !== ALPHA_TEXTS.unlock.typed" @click="alpha.unlock(typed)">Erase and unlock</button>
         <button class="btn" @click="alpha.reset()">Stop here</button>
+      </div>
+      <div v-if="unlockNeeds.length" class="needs muted small">
+        <strong>Still needed</strong>
+        <ul>
+          <li v-for="text in unlockNeeds" :key="text">{{ text }}</li>
+        </ul>
       </div>
     </section>
 
@@ -369,14 +412,20 @@ function kb(bytes: number): string {
       <p v-for="text in paragraphs(alpha.classification?.kind === 'blank' ? ALPHA_TEXTS.write : ALPHA_TEXTS.rewrite)" :key="text">{{ text }}</p>
       <p v-if="alpha.chosen" class="muted">{{ alpha.chosen.name }}, {{ kb(alpha.chosen.check.bytes) }}.</p>
       <div class="actions">
-        <button class="btn btn-primary" @click="alpha.write()">Write Betaflight</button>
+        <button class="btn btn-primary" :disabled="writeNeeds.length > 0" @click="alpha.write()">Write Betaflight</button>
+      </div>
+      <div v-if="writeNeeds.length" class="needs muted small">
+        <strong>Still needed</strong>
+        <ul>
+          <li v-for="text in writeNeeds" :key="text">{{ text }}</li>
+        </ul>
       </div>
     </section>
 
     <section v-else-if="alpha.step === 'working'" class="card step">
       <h2><LoaderCircle :size="18" class="spin" /> {{ alpha.message }}</h2>
       <progress v-if="percent !== undefined" :value="percent" max="100" class="bar">{{ percent }}%</progress>
-      <p class="muted">Keep the USB cable and the ST-Link connected. This step cannot be cancelled.</p>
+      <div class="notice notice-danger"><TriangleAlert :size="18" /><span>Do not close or change this browser tab. Keep the USB cable and the ST-Link connected. This step cannot be cancelled.</span></div>
     </section>
 
     <!-- 9. Done -->
@@ -402,6 +451,7 @@ function kb(bytes: number): string {
         <button class="btn" @click="alpha.reset()">Start over</button>
       </div>
     </section>
+    </template>
 
     <input ref="fileInput" type="file" accept=".hex" hidden @change="pickFile" />
     <input ref="usbFileInput" type="file" accept=".hex" hidden @change="pickUsbFile" />
@@ -482,7 +532,24 @@ function kb(bytes: number): string {
 }
 
 .step.danger {
-  border-color: var(--danger);
+  border: 2px solid var(--danger);
+}
+
+.step.danger h2 {
+  color: var(--danger);
+}
+
+.fold {
+  align-self: flex-start;
+}
+
+.needs {
+  margin-top: 0.6rem;
+}
+
+.needs ul {
+  margin: 0.2rem 0 0;
+  padding-left: 1.1rem;
 }
 
 .strong {

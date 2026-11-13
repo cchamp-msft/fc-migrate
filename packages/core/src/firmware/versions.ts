@@ -20,7 +20,14 @@ export function compareVersions(a: string, b: string): number {
   return left.prerelease.localeCompare(right.prerelease);
 }
 
-/** Releases a board can move to: anything newer than it runs, on a line migration understands. */
+/**
+ * Releases a board can move to: anything newer than it runs, on a line migration
+ * understands, and the release it runs now, which rebuilds it (for example with other
+ * build options) and sends its settings back.
+ */
 export function upgradeTargets(current: string, releases: readonly FirmwareRelease[], includeUnstable: boolean): FirmwareRelease[] {
-  return releases.filter((release) => releaseLineOf(release.release) && compareVersions(release.release, current) > 0 && (includeUnstable || release.type === "Stable"));
+  return releases.filter((release) => {
+    const order = compareVersions(release.release, current);
+    return releaseLineOf(release.release) && order >= 0 && (order === 0 || includeUnstable || release.type === "Stable");
+  });
 }

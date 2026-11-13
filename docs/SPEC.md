@@ -122,6 +122,10 @@ Stored schemas are data in `data/schemas/<version>.json`. When connected, the li
 
 If anything fails before `save`, the board has not stored the result. The backup and firmware dump stay available for rollback.
 
+The target can be any newer release on a line migration understands, or the release the board runs now: migrating to it rebuilds the board and sends its settings back. The firmware comes from Betaflight's cloud build, with build options ticked from what the board has now; the pilot can change them, and options the target does not offer are listed as left out.
+
+A G4 Alpha migrated to Betaflight is called out on the Migrate page. The cloud build does not carry it, so its firmware is this site's own release (pinned by SHA-256, as on the Alpha page) or the pilot's .hex, checked with the same image check. Its build options are fixed by the build. The pilot's file is warned about when it does not name the target version the settings are planned for.
+
 ### 6.2 What each line becomes
 
 | Outcome | Meaning |
@@ -260,11 +264,12 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight, 
 
 - Only the HD board (`TMOTORG4ALPHAHD`) is supported. Analog is listed and disabled until it is mapped.
 - The steps are: intro, board, wiring checklist, choose the ST-Link, connect, confirm the chip, save the report, choose the firmware, unlock (the one-way step), write, then done. Every warning text has an id and a version, and the board report records which ones the pilot confirmed.
-- The intro and wiring ticks are a checklist, not a gate: Continue works without them, and a confirmation is recorded only when they were ticked. The stage numbers are buttons. The stages up to choosing the ST-Link always open; later ones open once reached on the connected chip, never ahead of it. The typed ERASE and the saved report still gate the one-way step.
+- The intro and wiring ticks are a checklist, not a gate: Continue works without them, and a confirmation is recorded only when they were ticked. The stage numbers are buttons, and every stage opens at any time except while the chip is being connected or written. A button whose action needs something not yet done stays grey and lists what is still needed; the store checks the same things again. The one-way step needs a connected locked chip, a saved report, a checked firmware image and the typed ERASE.
+- On a migrated board connected over USB, the ST-Link steps fold away behind a toggle, unless an ST-Link session is in use.
 - Connecting tries hot-plug first. A stock Alpha uses the SWD clock pin as a UART, so on failure the pilot holds the board's reset button while the app attaches and arms a halt on the reset vector. The probe's RST pin is never relied on.
 - The board is classified from what the chip reports: locked (Level 1, stock or bricked), blank (an interrupted migration), programmed or unknown (Level 0), wrong chip, or protected in a way the tested run never saw. Wrong-chip and protected boards stop with nothing changed. Because classification is read from the chip each time, an interrupted run resumes at the right step.
 - Removing read protection mass-erases the chip, FETtec's unpublished bootloader included, so the board can never run Alpha again. It needs the typed word ERASE. No code path can produce Level 2. The pilot must save a board report (option bytes, protection registers, unique ID) before it; the report stays on the pilot's computer.
-- Firmware comes from a .hex file, checked before writing: it must stay inside main flash, start at 0x08000000 with a valid vector table whose reset, NMI and HardFault handlers are Thumb addresses inside the file, and look like Betaflight. Alpha images (starting at 0x08003800) are refused, and generic G474 builds or images for other boards are warned about.
+- Firmware is this site's own build or the pilot's file. The site's build is a release of [fc-migrate-firmware](https://github.com/cchamp-msft/fc-migrate-firmware), served from the site and pinned by SHA-256: a download that does not match is refused before anything is written. The page links the release and its source. Every image is checked before writing: it must stay inside main flash, start at 0x08000000 with a valid vector table whose reset, NMI and HardFault handlers are Thumb addresses inside the file, and look like Betaflight. Alpha images (starting at 0x08003800) are refused, and generic G474 builds or images for other boards are warned about.
 - The demo's stand-in image carries a marker, and the check refuses it for anything but the simulated board. Choosing a probe clears the chosen image, so a simulated choice never carries over to a real chip.
 - A rewrite of an unlocked board erases only the pages the image uses, keeping saved settings unless the pilot turns that off. Saved settings are found by the config header's magic, 0xBE, its second byte at 0x08004000 (the first is the config version). If the BOOT0 pin is honoured, the app offers to switch it off, since a DJI air unit on R3 can hold it high.
 - A board already migrated and connected over USB is flashed through its own DFU bootloader, with no ST-Link. Its file is chosen separately from the ST-Link flow's and shown (name, board, size, SHA-256) before writing. When the browser has no permission for the bootloader yet, the pilot grants it with a click, since the restart has used up the first one.
@@ -273,6 +278,10 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight, 
 
 
 Layout follows the Configurator: a left column with the logo, connect button and navigation, content on the right, and a status bar along the bottom.
+
+While any flow writes firmware, or a board waits in its bootloader, a red banner across the top says not to close or change the browser tab. The browser asks before the tab is closed or reloaded, and moving to another page in the app is refused until the write is done. Warning and danger notices carry a solid coloured edge, so they never read as decoration.
+
+The About page links the site's source, its license, and the source of every firmware the site serves, as the GPL asks of anyone who conveys the program.
 
 Themes, each in light and dark: Mono, Deep Purple, Deep Red, Blue Teal, Betaflight, Betaflight Sunset.
 

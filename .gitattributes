@@ -1,0 +1,2 @@
+# Firmware files are pinned by SHA-256: keep their bytes, line endings included.
+*.hex -text

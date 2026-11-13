@@ -1,11 +1,9 @@
 import {
   ALPHA_TEXTS,
   buildBoardReport,
-  checkAlphaImage,
   classifyBoard,
   DfuFlasher,
   isMigratedAlpha,
-  parseIntelHex,
   SessionError,
   type AlphaTextKey,
   type Classification,
@@ -13,13 +11,13 @@ import {
   type DfuProgress,
   type G4Readings,
   type G4Session,
-  type HexImage,
-  type ImageCheck,
   type UsbDeviceLike,
 } from "@bf-migrate/core";
 import { defineStore } from "pinia";
 import { computed, ref, shallowRef } from "vue";
+import { ALPHA_HD_FIRMWARE } from "../data/hosted-firmware";
 import { STM32_DFU_FILTER, waitForAuthorizedDfuDevice } from "../utils/dfu-device";
+import { loadHostedAlphaImage, readAlphaImage, type ChosenImage } from "../utils/firmware-image";
 import { saveFile } from "../utils/save-file";
 import { useConnectionStore } from "./connection";
 
@@ -50,25 +48,9 @@ export type AlphaStep =
   | "stopped"
   | "failed";
 
-export interface ChosenImage {
-  name: string;
-  image: HexImage;
-  check: ImageCheck;
-  sha256: string;
-}
+export type { ChosenImage };
 
 export type UsbStep = "idle" | "working" | "permission" | "done" | "failed";
-
-async function sha256Of(text: string): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-/** Parses and checks a chosen file. Only the simulated board accepts the demo's stand-in. */
-async function readImage(name: string, text: string, forHardware: boolean): Promise<ChosenImage> {
-  const image = parseIntelHex(text);
-  return { name, image, check: checkAlphaImage(image, { forHardware }), sha256: await sha256Of(text) };
-}
 
 const DEMO_ON_HARDWARE = "The demo's stand-in image is not firmware and would lock a real board up. Choose a Betaflight .hex file for this board.";
 
@@ -114,6 +96,8 @@ export const useAlphaStore = defineStore("alpha", () => {
   /** True between attaching under reset and the pilot releasing the button. */
   const awaitingRelease = ref(false);
   const usbStep = ref<UsbStep>("idle");
+  /** True while this site's release is downloading. */
+  const hostedLoading = ref(false);
   const usbMessage = ref("");
   const usbProgress = ref<DfuProgress>();
 
@@ -233,10 +217,35 @@ export const useAlphaStore = defineStore("alpha", () => {
 
   async function chooseImage(name: string, text: string): Promise<void> {
     try {
-      chosen.value = await readImage(name, text, !simulated.value);
+      chosen.value = await readAlphaImage(name, text, !simulated.value);
     } catch (reason) {
       chosen.value = undefined;
       error.value = describeError(reason);
+    }
+  }
+
+  /** Loads this site's release for the board, for the ST-Link flow or the USB rewrite. */
+  async function chooseHosted(target: "stlink" | "usb"): Promise<void> {
+    const firmware = ALPHA_HD_FIRMWARE;
+    hostedLoading.value = true;
+    if (target === "usb") {
+      usbStep.value = "idle";
+      usbMessage.value = "";
+    } else error.value = "";
+    try {
+      const loaded = await loadHostedAlphaImage(firmware, target === "usb" || !simulated.value);
+      if (target === "usb") usbChosen.value = loaded;
+      else chosen.value = loaded;
+    } catch (reason) {
+      if (target === "usb") {
+        usbChosen.value = undefined;
+        failUsb(reason);
+      } else {
+        chosen.value = undefined;
+        error.value = describeError(reason);
+      }
+    } finally {
+      hostedLoading.value = false;
     }
   }
 
@@ -244,7 +253,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     usbStep.value = "idle";
     usbMessage.value = "";
     try {
-      usbChosen.value = await readImage(name, text, true);
+      usbChosen.value = await readAlphaImage(name, text, true);
     } catch (reason) {
       usbChosen.value = undefined;
       usbStep.value = "failed";
@@ -278,6 +287,8 @@ export const useAlphaStore = defineStore("alpha", () => {
   async function unlock(typed: string): Promise<void> {
     const current = session.value;
     if (!current || typed.trim() !== ALPHA_TEXTS.unlock.typed || classification.value?.kind !== "locked") return;
+    // Every stage can be opened at any time, so the one-way step checks its own prerequisites.
+    if (!reportSaved.value || !chosen.value?.check.ok) return;
     confirm("unlock");
     const ok = await run("Removing read protection. The chip is erasing itself; this takes a few seconds", () => current.removeReadProtection({ clearSwBoot0: clearBootPin.value && !!classification.value?.bootPinHonoured }), "probe");
     if (!ok) return;
@@ -297,6 +308,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     const image = chosen.value;
     const found = classification.value;
     if (!current || !image?.check.ok || !found) return;
+    if (found.kind === "locked" || found.kind === "wrong-chip" || found.kind === "protected") return;
     if (image.check.demo && !simulated.value) return fail(new Error(DEMO_ON_HARDWARE), "probe");
     confirm(found.kind === "blank" ? "write" : "rewrite");
     const blocks = image.image.data;
@@ -411,6 +423,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     usbStep,
     usbMessage,
     usbProgress,
+    hostedLoading,
     confirm,
     goTo,
     reset,
@@ -420,6 +433,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     saveReport,
     chooseImage,
     chooseUsbImage,
+    chooseHosted,
     firmwareConfirmed,
     unlock,
     write,

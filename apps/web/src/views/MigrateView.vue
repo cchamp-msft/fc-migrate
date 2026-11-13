@@ -1,14 +1,32 @@
 <script setup lang="ts">
-import { BuildApi, parseConfig, planMigration, releaseLineOf, upgradeTargets, type Domain, type FirmwareRelease, type FirmwareSchema, type MigrationPlan, type Outcome, type PlanItem } from "@bf-migrate/core";
-import { CircleAlert, CircleCheck, Download, X } from "lucide-vue-next";
+import {
+  BuildApi,
+  isMigratedAlpha,
+  parseConfig,
+  planMigration,
+  releaseLineOf,
+  upgradeTargets,
+  type BuildOptionCatalog,
+  type BuildOptionChoice,
+  type Domain,
+  type FirmwareRelease,
+  type FirmwareSchema,
+  type MigrationPlan,
+  type Outcome,
+  type PlanItem,
+} from "@bf-migrate/core";
+import { CircleAlert, CircleCheck, Cpu, Download, PackageCheck, Upload, X } from "lucide-vue-next";
 import { computed, ref, shallowRef, watch } from "vue";
 import AiSuggestions from "../components/AiSuggestions.vue";
+import AlphaImageFacts from "../components/AlphaImageFacts.vue";
 import NotConnected from "../components/NotConnected.vue";
 import UpgradePanel from "../components/UpgradePanel.vue";
+import { ALPHA_HD_FIRMWARE } from "../data/hosted-firmware";
 import { loadSchema } from "../data/schemas";
 import { useConnectionStore } from "../stores/connection";
 import { useStandardsStore } from "../stores/standards";
-import { useUpgradeStore } from "../stores/upgrade";
+import { useUpgradeStore, type FirmwareSource } from "../stores/upgrade";
+import { loadHostedAlphaImage, readAlphaImage, type ChosenImage } from "../utils/firmware-image";
 import { saveFile } from "../utils/save-file";
 
 const connection = useConnectionStore();
@@ -72,6 +90,7 @@ const SUMMARY: Outcome[] = ["carried", "renamed", "converted", "derived", "dropp
 const summary = computed<Outcome[]>(() => (plan.value?.counts.suggested ? [...SUMMARY, "suggested"] : SUMMARY));
 
 const sourceLine = computed(() => (connection.identity ? releaseLineOf(connection.identity.firmwareVersion) : undefined));
+const currentVersion = computed(() => connection.identity?.firmwareVersion);
 
 const targets = computed(() => {
   const identity = connection.identity;
@@ -79,12 +98,70 @@ const targets = computed(() => {
   return upgradeTargets(identity.firmwareVersion, releases.value, showUnstable.value);
 });
 
+/** Only the release the board runs is on offer: migrating to it rebuilds the board. */
+const onlyRebuild = computed(() => targets.value.length > 0 && targets.value.every((release) => release.release === currentVersion.value));
+
+/**
+ * A G4 Alpha migrated to Betaflight. Betaflight's cloud build does not carry it yet, so
+ * its firmware is this site's own release, or the pilot's file.
+ */
+const alphaFirmware = computed(() => (connection.identity && isMigratedAlpha(connection.identity) ? ALPHA_HD_FIRMWARE : undefined));
+const alphaImage = shallowRef<ChosenImage>();
+const alphaError = ref("");
+const alphaLoading = ref(false);
+const fileInput = ref<HTMLInputElement>();
+
+async function useHostedBuild(): Promise<void> {
+  const firmware = alphaFirmware.value;
+  if (!firmware) return;
+  alphaLoading.value = true;
+  alphaError.value = "";
+  try {
+    alphaImage.value = await loadHostedAlphaImage(firmware, true);
+  } catch (error) {
+    alphaImage.value = undefined;
+    alphaError.value = error instanceof Error ? error.message : String(error);
+  } finally {
+    alphaLoading.value = false;
+  }
+}
+
+async function pickFile(event: Event): Promise<void> {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (fileInput.value) fileInput.value.value = "";
+  if (!file) return;
+  alphaError.value = "";
+  try {
+    alphaImage.value = await readAlphaImage(file.name, await file.text(), true);
+  } catch (error) {
+    alphaImage.value = undefined;
+    alphaError.value = error instanceof Error ? error.message : String(error);
+  }
+}
+
+/** The pilot's own file may be another Betaflight version than the one the settings are planned for. */
+const alphaVersionUnnamed = computed(() => {
+  const chosen = alphaImage.value;
+  if (!chosen || chosen.hosted || !targetVersion.value) return false;
+  const needle = targetVersion.value;
+  return !chosen.image.data.some((block) => new TextDecoder("latin1").decode(block.bytes).includes(needle));
+});
+
 watch(
   () => connection.identity?.board.boardName,
   async (board) => {
     releases.value = [];
     releasesError.value = "";
+    alphaImage.value = undefined;
+    alphaError.value = "";
     if (!board) return;
+    const alpha = alphaFirmware.value;
+    if (alpha) {
+      // The cloud build does not know this board, so the release list is this site's own.
+      releases.value = [{ release: alpha.betaflight, label: `fc-migrate ${alpha.release}`, type: "Stable" }];
+      await useHostedBuild();
+      return;
+    }
     try {
       releases.value = await new BuildApi().listReleases(board);
     } catch (error) {
@@ -93,6 +170,75 @@ watch(
   },
   { immediate: true },
 );
+
+const OPTION_GROUPS = [
+  { key: "radioProtocols", label: "Radio protocols" },
+  { key: "telemetryProtocols", label: "Telemetry" },
+  { key: "motorProtocols", label: "Motor protocols" },
+  { key: "generalOptions", label: "Other options" },
+] as const;
+
+/** The cloud build's options for the target release, and the ones chosen for this build. */
+const catalog = shallowRef<BuildOptionCatalog>();
+const catalogError = ref("");
+const chosenOptions = ref(new Set<string>());
+
+function choicesOf(list: BuildOptionCatalog): BuildOptionChoice[] {
+  return OPTION_GROUPS.flatMap((group) => list[group.key]).filter((choice) => choice.value);
+}
+
+/** What the board was built with, as far as it reports. */
+const boardDefines = computed(() => connection.identity?.buildOptions.flatMap((entry) => (entry.option ? [entry.option.define] : [])) ?? []);
+/** Options the board has that the target release does not offer. */
+const notOffered = computed(() => {
+  const list = catalog.value;
+  if (!list) return [];
+  const offered = new Set(choicesOf(list).map((choice) => choice.value));
+  return boardDefines.value.filter((define) => !offered.has(define));
+});
+
+watch(
+  [targetVersion, alphaFirmware],
+  async ([version, alpha]) => {
+    catalog.value = undefined;
+    catalogError.value = "";
+    if (!version || alpha) return;
+    try {
+      const loaded = await new BuildApi().getOptions(version);
+      if (targetVersion.value !== version) return;
+      catalog.value = loaded;
+      const choices = choicesOf(loaded);
+      const offered = new Set(choices.map((choice) => choice.value));
+      // Start from what the board has now; a board that cannot say starts from the defaults.
+      const start = connection.identity?.buildOptionsKnown ? boardDefines.value.filter((define) => offered.has(define)) : choices.filter((choice) => choice.default).map((choice) => choice.value);
+      chosenOptions.value = new Set(start);
+    } catch (error) {
+      catalogError.value = error instanceof Error ? error.message : String(error);
+    }
+  },
+  { immediate: true },
+);
+
+function toggleOption(value: string): void {
+  const next = new Set(chosenOptions.value);
+  if (next.has(value)) next.delete(value);
+  else next.add(value);
+  chosenOptions.value = next;
+}
+
+/** Where the upgrade's firmware comes from: this site's build or the pilot's file for an Alpha, otherwise the cloud build. */
+const firmwareSource = computed<FirmwareSource | undefined>(() => {
+  if (alphaFirmware.value) {
+    const chosen = alphaImage.value;
+    return chosen?.check.ok && !chosen.check.demo ? { kind: "image", chosen } : undefined;
+  }
+  return catalog.value ? { kind: "cloud", options: [...chosenOptions.value] } : undefined;
+});
+
+function releaseLabel(release: FirmwareRelease): string {
+  const same = release.release === currentVersion.value ? " (this version: rebuild)" : "";
+  return `${release.release}${same}${release.type === "Stable" ? "" : " (unstable)"}`;
+}
 
 watch(
   targets,
@@ -175,7 +321,7 @@ function downloadScript(): void {
     <header class="page-header">
       <div>
         <h1>Migrate</h1>
-        <p>Review how this board's configuration moves to a newer firmware, then upgrade when you are ready.</p>
+        <p>Review how this board's configuration moves to a newer firmware, or to a fresh build of the one it runs, then upgrade when you are ready.</p>
       </div>
       <button v-if="plan && !upgradeActive" class="btn" @click="downloadScript()"><Download :size="15" /> Save script</button>
     </header>
@@ -204,17 +350,66 @@ function downloadScript(): void {
         <label class="target-field">
           <span class="muted">To</span>
           <select v-model="targetVersion" class="input" :disabled="targets.length === 0">
-            <option v-for="release in targets" :key="release.release" :value="release.release">{{ release.release }}{{ release.type === "Stable" ? "" : " (unstable)" }}</option>
+            <option v-for="release in targets" :key="release.release" :value="release.release">{{ releaseLabel(release) }}</option>
           </select>
         </label>
-        <label class="unstable"><input v-model="showUnstable" type="checkbox" /> Include unstable releases</label>
+        <label v-if="!alphaFirmware" class="unstable"><input v-model="showUnstable" type="checkbox" /> Include unstable releases</label>
         <span v-if="plan" class="muted steps">{{ plan.steps.length ? plan.steps.join(", then ") : "Same release line, no conversions" }}</span>
       </section>
 
-      <div v-if="sourceLine && releases.length && targets.length === 0" class="notice">
+      <div v-if="sourceLine && onlyRebuild && !alphaFirmware" class="notice">
         <CircleCheck :size="18" />
-        <span>This board is already on the newest {{ showUnstable ? "" : "stable " }}release.</span>
+        <span>This board is already on the newest {{ showUnstable ? "" : "stable " }}release. Migrating to it again rebuilds the board, for example with other build options, and sends your settings back.</span>
       </div>
+      <div v-else-if="plan && targetVersion === currentVersion && !alphaFirmware" class="notice">
+        <CircleCheck :size="18" />
+        <span>Same version: the board is rebuilt with the build options below, and your settings are sent back.</span>
+      </div>
+
+      <section v-if="sourceLine && alphaFirmware" class="card alpha">
+        <h2><Cpu :size="18" /> T-Motor Pacer G4 Alpha HD, migrated to Betaflight</h2>
+        <p class="muted">
+          Betaflight's cloud build does not carry this board yet, so its firmware is fc-migrate's own build:
+          <a :href="alphaFirmware.releaseUrl" target="_blank" rel="noopener">{{ alphaFirmware.release }}</a>, Betaflight {{ alphaFirmware.betaflight }}
+          (<a :href="alphaFirmware.sourceUrl" target="_blank" rel="noopener">source</a>), served from this site and checked against its published SHA-256.
+          You can load your own .hex instead. Its build options are fixed: {{ alphaFirmware.options.join(", ") }}.
+        </p>
+        <AlphaImageFacts v-if="alphaImage" :image="alphaImage" />
+        <div class="actions">
+          <button class="btn" :disabled="alphaLoading || !!alphaImage?.hosted" @click="useHostedBuild()"><PackageCheck :size="15" /> Use fc-migrate's build</button>
+          <button class="btn" :disabled="alphaLoading" @click="fileInput?.click()"><Upload :size="15" /> Choose a .hex file</button>
+        </div>
+        <div v-if="alphaError" class="notice notice-danger"><CircleAlert :size="18" /><span>{{ alphaError }}</span></div>
+        <div v-if="alphaVersionUnnamed" class="notice notice-warn">
+          <CircleAlert :size="18" />
+          <span>This file does not name Betaflight {{ targetVersion }}, which your settings are planned for. Use a {{ targetVersion }} build, or settings may be rejected.</span>
+        </div>
+        <input ref="fileInput" type="file" accept=".hex" hidden @change="pickFile" />
+      </section>
+
+      <details v-if="sourceLine && !alphaFirmware && (catalog || catalogError)" class="card group">
+        <summary>
+          <h2>Build options</h2>
+          <span class="muted">{{ chosenOptions.size }} chosen</span>
+        </summary>
+        <div v-if="catalogError" class="notice notice-danger"><CircleAlert :size="18" /><span>Could not load the build options for {{ targetVersion }}: {{ catalogError }}</span></div>
+        <template v-if="catalog">
+          <p class="muted lead">Ticked from what this board has now. Change them to build {{ targetVersion }} with other options.</p>
+          <div v-for="group in OPTION_GROUPS" :key="group.key" class="option-group">
+            <h3>{{ group.label }}</h3>
+            <div class="options">
+              <label v-for="choice in catalog[group.key].filter((entry) => entry.value)" :key="choice.value" class="option">
+                <input type="checkbox" :checked="chosenOptions.has(choice.value)" @change="toggleOption(choice.value)" />
+                {{ choice.name }}
+              </label>
+            </div>
+          </div>
+          <div v-if="notOffered.length" class="notice notice-warn">
+            <CircleAlert :size="18" />
+            <span>This board has options {{ targetVersion }} does not offer, so they are left out: {{ notOffered.join(", ") }}</span>
+          </div>
+        </template>
+      </details>
 
       <div v-if="releasesError" class="notice notice-danger">
         <CircleAlert :size="18" />
@@ -315,7 +510,7 @@ function downloadScript(): void {
           </ul>
         </details>
 
-        <UpgradePanel :plan="plan" />
+        <UpgradePanel :plan="plan" :source="firmwareSource" />
 
         <details class="card group">
           <summary>
@@ -330,6 +525,41 @@ function downloadScript(): void {
 </template>
 
 <style scoped>
+.alpha h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.alpha .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.6rem 0;
+}
+
+.alpha .notice + .notice,
+.alpha .actions + .notice {
+  margin-top: 0.5rem;
+}
+
+.option-group h3 {
+  margin: 0.8rem 0 0.35rem;
+  font-size: 0.9rem;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.25rem 1rem;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 .target {
   display: flex;
   flex-wrap: wrap;
