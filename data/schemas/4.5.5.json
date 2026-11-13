@@ -1,0 +1,5357 @@
+{
+ "firmwareVersion": "4.5.5",
+ "source": "live-board",
+ "capturedFrom": "RRIOT_F722",
+ "settings": {
+  "gyro_hardware_lpf": {
+   "name": "gyro_hardware_lpf",
+   "scope": "master",
+   "defaultValue": "NORMAL",
+   "kind": "enum",
+   "values": [
+    "NORMAL",
+    "OPTION_1",
+    "OPTION_2",
+    "EXPERIMENTAL"
+   ]
+  },
+  "gyro_lpf1_type": {
+   "name": "gyro_lpf1_type",
+   "scope": "master",
+   "defaultValue": "PT1",
+   "kind": "enum",
+   "values": [
+    "PT1",
+    "BIQUAD",
+    "PT2",
+    "PT3"
+   ]
+  },
+  "gyro_lpf1_static_hz": {
+   "name": "gyro_lpf1_static_hz",
+   "scope": "master",
+   "defaultValue": "250",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "gyro_lpf2_type": {
+   "name": "gyro_lpf2_type",
+   "scope": "master",
+   "defaultValue": "PT1",
+   "kind": "enum",
+   "values": [
+    "PT1",
+    "BIQUAD",
+    "PT2",
+    "PT3"
+   ]
+  },
+  "gyro_lpf2_static_hz": {
+   "name": "gyro_lpf2_static_hz",
+   "scope": "master",
+   "defaultValue": "500",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "gyro_notch1_hz": {
+   "name": "gyro_notch1_hz",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "gyro_notch1_cutoff": {
+   "name": "gyro_notch1_cutoff",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "gyro_notch2_hz": {
+   "name": "gyro_notch2_hz",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "gyro_notch2_cutoff": {
+   "name": "gyro_notch2_cutoff",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "gyro_calib_duration": {
+   "name": "gyro_calib_duration",
+   "scope": "master",
+   "defaultValue": "125",
+   "kind": "number",
+   "min": 50,
+   "max": 3000
+  },
+  "gyro_calib_noise_limit": {
+   "name": "gyro_calib_noise_limit",
+   "scope": "master",
+   "defaultValue": "48",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "gyro_offset_yaw": {
+   "name": "gyro_offset_yaw",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -1000,
+   "max": 1000
+  },
+  "gyro_overflow_detect": {
+   "name": "gyro_overflow_detect",
+   "scope": "master",
+   "defaultValue": "ALL",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "YAW",
+    "ALL"
+   ]
+  },
+  "yaw_spin_recovery": {
+   "name": "yaw_spin_recovery",
+   "scope": "master",
+   "defaultValue": "AUTO",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON",
+    "AUTO"
+   ]
+  },
+  "yaw_spin_threshold": {
+   "name": "yaw_spin_threshold",
+   "scope": "master",
+   "defaultValue": "1950",
+   "kind": "number",
+   "min": 500,
+   "max": 1950
+  },
+  "gyro_to_use": {
+   "name": "gyro_to_use",
+   "scope": "master",
+   "defaultValue": "FIRST",
+   "kind": "enum",
+   "values": [
+    "FIRST",
+    "SECOND",
+    "BOTH"
+   ]
+  },
+  "dyn_notch_count": {
+   "name": "dyn_notch_count",
+   "scope": "master",
+   "defaultValue": "3",
+   "kind": "number",
+   "min": 0,
+   "max": 5
+  },
+  "dyn_notch_q": {
+   "name": "dyn_notch_q",
+   "scope": "master",
+   "defaultValue": "300",
+   "kind": "number",
+   "min": 1,
+   "max": 1000
+  },
+  "dyn_notch_min_hz": {
+   "name": "dyn_notch_min_hz",
+   "scope": "master",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 20,
+   "max": 250
+  },
+  "dyn_notch_max_hz": {
+   "name": "dyn_notch_max_hz",
+   "scope": "master",
+   "defaultValue": "600",
+   "kind": "number",
+   "min": 200,
+   "max": 1000
+  },
+  "gyro_lpf1_dyn_min_hz": {
+   "name": "gyro_lpf1_dyn_min_hz",
+   "scope": "master",
+   "defaultValue": "250",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "gyro_lpf1_dyn_max_hz": {
+   "name": "gyro_lpf1_dyn_max_hz",
+   "scope": "master",
+   "defaultValue": "500",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "gyro_lpf1_dyn_expo": {
+   "name": "gyro_lpf1_dyn_expo",
+   "scope": "master",
+   "defaultValue": "5",
+   "kind": "number",
+   "min": 0,
+   "max": 10
+  },
+  "gyro_filter_debug_axis": {
+   "name": "gyro_filter_debug_axis",
+   "scope": "master",
+   "defaultValue": "ROLL",
+   "kind": "enum",
+   "values": [
+    "ROLL",
+    "PITCH",
+    "YAW"
+   ]
+  },
+  "acc_hardware": {
+   "name": "acc_hardware",
+   "scope": "master",
+   "defaultValue": "AUTO",
+   "kind": "enum",
+   "values": [
+    "AUTO",
+    "NONE",
+    "ADXL345",
+    "MPU6050",
+    "MMA8452",
+    "BMA280",
+    "LSM303DLHC",
+    "MPU6000",
+    "MPU6500",
+    "MPU9250",
+    "ICM20601",
+    "ICM20602",
+    "ICM20608G",
+    "ICM20649",
+    "ICM20689",
+    "ICM42605",
+    "ICM42688P",
+    "BMI160",
+    "BMI270",
+    "LSM6DSO",
+    "LSM6DSV16X",
+    "VIRTUAL"
+   ]
+  },
+  "acc_lpf_hz": {
+   "name": "acc_lpf_hz",
+   "scope": "master",
+   "defaultValue": "25",
+   "kind": "number",
+   "min": 0,
+   "max": 500
+  },
+  "acc_trim_pitch": {
+   "name": "acc_trim_pitch",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -300,
+   "max": 300
+  },
+  "acc_trim_roll": {
+   "name": "acc_trim_roll",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -300,
+   "max": 300
+  },
+  "acc_calibration": {
+   "name": "acc_calibration",
+   "scope": "master",
+   "defaultValue": "0,0,0,0",
+   "kind": "array",
+   "length": 4
+  },
+  "baro_bustype": {
+   "name": "baro_bustype",
+   "scope": "master",
+   "defaultValue": "I2C",
+   "kind": "enum",
+   "values": [
+    "NONE",
+    "I2C",
+    "SPI",
+    "SLAVE"
+   ]
+  },
+  "baro_spi_device": {
+   "name": "baro_spi_device",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 5
+  },
+  "baro_i2c_device": {
+   "name": "baro_i2c_device",
+   "scope": "master",
+   "defaultValue": "1",
+   "kind": "number",
+   "min": 0,
+   "max": 5
+  },
+  "baro_i2c_address": {
+   "name": "baro_i2c_address",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 119
+  },
+  "baro_hardware": {
+   "name": "baro_hardware",
+   "scope": "master",
+   "defaultValue": "AUTO",
+   "kind": "enum",
+   "values": [
+    "AUTO",
+    "NONE",
+    "BMP085",
+    "MS5611",
+    "BMP280",
+    "LPS",
+    "QMP6988",
+    "BMP388",
+    "DPS310",
+    "2SMPB_02B",
+    "LPS22DF",
+    "VIRTUAL"
+   ]
+  },
+  "mid_rc": {
+   "name": "mid_rc",
+   "scope": "master",
+   "defaultValue": "1500",
+   "kind": "number",
+   "min": 1200,
+   "max": 1700
+  },
+  "min_check": {
+   "name": "min_check",
+   "scope": "master",
+   "defaultValue": "1050",
+   "kind": "number",
+   "min": 750,
+   "max": 2250
+  },
+  "max_check": {
+   "name": "max_check",
+   "scope": "master",
+   "defaultValue": "1900",
+   "kind": "number",
+   "min": 750,
+   "max": 2250
+  },
+  "rssi_channel": {
+   "name": "rssi_channel",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 18
+  },
+  "rssi_src_frame_errors": {
+   "name": "rssi_src_frame_errors",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "rssi_scale": {
+   "name": "rssi_scale",
+   "scope": "master",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 1,
+   "max": 255
+  },
+  "rssi_offset": {
+   "name": "rssi_offset",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -100,
+   "max": 100
+  },
+  "rssi_invert": {
+   "name": "rssi_invert",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "rssi_src_frame_lpf_period": {
+   "name": "rssi_src_frame_lpf_period",
+   "scope": "master",
+   "defaultValue": "30",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "rssi_smoothing": {
+   "name": "rssi_smoothing",
+   "scope": "master",
+   "defaultValue": "125",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "rc_smoothing": {
+   "name": "rc_smoothing",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "rc_smoothing_auto_factor": {
+   "name": "rc_smoothing_auto_factor",
+   "scope": "master",
+   "defaultValue": "30",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "rc_smoothing_auto_factor_throttle": {
+   "name": "rc_smoothing_auto_factor_throttle",
+   "scope": "master",
+   "defaultValue": "30",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "rc_smoothing_setpoint_cutoff": {
+   "name": "rc_smoothing_setpoint_cutoff",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "rc_smoothing_feedforward_cutoff": {
+   "name": "rc_smoothing_feedforward_cutoff",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "rc_smoothing_throttle_cutoff": {
+   "name": "rc_smoothing_throttle_cutoff",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "rc_smoothing_debug_axis": {
+   "name": "rc_smoothing_debug_axis",
+   "scope": "master",
+   "defaultValue": "ROLL",
+   "kind": "enum",
+   "values": [
+    "ROLL",
+    "PITCH",
+    "YAW",
+    "THROTTLE"
+   ]
+  },
+  "fpv_mix_degrees": {
+   "name": "fpv_mix_degrees",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 90
+  },
+  "max_aux_channels": {
+   "name": "max_aux_channels",
+   "scope": "master",
+   "defaultValue": "14",
+   "kind": "number",
+   "min": 0,
+   "max": 14
+  },
+  "serialrx_provider": {
+   "name": "serialrx_provider",
+   "scope": "master",
+   "defaultValue": "CRSF",
+   "kind": "enum",
+   "values": [
+    "NONE",
+    "SPEK2048",
+    "SBUS",
+    "SUMD",
+    "SUMH",
+    "XB-B",
+    "XB-B-RJ01",
+    "IBUS",
+    "JETIEXBUS",
+    "CRSF",
+    "SRXL",
+    "CUSTOM",
+    "FPORT",
+    "SRXL2",
+    "GHST",
+    "SPEK1024"
+   ]
+  },
+  "serialrx_inverted": {
+   "name": "serialrx_inverted",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "spektrum_sat_bind": {
+   "name": "spektrum_sat_bind",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 10
+  },
+  "spektrum_sat_bind_autoreset": {
+   "name": "spektrum_sat_bind_autoreset",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "srxl2_unit_id": {
+   "name": "srxl2_unit_id",
+   "scope": "master",
+   "defaultValue": "1",
+   "kind": "number",
+   "min": 0,
+   "max": 15
+  },
+  "srxl2_baud_fast": {
+   "name": "srxl2_baud_fast",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "sbus_baud_fast": {
+   "name": "sbus_baud_fast",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "crsf_use_negotiated_baud": {
+   "name": "crsf_use_negotiated_baud",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "airmode_start_throttle_percent": {
+   "name": "airmode_start_throttle_percent",
+   "scope": "master",
+   "defaultValue": "25",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "rx_min_usec": {
+   "name": "rx_min_usec",
+   "scope": "master",
+   "defaultValue": "885",
+   "kind": "number",
+   "min": 750,
+   "max": 2250
+  },
+  "rx_max_usec": {
+   "name": "rx_max_usec",
+   "scope": "master",
+   "defaultValue": "2115",
+   "kind": "number",
+   "min": 750,
+   "max": 2250
+  },
+  "serialrx_halfduplex": {
+   "name": "serialrx_halfduplex",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "msp_override_channels_mask": {
+   "name": "msp_override_channels_mask",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 262143
+  },
+  "msp_override_failsafe": {
+   "name": "msp_override_failsafe",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "adc_device": {
+   "name": "adc_device",
+   "scope": "master",
+   "defaultValue": "1",
+   "kind": "number",
+   "min": 0,
+   "max": 3
+  },
+  "adc_vrefint_calibration": {
+   "name": "adc_vrefint_calibration",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 2000
+  },
+  "adc_tempsensor_calibration30": {
+   "name": "adc_tempsensor_calibration30",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 2000
+  },
+  "adc_tempsensor_calibration110": {
+   "name": "adc_tempsensor_calibration110",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 2000
+  },
+  "blackbox_sample_rate": {
+   "name": "blackbox_sample_rate",
+   "scope": "master",
+   "defaultValue": "1/4",
+   "kind": "enum",
+   "values": [
+    "1/1",
+    "1/2",
+    "1/4",
+    "1/8",
+    "1/16"
+   ]
+  },
+  "blackbox_device": {
+   "name": "blackbox_device",
+   "scope": "master",
+   "defaultValue": "NONE",
+   "kind": "enum",
+   "values": [
+    "NONE",
+    "SPIFLASH",
+    "SDCARD",
+    "SERIAL"
+   ]
+  },
+  "blackbox_disable_pids": {
+   "name": "blackbox_disable_pids",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "blackbox_disable_rc": {
+   "name": "blackbox_disable_rc",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "blackbox_disable_setpoint": {
+   "name": "blackbox_disable_setpoint",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "blackbox_disable_bat": {
+   "name": "blackbox_disable_bat",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "blackbox_disable_alt": {
+   "name": "blackbox_disable_alt",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "blackbox_disable_rssi": {
+   "name": "blackbox_disable_rssi",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "blackbox_disable_gyro": {
+   "name": "blackbox_disable_gyro",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "blackbox_disable_gyrounfilt": {
+   "name": "blackbox_disable_gyrounfilt",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "blackbox_disable_acc": {
+   "name": "blackbox_disable_acc",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "blackbox_disable_debug": {
+   "name": "blackbox_disable_debug",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "blackbox_disable_motors": {
+   "name": "blackbox_disable_motors",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "blackbox_disable_rpm": {
+   "name": "blackbox_disable_rpm",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "blackbox_mode": {
+   "name": "blackbox_mode",
+   "scope": "master",
+   "defaultValue": "NORMAL",
+   "kind": "enum",
+   "values": [
+    "NORMAL",
+    "MOTOR_TEST",
+    "ALWAYS"
+   ]
+  },
+  "blackbox_high_resolution": {
+   "name": "blackbox_high_resolution",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "min_throttle": {
+   "name": "min_throttle",
+   "scope": "master",
+   "defaultValue": "1070",
+   "kind": "number",
+   "min": 750,
+   "max": 2250
+  },
+  "max_throttle": {
+   "name": "max_throttle",
+   "scope": "master",
+   "defaultValue": "2000",
+   "kind": "number",
+   "min": 750,
+   "max": 2250
+  },
+  "min_command": {
+   "name": "min_command",
+   "scope": "master",
+   "defaultValue": "1000",
+   "kind": "number",
+   "min": 750,
+   "max": 2250
+  },
+  "motor_kv": {
+   "name": "motor_kv",
+   "scope": "master",
+   "defaultValue": "1960",
+   "kind": "number",
+   "min": 1,
+   "max": 40000
+  },
+  "dshot_idle_value": {
+   "name": "dshot_idle_value",
+   "scope": "master",
+   "defaultValue": "550",
+   "kind": "number",
+   "min": 0,
+   "max": 2000
+  },
+  "dshot_burst": {
+   "name": "dshot_burst",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON",
+    "AUTO"
+   ]
+  },
+  "dshot_bidir": {
+   "name": "dshot_bidir",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "dshot_edt": {
+   "name": "dshot_edt",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "dshot_bitbang": {
+   "name": "dshot_bitbang",
+   "scope": "master",
+   "defaultValue": "AUTO",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON",
+    "AUTO"
+   ]
+  },
+  "dshot_bitbang_timer": {
+   "name": "dshot_bitbang_timer",
+   "scope": "master",
+   "defaultValue": "AUTO",
+   "kind": "enum",
+   "values": [
+    "AUTO",
+    "TIM1",
+    "TIM8"
+   ]
+  },
+  "use_unsynced_pwm": {
+   "name": "use_unsynced_pwm",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "motor_pwm_protocol": {
+   "name": "motor_pwm_protocol",
+   "scope": "master",
+   "defaultValue": "DSHOT600",
+   "kind": "enum",
+   "values": [
+    "PWM",
+    "ONESHOT125",
+    "ONESHOT42",
+    "MULTISHOT",
+    "BRUSHED",
+    "DSHOT150",
+    "DSHOT300",
+    "DSHOT600",
+    "PROSHOT1000",
+    "DISABLED"
+   ]
+  },
+  "motor_pwm_rate": {
+   "name": "motor_pwm_rate",
+   "scope": "master",
+   "defaultValue": "480",
+   "kind": "number",
+   "min": 200,
+   "max": 32000
+  },
+  "motor_pwm_inversion": {
+   "name": "motor_pwm_inversion",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "motor_poles": {
+   "name": "motor_poles",
+   "scope": "master",
+   "defaultValue": "14",
+   "kind": "number",
+   "min": 4,
+   "max": 255
+  },
+  "motor_output_reordering": {
+   "name": "motor_output_reordering",
+   "scope": "master",
+   "defaultValue": "0,1,2,3,4,5,6,7",
+   "kind": "array",
+   "length": 8
+  },
+  "thr_corr_value": {
+   "name": "thr_corr_value",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 150
+  },
+  "thr_corr_angle": {
+   "name": "thr_corr_angle",
+   "scope": "master",
+   "defaultValue": "800",
+   "kind": "number",
+   "min": 1,
+   "max": 900
+  },
+  "failsafe_delay": {
+   "name": "failsafe_delay",
+   "scope": "master",
+   "defaultValue": "15",
+   "kind": "number",
+   "min": 1,
+   "max": 200
+  },
+  "failsafe_off_delay": {
+   "name": "failsafe_off_delay",
+   "scope": "master",
+   "defaultValue": "10",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "failsafe_throttle": {
+   "name": "failsafe_throttle",
+   "scope": "master",
+   "defaultValue": "1000",
+   "kind": "number",
+   "min": 750,
+   "max": 2250
+  },
+  "failsafe_switch_mode": {
+   "name": "failsafe_switch_mode",
+   "scope": "master",
+   "defaultValue": "STAGE1",
+   "kind": "enum",
+   "values": [
+    "STAGE1",
+    "KILL",
+    "STAGE2"
+   ]
+  },
+  "failsafe_throttle_low_delay": {
+   "name": "failsafe_throttle_low_delay",
+   "scope": "master",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 300
+  },
+  "failsafe_procedure": {
+   "name": "failsafe_procedure",
+   "scope": "master",
+   "defaultValue": "DROP",
+   "kind": "enum",
+   "values": [
+    "AUTO-LAND",
+    "DROP",
+    "GPS-RESCUE"
+   ]
+  },
+  "failsafe_recovery_delay": {
+   "name": "failsafe_recovery_delay",
+   "scope": "master",
+   "defaultValue": "1",
+   "kind": "number",
+   "min": 1,
+   "max": 200
+  },
+  "failsafe_stick_threshold": {
+   "name": "failsafe_stick_threshold",
+   "scope": "master",
+   "defaultValue": "30",
+   "kind": "number",
+   "min": 0,
+   "max": 50
+  },
+  "align_board_roll": {
+   "name": "align_board_roll",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -180,
+   "max": 360
+  },
+  "align_board_pitch": {
+   "name": "align_board_pitch",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -180,
+   "max": 360
+  },
+  "align_board_yaw": {
+   "name": "align_board_yaw",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -180,
+   "max": 360
+  },
+  "gimbal_mode": {
+   "name": "gimbal_mode",
+   "scope": "master",
+   "defaultValue": "NORMAL",
+   "kind": "enum",
+   "values": [
+    "NORMAL",
+    "MIXTILT"
+   ]
+  },
+  "bat_capacity": {
+   "name": "bat_capacity",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 20000
+  },
+  "vbat_max_cell_voltage": {
+   "name": "vbat_max_cell_voltage",
+   "scope": "master",
+   "defaultValue": "430",
+   "kind": "number",
+   "min": 100,
+   "max": 500
+  },
+  "vbat_full_cell_voltage": {
+   "name": "vbat_full_cell_voltage",
+   "scope": "master",
+   "defaultValue": "410",
+   "kind": "number",
+   "min": 100,
+   "max": 500
+  },
+  "vbat_min_cell_voltage": {
+   "name": "vbat_min_cell_voltage",
+   "scope": "master",
+   "defaultValue": "330",
+   "kind": "number",
+   "min": 100,
+   "max": 500
+  },
+  "vbat_warning_cell_voltage": {
+   "name": "vbat_warning_cell_voltage",
+   "scope": "master",
+   "defaultValue": "350",
+   "kind": "number",
+   "min": 100,
+   "max": 500
+  },
+  "vbat_hysteresis": {
+   "name": "vbat_hysteresis",
+   "scope": "master",
+   "defaultValue": "1",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "current_meter": {
+   "name": "current_meter",
+   "scope": "master",
+   "defaultValue": "ADC",
+   "kind": "enum",
+   "values": [
+    "NONE",
+    "ADC",
+    "VIRTUAL",
+    "ESC",
+    "MSP"
+   ]
+  },
+  "battery_meter": {
+   "name": "battery_meter",
+   "scope": "master",
+   "defaultValue": "ADC",
+   "kind": "enum",
+   "values": [
+    "NONE",
+    "ADC",
+    "ESC"
+   ]
+  },
+  "vbat_detect_cell_voltage": {
+   "name": "vbat_detect_cell_voltage",
+   "scope": "master",
+   "defaultValue": "300",
+   "kind": "number",
+   "min": 0,
+   "max": 2000
+  },
+  "use_vbat_alerts": {
+   "name": "use_vbat_alerts",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "use_cbat_alerts": {
+   "name": "use_cbat_alerts",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "cbat_alert_percent": {
+   "name": "cbat_alert_percent",
+   "scope": "master",
+   "defaultValue": "10",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "vbat_cutoff_percent": {
+   "name": "vbat_cutoff_percent",
+   "scope": "master",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "force_battery_cell_count": {
+   "name": "force_battery_cell_count",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 24
+  },
+  "vbat_display_lpf_period": {
+   "name": "vbat_display_lpf_period",
+   "scope": "master",
+   "defaultValue": "30",
+   "kind": "number",
+   "min": 1,
+   "max": 255
+  },
+  "vbat_sag_lpf_period": {
+   "name": "vbat_sag_lpf_period",
+   "scope": "master",
+   "defaultValue": "2",
+   "kind": "number",
+   "min": 1,
+   "max": 255
+  },
+  "ibat_lpf_period": {
+   "name": "ibat_lpf_period",
+   "scope": "master",
+   "defaultValue": "10",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "vbat_duration_for_warning": {
+   "name": "vbat_duration_for_warning",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 150
+  },
+  "vbat_duration_for_critical": {
+   "name": "vbat_duration_for_critical",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 150
+  },
+  "vbat_scale": {
+   "name": "vbat_scale",
+   "scope": "master",
+   "defaultValue": "110",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "vbat_divider": {
+   "name": "vbat_divider",
+   "scope": "master",
+   "defaultValue": "10",
+   "kind": "number",
+   "min": 1,
+   "max": 255
+  },
+  "vbat_multiplier": {
+   "name": "vbat_multiplier",
+   "scope": "master",
+   "defaultValue": "1",
+   "kind": "number",
+   "min": 1,
+   "max": 255
+  },
+  "ibata_scale": {
+   "name": "ibata_scale",
+   "scope": "master",
+   "defaultValue": "400",
+   "kind": "number",
+   "min": -16000,
+   "max": 16000
+  },
+  "ibata_offset": {
+   "name": "ibata_offset",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -32000,
+   "max": 32000
+  },
+  "ibatv_scale": {
+   "name": "ibatv_scale",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -16000,
+   "max": 16000
+  },
+  "ibatv_offset": {
+   "name": "ibatv_offset",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 16000
+  },
+  "beeper_inversion": {
+   "name": "beeper_inversion",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "beeper_od": {
+   "name": "beeper_od",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "beeper_frequency": {
+   "name": "beeper_frequency",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 16000
+  },
+  "beeper_dshot_beacon_tone": {
+   "name": "beeper_dshot_beacon_tone",
+   "scope": "master",
+   "defaultValue": "1",
+   "kind": "number",
+   "min": 1,
+   "max": 5
+  },
+  "yaw_motors_reversed": {
+   "name": "yaw_motors_reversed",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "mixer_type": {
+   "name": "mixer_type",
+   "scope": "master",
+   "defaultValue": "LEGACY",
+   "kind": "enum",
+   "values": [
+    "LEGACY",
+    "LINEAR",
+    "DYNAMIC",
+    "EZLANDING"
+   ]
+  },
+  "crashflip_motor_percent": {
+   "name": "crashflip_motor_percent",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "crashflip_expo": {
+   "name": "crashflip_expo",
+   "scope": "master",
+   "defaultValue": "35",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "rpm_limit": {
+   "name": "rpm_limit",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "rpm_limit_p": {
+   "name": "rpm_limit_p",
+   "scope": "master",
+   "defaultValue": "25",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "rpm_limit_i": {
+   "name": "rpm_limit_i",
+   "scope": "master",
+   "defaultValue": "10",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "rpm_limit_d": {
+   "name": "rpm_limit_d",
+   "scope": "master",
+   "defaultValue": "8",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "rpm_limit_value": {
+   "name": "rpm_limit_value",
+   "scope": "master",
+   "defaultValue": "18000",
+   "kind": "number",
+   "min": 1,
+   "max": 65535
+  },
+  "3d_deadband_low": {
+   "name": "3d_deadband_low",
+   "scope": "master",
+   "defaultValue": "1406",
+   "kind": "number",
+   "min": 750,
+   "max": 1500
+  },
+  "3d_deadband_high": {
+   "name": "3d_deadband_high",
+   "scope": "master",
+   "defaultValue": "1514",
+   "kind": "number",
+   "min": 1500,
+   "max": 2250
+  },
+  "3d_neutral": {
+   "name": "3d_neutral",
+   "scope": "master",
+   "defaultValue": "1460",
+   "kind": "number",
+   "min": 750,
+   "max": 2250
+  },
+  "3d_deadband_throttle": {
+   "name": "3d_deadband_throttle",
+   "scope": "master",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 1,
+   "max": 100
+  },
+  "3d_limit_low": {
+   "name": "3d_limit_low",
+   "scope": "master",
+   "defaultValue": "1000",
+   "kind": "number",
+   "min": 750,
+   "max": 1500
+  },
+  "3d_limit_high": {
+   "name": "3d_limit_high",
+   "scope": "master",
+   "defaultValue": "2000",
+   "kind": "number",
+   "min": 1500,
+   "max": 2250
+  },
+  "3d_switched_mode": {
+   "name": "3d_switched_mode",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "servo_center_pulse": {
+   "name": "servo_center_pulse",
+   "scope": "master",
+   "defaultValue": "1500",
+   "kind": "number",
+   "min": 750,
+   "max": 2250
+  },
+  "servo_pwm_rate": {
+   "name": "servo_pwm_rate",
+   "scope": "master",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 50,
+   "max": 498
+  },
+  "servo_lowpass_hz": {
+   "name": "servo_lowpass_hz",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 400
+  },
+  "tri_unarmed_servo": {
+   "name": "tri_unarmed_servo",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "channel_forwarding_start": {
+   "name": "channel_forwarding_start",
+   "scope": "master",
+   "defaultValue": "4",
+   "kind": "number",
+   "min": 4,
+   "max": 18
+  },
+  "rateprofile_name": {
+   "name": "rateprofile_name",
+   "scope": "rateprofile",
+   "defaultValue": "-",
+   "kind": "string",
+   "minLength": 1,
+   "maxLength": 8
+  },
+  "thr_mid": {
+   "name": "thr_mid",
+   "scope": "rateprofile",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "thr_expo": {
+   "name": "thr_expo",
+   "scope": "rateprofile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "rates_type": {
+   "name": "rates_type",
+   "scope": "rateprofile",
+   "defaultValue": "ACTUAL",
+   "kind": "enum",
+   "values": [
+    "BETAFLIGHT",
+    "RACEFLIGHT",
+    "KISS",
+    "ACTUAL",
+    "QUICK"
+   ]
+  },
+  "quickrates_rc_expo": {
+   "name": "quickrates_rc_expo",
+   "scope": "rateprofile",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "roll_rc_rate": {
+   "name": "roll_rc_rate",
+   "scope": "rateprofile",
+   "defaultValue": "7",
+   "kind": "number",
+   "min": 1,
+   "max": 255
+  },
+  "pitch_rc_rate": {
+   "name": "pitch_rc_rate",
+   "scope": "rateprofile",
+   "defaultValue": "7",
+   "kind": "number",
+   "min": 1,
+   "max": 255
+  },
+  "yaw_rc_rate": {
+   "name": "yaw_rc_rate",
+   "scope": "rateprofile",
+   "defaultValue": "7",
+   "kind": "number",
+   "min": 1,
+   "max": 255
+  },
+  "roll_expo": {
+   "name": "roll_expo",
+   "scope": "rateprofile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "pitch_expo": {
+   "name": "pitch_expo",
+   "scope": "rateprofile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "yaw_expo": {
+   "name": "yaw_expo",
+   "scope": "rateprofile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "roll_srate": {
+   "name": "roll_srate",
+   "scope": "rateprofile",
+   "defaultValue": "67",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "pitch_srate": {
+   "name": "pitch_srate",
+   "scope": "rateprofile",
+   "defaultValue": "67",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "yaw_srate": {
+   "name": "yaw_srate",
+   "scope": "rateprofile",
+   "defaultValue": "67",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "throttle_limit_type": {
+   "name": "throttle_limit_type",
+   "scope": "rateprofile",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "SCALE",
+    "CLIP"
+   ]
+  },
+  "throttle_limit_percent": {
+   "name": "throttle_limit_percent",
+   "scope": "rateprofile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 25,
+   "max": 100
+  },
+  "roll_rate_limit": {
+   "name": "roll_rate_limit",
+   "scope": "rateprofile",
+   "defaultValue": "1998",
+   "kind": "number",
+   "min": 200,
+   "max": 1998
+  },
+  "pitch_rate_limit": {
+   "name": "pitch_rate_limit",
+   "scope": "rateprofile",
+   "defaultValue": "1998",
+   "kind": "number",
+   "min": 200,
+   "max": 1998
+  },
+  "yaw_rate_limit": {
+   "name": "yaw_rate_limit",
+   "scope": "rateprofile",
+   "defaultValue": "1998",
+   "kind": "number",
+   "min": 200,
+   "max": 1998
+  },
+  "reboot_character": {
+   "name": "reboot_character",
+   "scope": "master",
+   "defaultValue": "82",
+   "kind": "number",
+   "min": 48,
+   "max": 126
+  },
+  "serial_update_rate_hz": {
+   "name": "serial_update_rate_hz",
+   "scope": "master",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 100,
+   "max": 2000
+  },
+  "imu_dcm_kp": {
+   "name": "imu_dcm_kp",
+   "scope": "master",
+   "defaultValue": "2500",
+   "kind": "number",
+   "min": 0,
+   "max": 32000
+  },
+  "imu_dcm_ki": {
+   "name": "imu_dcm_ki",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 32000
+  },
+  "small_angle": {
+   "name": "small_angle",
+   "scope": "master",
+   "defaultValue": "180",
+   "kind": "number",
+   "min": 0,
+   "max": 180
+  },
+  "imu_process_denom": {
+   "name": "imu_process_denom",
+   "scope": "master",
+   "defaultValue": "2",
+   "kind": "number",
+   "min": 1,
+   "max": 4
+  },
+  "auto_disarm_delay": {
+   "name": "auto_disarm_delay",
+   "scope": "master",
+   "defaultValue": "5",
+   "kind": "number",
+   "min": 0,
+   "max": 60
+  },
+  "gyro_cal_on_first_arm": {
+   "name": "gyro_cal_on_first_arm",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "deadband": {
+   "name": "deadband",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 32
+  },
+  "yaw_deadband": {
+   "name": "yaw_deadband",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "yaw_control_reversed": {
+   "name": "yaw_control_reversed",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "pid_process_denom": {
+   "name": "pid_process_denom",
+   "scope": "master",
+   "defaultValue": "1",
+   "kind": "number",
+   "min": 1,
+   "max": 16
+  },
+  "runaway_takeoff_prevention": {
+   "name": "runaway_takeoff_prevention",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "runaway_takeoff_deactivate_delay": {
+   "name": "runaway_takeoff_deactivate_delay",
+   "scope": "master",
+   "defaultValue": "500",
+   "kind": "number",
+   "min": 100,
+   "max": 1000
+  },
+  "runaway_takeoff_deactivate_throttle_percent": {
+   "name": "runaway_takeoff_deactivate_throttle_percent",
+   "scope": "master",
+   "defaultValue": "20",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "profile_name": {
+   "name": "profile_name",
+   "scope": "profile",
+   "defaultValue": "-",
+   "kind": "string",
+   "minLength": 1,
+   "maxLength": 8
+  },
+  "dterm_lpf1_dyn_min_hz": {
+   "name": "dterm_lpf1_dyn_min_hz",
+   "scope": "profile",
+   "defaultValue": "75",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "dterm_lpf1_dyn_max_hz": {
+   "name": "dterm_lpf1_dyn_max_hz",
+   "scope": "profile",
+   "defaultValue": "150",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "dterm_lpf1_dyn_expo": {
+   "name": "dterm_lpf1_dyn_expo",
+   "scope": "profile",
+   "defaultValue": "5",
+   "kind": "number",
+   "min": 0,
+   "max": 10
+  },
+  "dterm_lpf1_type": {
+   "name": "dterm_lpf1_type",
+   "scope": "profile",
+   "defaultValue": "PT1",
+   "kind": "enum",
+   "values": [
+    "PT1",
+    "BIQUAD",
+    "PT2",
+    "PT3"
+   ]
+  },
+  "dterm_lpf1_static_hz": {
+   "name": "dterm_lpf1_static_hz",
+   "scope": "profile",
+   "defaultValue": "75",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "dterm_lpf2_type": {
+   "name": "dterm_lpf2_type",
+   "scope": "profile",
+   "defaultValue": "PT1",
+   "kind": "enum",
+   "values": [
+    "PT1",
+    "BIQUAD",
+    "PT2",
+    "PT3"
+   ]
+  },
+  "dterm_lpf2_static_hz": {
+   "name": "dterm_lpf2_static_hz",
+   "scope": "profile",
+   "defaultValue": "150",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "dterm_notch_hz": {
+   "name": "dterm_notch_hz",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "dterm_notch_cutoff": {
+   "name": "dterm_notch_cutoff",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "vbat_sag_compensation": {
+   "name": "vbat_sag_compensation",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 150
+  },
+  "pid_at_min_throttle": {
+   "name": "pid_at_min_throttle",
+   "scope": "profile",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "anti_gravity_gain": {
+   "name": "anti_gravity_gain",
+   "scope": "profile",
+   "defaultValue": "80",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "anti_gravity_cutoff_hz": {
+   "name": "anti_gravity_cutoff_hz",
+   "scope": "profile",
+   "defaultValue": "5",
+   "kind": "number",
+   "min": 2,
+   "max": 50
+  },
+  "anti_gravity_p_gain": {
+   "name": "anti_gravity_p_gain",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "acc_limit_yaw": {
+   "name": "acc_limit_yaw",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 500
+  },
+  "acc_limit": {
+   "name": "acc_limit",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 500
+  },
+  "crash_dthreshold": {
+   "name": "crash_dthreshold",
+   "scope": "profile",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 10,
+   "max": 2000
+  },
+  "crash_gthreshold": {
+   "name": "crash_gthreshold",
+   "scope": "profile",
+   "defaultValue": "400",
+   "kind": "number",
+   "min": 100,
+   "max": 2000
+  },
+  "crash_setpoint_threshold": {
+   "name": "crash_setpoint_threshold",
+   "scope": "profile",
+   "defaultValue": "350",
+   "kind": "number",
+   "min": 50,
+   "max": 2000
+  },
+  "crash_time": {
+   "name": "crash_time",
+   "scope": "profile",
+   "defaultValue": "500",
+   "kind": "number",
+   "min": 100,
+   "max": 5000
+  },
+  "crash_delay": {
+   "name": "crash_delay",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 500
+  },
+  "crash_recovery_angle": {
+   "name": "crash_recovery_angle",
+   "scope": "profile",
+   "defaultValue": "10",
+   "kind": "number",
+   "min": 5,
+   "max": 30
+  },
+  "crash_recovery_rate": {
+   "name": "crash_recovery_rate",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 50,
+   "max": 255
+  },
+  "crash_limit_yaw": {
+   "name": "crash_limit_yaw",
+   "scope": "profile",
+   "defaultValue": "200",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "crash_recovery": {
+   "name": "crash_recovery",
+   "scope": "profile",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON",
+    "BEEP",
+    "DISARM"
+   ]
+  },
+  "iterm_rotation": {
+   "name": "iterm_rotation",
+   "scope": "profile",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "iterm_relax": {
+   "name": "iterm_relax",
+   "scope": "profile",
+   "defaultValue": "RP",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "RP",
+    "RPY",
+    "RP_INC",
+    "RPY_INC"
+   ]
+  },
+  "iterm_relax_type": {
+   "name": "iterm_relax_type",
+   "scope": "profile",
+   "defaultValue": "SETPOINT",
+   "kind": "enum",
+   "values": [
+    "GYRO",
+    "SETPOINT"
+   ]
+  },
+  "iterm_relax_cutoff": {
+   "name": "iterm_relax_cutoff",
+   "scope": "profile",
+   "defaultValue": "15",
+   "kind": "number",
+   "min": 1,
+   "max": 50
+  },
+  "iterm_windup": {
+   "name": "iterm_windup",
+   "scope": "profile",
+   "defaultValue": "85",
+   "kind": "number",
+   "min": 30,
+   "max": 100
+  },
+  "iterm_limit": {
+   "name": "iterm_limit",
+   "scope": "profile",
+   "defaultValue": "400",
+   "kind": "number",
+   "min": 0,
+   "max": 500
+  },
+  "pidsum_limit": {
+   "name": "pidsum_limit",
+   "scope": "profile",
+   "defaultValue": "500",
+   "kind": "number",
+   "min": 100,
+   "max": 1000
+  },
+  "pidsum_limit_yaw": {
+   "name": "pidsum_limit_yaw",
+   "scope": "profile",
+   "defaultValue": "400",
+   "kind": "number",
+   "min": 100,
+   "max": 1000
+  },
+  "yaw_lowpass_hz": {
+   "name": "yaw_lowpass_hz",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 500
+  },
+  "throttle_boost": {
+   "name": "throttle_boost",
+   "scope": "profile",
+   "defaultValue": "5",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "throttle_boost_cutoff": {
+   "name": "throttle_boost_cutoff",
+   "scope": "profile",
+   "defaultValue": "15",
+   "kind": "number",
+   "min": 5,
+   "max": 50
+  },
+  "acro_trainer_angle_limit": {
+   "name": "acro_trainer_angle_limit",
+   "scope": "profile",
+   "defaultValue": "20",
+   "kind": "number",
+   "min": 10,
+   "max": 80
+  },
+  "acro_trainer_lookahead_ms": {
+   "name": "acro_trainer_lookahead_ms",
+   "scope": "profile",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 10,
+   "max": 200
+  },
+  "acro_trainer_debug_axis": {
+   "name": "acro_trainer_debug_axis",
+   "scope": "profile",
+   "defaultValue": "ROLL",
+   "kind": "enum",
+   "values": [
+    "ROLL",
+    "PITCH"
+   ]
+  },
+  "acro_trainer_gain": {
+   "name": "acro_trainer_gain",
+   "scope": "profile",
+   "defaultValue": "75",
+   "kind": "number",
+   "min": 25,
+   "max": 255
+  },
+  "p_pitch": {
+   "name": "p_pitch",
+   "scope": "profile",
+   "defaultValue": "47",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "i_pitch": {
+   "name": "i_pitch",
+   "scope": "profile",
+   "defaultValue": "84",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "d_pitch": {
+   "name": "d_pitch",
+   "scope": "profile",
+   "defaultValue": "46",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "f_pitch": {
+   "name": "f_pitch",
+   "scope": "profile",
+   "defaultValue": "125",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "p_roll": {
+   "name": "p_roll",
+   "scope": "profile",
+   "defaultValue": "45",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "i_roll": {
+   "name": "i_roll",
+   "scope": "profile",
+   "defaultValue": "80",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "d_roll": {
+   "name": "d_roll",
+   "scope": "profile",
+   "defaultValue": "40",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "f_roll": {
+   "name": "f_roll",
+   "scope": "profile",
+   "defaultValue": "120",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "p_yaw": {
+   "name": "p_yaw",
+   "scope": "profile",
+   "defaultValue": "45",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "i_yaw": {
+   "name": "i_yaw",
+   "scope": "profile",
+   "defaultValue": "80",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "d_yaw": {
+   "name": "d_yaw",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "f_yaw": {
+   "name": "f_yaw",
+   "scope": "profile",
+   "defaultValue": "120",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "angle_p_gain": {
+   "name": "angle_p_gain",
+   "scope": "profile",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "angle_feedforward": {
+   "name": "angle_feedforward",
+   "scope": "profile",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "angle_feedforward_smoothing_ms": {
+   "name": "angle_feedforward_smoothing_ms",
+   "scope": "profile",
+   "defaultValue": "80",
+   "kind": "number",
+   "min": 10,
+   "max": 250
+  },
+  "angle_limit": {
+   "name": "angle_limit",
+   "scope": "profile",
+   "defaultValue": "60",
+   "kind": "number",
+   "min": 10,
+   "max": 85
+  },
+  "angle_earth_ref": {
+   "name": "angle_earth_ref",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "horizon_level_strength": {
+   "name": "horizon_level_strength",
+   "scope": "profile",
+   "defaultValue": "75",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "horizon_limit_sticks": {
+   "name": "horizon_limit_sticks",
+   "scope": "profile",
+   "defaultValue": "75",
+   "kind": "number",
+   "min": 10,
+   "max": 200
+  },
+  "horizon_limit_degrees": {
+   "name": "horizon_limit_degrees",
+   "scope": "profile",
+   "defaultValue": "135",
+   "kind": "number",
+   "min": 10,
+   "max": 250
+  },
+  "horizon_ignore_sticks": {
+   "name": "horizon_ignore_sticks",
+   "scope": "profile",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "horizon_delay_ms": {
+   "name": "horizon_delay_ms",
+   "scope": "profile",
+   "defaultValue": "500",
+   "kind": "number",
+   "min": 10,
+   "max": 5000
+  },
+  "abs_control_gain": {
+   "name": "abs_control_gain",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 20
+  },
+  "abs_control_limit": {
+   "name": "abs_control_limit",
+   "scope": "profile",
+   "defaultValue": "90",
+   "kind": "number",
+   "min": 10,
+   "max": 255
+  },
+  "abs_control_error_limit": {
+   "name": "abs_control_error_limit",
+   "scope": "profile",
+   "defaultValue": "20",
+   "kind": "number",
+   "min": 1,
+   "max": 45
+  },
+  "abs_control_cutoff": {
+   "name": "abs_control_cutoff",
+   "scope": "profile",
+   "defaultValue": "11",
+   "kind": "number",
+   "min": 1,
+   "max": 45
+  },
+  "use_integrated_yaw": {
+   "name": "use_integrated_yaw",
+   "scope": "profile",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "integrated_yaw_relax": {
+   "name": "integrated_yaw_relax",
+   "scope": "profile",
+   "defaultValue": "200",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "d_min_roll": {
+   "name": "d_min_roll",
+   "scope": "profile",
+   "defaultValue": "30",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "d_min_pitch": {
+   "name": "d_min_pitch",
+   "scope": "profile",
+   "defaultValue": "34",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "d_min_yaw": {
+   "name": "d_min_yaw",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "d_max_gain": {
+   "name": "d_max_gain",
+   "scope": "profile",
+   "defaultValue": "37",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "d_max_advance": {
+   "name": "d_max_advance",
+   "scope": "profile",
+   "defaultValue": "20",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "motor_output_limit": {
+   "name": "motor_output_limit",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 1,
+   "max": 100
+  },
+  "auto_profile_cell_count": {
+   "name": "auto_profile_cell_count",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -1,
+   "max": 8
+  },
+  "launch_control_mode": {
+   "name": "launch_control_mode",
+   "scope": "profile",
+   "defaultValue": "NORMAL",
+   "kind": "enum",
+   "values": [
+    "NORMAL",
+    "PITCHONLY",
+    "FULL"
+   ]
+  },
+  "launch_trigger_allow_reset": {
+   "name": "launch_trigger_allow_reset",
+   "scope": "profile",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "launch_trigger_throttle_percent": {
+   "name": "launch_trigger_throttle_percent",
+   "scope": "profile",
+   "defaultValue": "20",
+   "kind": "number",
+   "min": 0,
+   "max": 90
+  },
+  "launch_angle_limit": {
+   "name": "launch_angle_limit",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 80
+  },
+  "launch_control_gain": {
+   "name": "launch_control_gain",
+   "scope": "profile",
+   "defaultValue": "40",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "thrust_linear": {
+   "name": "thrust_linear",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 150
+  },
+  "transient_throttle_limit": {
+   "name": "transient_throttle_limit",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 30
+  },
+  "feedforward_transition": {
+   "name": "feedforward_transition",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "feedforward_averaging": {
+   "name": "feedforward_averaging",
+   "scope": "profile",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "2_POINT",
+    "3_POINT",
+    "4_POINT"
+   ]
+  },
+  "feedforward_smooth_factor": {
+   "name": "feedforward_smooth_factor",
+   "scope": "profile",
+   "defaultValue": "25",
+   "kind": "number",
+   "min": 0,
+   "max": 95
+  },
+  "feedforward_jitter_factor": {
+   "name": "feedforward_jitter_factor",
+   "scope": "profile",
+   "defaultValue": "7",
+   "kind": "number",
+   "min": 0,
+   "max": 20
+  },
+  "feedforward_boost": {
+   "name": "feedforward_boost",
+   "scope": "profile",
+   "defaultValue": "15",
+   "kind": "number",
+   "min": 0,
+   "max": 50
+  },
+  "feedforward_max_rate_limit": {
+   "name": "feedforward_max_rate_limit",
+   "scope": "profile",
+   "defaultValue": "90",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "dyn_idle_min_rpm": {
+   "name": "dyn_idle_min_rpm",
+   "scope": "profile",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "dyn_idle_p_gain": {
+   "name": "dyn_idle_p_gain",
+   "scope": "profile",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 1,
+   "max": 250
+  },
+  "dyn_idle_i_gain": {
+   "name": "dyn_idle_i_gain",
+   "scope": "profile",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 1,
+   "max": 250
+  },
+  "dyn_idle_d_gain": {
+   "name": "dyn_idle_d_gain",
+   "scope": "profile",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "dyn_idle_max_increase": {
+   "name": "dyn_idle_max_increase",
+   "scope": "profile",
+   "defaultValue": "150",
+   "kind": "number",
+   "min": 10,
+   "max": 255
+  },
+  "dyn_idle_start_increase": {
+   "name": "dyn_idle_start_increase",
+   "scope": "profile",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 10,
+   "max": 255
+  },
+  "level_race_mode": {
+   "name": "level_race_mode",
+   "scope": "profile",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "simplified_pids_mode": {
+   "name": "simplified_pids_mode",
+   "scope": "profile",
+   "defaultValue": "RPY",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "RP",
+    "RPY"
+   ]
+  },
+  "simplified_master_multiplier": {
+   "name": "simplified_master_multiplier",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "simplified_i_gain": {
+   "name": "simplified_i_gain",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "simplified_d_gain": {
+   "name": "simplified_d_gain",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "simplified_pi_gain": {
+   "name": "simplified_pi_gain",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "simplified_dmax_gain": {
+   "name": "simplified_dmax_gain",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "simplified_feedforward_gain": {
+   "name": "simplified_feedforward_gain",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "simplified_pitch_d_gain": {
+   "name": "simplified_pitch_d_gain",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "simplified_pitch_pi_gain": {
+   "name": "simplified_pitch_pi_gain",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "simplified_dterm_filter": {
+   "name": "simplified_dterm_filter",
+   "scope": "profile",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "simplified_dterm_filter_multiplier": {
+   "name": "simplified_dterm_filter_multiplier",
+   "scope": "profile",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 10,
+   "max": 200
+  },
+  "simplified_gyro_filter": {
+   "name": "simplified_gyro_filter",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "simplified_gyro_filter_multiplier": {
+   "name": "simplified_gyro_filter_multiplier",
+   "scope": "master",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 10,
+   "max": 200
+  },
+  "tpa_mode": {
+   "name": "tpa_mode",
+   "scope": "profile",
+   "defaultValue": "D",
+   "kind": "enum",
+   "values": [
+    "PD",
+    "D"
+   ]
+  },
+  "tpa_rate": {
+   "name": "tpa_rate",
+   "scope": "profile",
+   "defaultValue": "65",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "tpa_breakpoint": {
+   "name": "tpa_breakpoint",
+   "scope": "profile",
+   "defaultValue": "1350",
+   "kind": "number",
+   "min": 1000,
+   "max": 2000
+  },
+  "tpa_low_rate": {
+   "name": "tpa_low_rate",
+   "scope": "profile",
+   "defaultValue": "20",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "tpa_low_breakpoint": {
+   "name": "tpa_low_breakpoint",
+   "scope": "profile",
+   "defaultValue": "1050",
+   "kind": "number",
+   "min": 1000,
+   "max": 2000
+  },
+  "tpa_low_always": {
+   "name": "tpa_low_always",
+   "scope": "profile",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "ez_landing_threshold": {
+   "name": "ez_landing_threshold",
+   "scope": "profile",
+   "defaultValue": "25",
+   "kind": "number",
+   "min": 0,
+   "max": 200
+  },
+  "ez_landing_limit": {
+   "name": "ez_landing_limit",
+   "scope": "profile",
+   "defaultValue": "15",
+   "kind": "number",
+   "min": 0,
+   "max": 75
+  },
+  "ez_landing_speed": {
+   "name": "ez_landing_speed",
+   "scope": "profile",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 0,
+   "max": 250
+  },
+  "tlm_inverted": {
+   "name": "tlm_inverted",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "tlm_halfduplex": {
+   "name": "tlm_halfduplex",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "frsky_vfas_precision": {
+   "name": "frsky_vfas_precision",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 1
+  },
+  "hott_alarm_int": {
+   "name": "hott_alarm_int",
+   "scope": "master",
+   "defaultValue": "5",
+   "kind": "number",
+   "min": 0,
+   "max": 120
+  },
+  "pid_in_tlm": {
+   "name": "pid_in_tlm",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "report_cell_voltage": {
+   "name": "report_cell_voltage",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_voltage": {
+   "name": "telemetry_disabled_voltage",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_current": {
+   "name": "telemetry_disabled_current",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_fuel": {
+   "name": "telemetry_disabled_fuel",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_mode": {
+   "name": "telemetry_disabled_mode",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_acc_x": {
+   "name": "telemetry_disabled_acc_x",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_acc_y": {
+   "name": "telemetry_disabled_acc_y",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_acc_z": {
+   "name": "telemetry_disabled_acc_z",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_pitch": {
+   "name": "telemetry_disabled_pitch",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_roll": {
+   "name": "telemetry_disabled_roll",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_heading": {
+   "name": "telemetry_disabled_heading",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_altitude": {
+   "name": "telemetry_disabled_altitude",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_vario": {
+   "name": "telemetry_disabled_vario",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_lat_long": {
+   "name": "telemetry_disabled_lat_long",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_ground_speed": {
+   "name": "telemetry_disabled_ground_speed",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_distance": {
+   "name": "telemetry_disabled_distance",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_esc_current": {
+   "name": "telemetry_disabled_esc_current",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_esc_voltage": {
+   "name": "telemetry_disabled_esc_voltage",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_esc_rpm": {
+   "name": "telemetry_disabled_esc_rpm",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_esc_temperature": {
+   "name": "telemetry_disabled_esc_temperature",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_temperature": {
+   "name": "telemetry_disabled_temperature",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "telemetry_disabled_cap_used": {
+   "name": "telemetry_disabled_cap_used",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "osd_units": {
+   "name": "osd_units",
+   "scope": "master",
+   "defaultValue": "METRIC",
+   "kind": "enum",
+   "values": [
+    "IMPERIAL",
+    "METRIC",
+    "BRITISH"
+   ]
+  },
+  "osd_warn_bitmask": {
+   "name": "osd_warn_bitmask",
+   "scope": "master",
+   "defaultValue": "270335",
+   "kind": "number",
+   "min": 0,
+   "max": 4294967295
+  },
+  "osd_rssi_alarm": {
+   "name": "osd_rssi_alarm",
+   "scope": "master",
+   "defaultValue": "20",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "osd_link_quality_alarm": {
+   "name": "osd_link_quality_alarm",
+   "scope": "master",
+   "defaultValue": "80",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "osd_rssi_dbm_alarm": {
+   "name": "osd_rssi_dbm_alarm",
+   "scope": "master",
+   "defaultValue": "-60",
+   "kind": "number",
+   "min": -130,
+   "max": 0
+  },
+  "osd_rsnr_alarm": {
+   "name": "osd_rsnr_alarm",
+   "scope": "master",
+   "defaultValue": "4",
+   "kind": "number",
+   "min": -30,
+   "max": 20
+  },
+  "osd_cap_alarm": {
+   "name": "osd_cap_alarm",
+   "scope": "master",
+   "defaultValue": "2200",
+   "kind": "number",
+   "min": 0,
+   "max": 20000
+  },
+  "osd_alt_alarm": {
+   "name": "osd_alt_alarm",
+   "scope": "master",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 10000
+  },
+  "osd_distance_alarm": {
+   "name": "osd_distance_alarm",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_esc_temp_alarm": {
+   "name": "osd_esc_temp_alarm",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "osd_esc_rpm_alarm": {
+   "name": "osd_esc_rpm_alarm",
+   "scope": "master",
+   "defaultValue": "-1",
+   "kind": "number",
+   "min": -1,
+   "max": 32767
+  },
+  "osd_esc_current_alarm": {
+   "name": "osd_esc_current_alarm",
+   "scope": "master",
+   "defaultValue": "-1",
+   "kind": "number",
+   "min": -1,
+   "max": 32767
+  },
+  "osd_core_temp_alarm": {
+   "name": "osd_core_temp_alarm",
+   "scope": "master",
+   "defaultValue": "70",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "osd_ah_max_pit": {
+   "name": "osd_ah_max_pit",
+   "scope": "master",
+   "defaultValue": "20",
+   "kind": "number",
+   "min": 0,
+   "max": 90
+  },
+  "osd_ah_max_rol": {
+   "name": "osd_ah_max_rol",
+   "scope": "master",
+   "defaultValue": "40",
+   "kind": "number",
+   "min": 0,
+   "max": 90
+  },
+  "osd_ah_invert": {
+   "name": "osd_ah_invert",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "osd_logo_on_arming": {
+   "name": "osd_logo_on_arming",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON",
+    "FIRST_ARMING"
+   ]
+  },
+  "osd_logo_on_arming_duration": {
+   "name": "osd_logo_on_arming_duration",
+   "scope": "master",
+   "defaultValue": "5",
+   "kind": "number",
+   "min": 5,
+   "max": 50
+  },
+  "osd_use_quick_menu": {
+   "name": "osd_use_quick_menu",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "osd_show_spec_prearm": {
+   "name": "osd_show_spec_prearm",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "osd_tim1": {
+   "name": "osd_tim1",
+   "scope": "master",
+   "defaultValue": "2560",
+   "kind": "number",
+   "min": 0,
+   "max": 32767
+  },
+  "osd_tim2": {
+   "name": "osd_tim2",
+   "scope": "master",
+   "defaultValue": "2561",
+   "kind": "number",
+   "min": 0,
+   "max": 32767
+  },
+  "osd_vbat_pos": {
+   "name": "osd_vbat_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_rssi_pos": {
+   "name": "osd_rssi_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_link_quality_pos": {
+   "name": "osd_link_quality_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_link_tx_power_pos": {
+   "name": "osd_link_tx_power_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_rssi_dbm_pos": {
+   "name": "osd_rssi_dbm_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_rsnr_pos": {
+   "name": "osd_rsnr_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_tim_1_pos": {
+   "name": "osd_tim_1_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_tim_2_pos": {
+   "name": "osd_tim_2_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_remaining_time_estimate_pos": {
+   "name": "osd_remaining_time_estimate_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_flymode_pos": {
+   "name": "osd_flymode_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_anti_gravity_pos": {
+   "name": "osd_anti_gravity_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_g_force_pos": {
+   "name": "osd_g_force_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_throttle_pos": {
+   "name": "osd_throttle_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_vtx_channel_pos": {
+   "name": "osd_vtx_channel_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_crosshairs_pos": {
+   "name": "osd_crosshairs_pos",
+   "scope": "master",
+   "defaultValue": "312",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_ah_sbar_pos": {
+   "name": "osd_ah_sbar_pos",
+   "scope": "master",
+   "defaultValue": "313",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_ah_pos": {
+   "name": "osd_ah_pos",
+   "scope": "master",
+   "defaultValue": "185",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_current_pos": {
+   "name": "osd_current_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_mah_drawn_pos": {
+   "name": "osd_mah_drawn_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_wh_drawn_pos": {
+   "name": "osd_wh_drawn_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_motor_diag_pos": {
+   "name": "osd_motor_diag_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_craft_name_pos": {
+   "name": "osd_craft_name_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_pilot_name_pos": {
+   "name": "osd_pilot_name_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_gps_speed_pos": {
+   "name": "osd_gps_speed_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_gps_lon_pos": {
+   "name": "osd_gps_lon_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_gps_lat_pos": {
+   "name": "osd_gps_lat_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_gps_sats_pos": {
+   "name": "osd_gps_sats_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_home_dir_pos": {
+   "name": "osd_home_dir_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_home_dist_pos": {
+   "name": "osd_home_dist_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_flight_dist_pos": {
+   "name": "osd_flight_dist_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_compass_bar_pos": {
+   "name": "osd_compass_bar_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_altitude_pos": {
+   "name": "osd_altitude_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_pid_roll_pos": {
+   "name": "osd_pid_roll_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_pid_pitch_pos": {
+   "name": "osd_pid_pitch_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_pid_yaw_pos": {
+   "name": "osd_pid_yaw_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_debug_pos": {
+   "name": "osd_debug_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_power_pos": {
+   "name": "osd_power_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_pidrate_profile_pos": {
+   "name": "osd_pidrate_profile_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_warnings_pos": {
+   "name": "osd_warnings_pos",
+   "scope": "master",
+   "defaultValue": "14772",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_avg_cell_voltage_pos": {
+   "name": "osd_avg_cell_voltage_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_pit_ang_pos": {
+   "name": "osd_pit_ang_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_rol_ang_pos": {
+   "name": "osd_rol_ang_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_battery_usage_pos": {
+   "name": "osd_battery_usage_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_disarmed_pos": {
+   "name": "osd_disarmed_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_nheading_pos": {
+   "name": "osd_nheading_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_up_down_reference_pos": {
+   "name": "osd_up_down_reference_pos",
+   "scope": "master",
+   "defaultValue": "312",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_ready_mode_pos": {
+   "name": "osd_ready_mode_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_nvario_pos": {
+   "name": "osd_nvario_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_esc_tmp_pos": {
+   "name": "osd_esc_tmp_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_esc_rpm_pos": {
+   "name": "osd_esc_rpm_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_esc_rpm_freq_pos": {
+   "name": "osd_esc_rpm_freq_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_rtc_date_time_pos": {
+   "name": "osd_rtc_date_time_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_adjustment_range_pos": {
+   "name": "osd_adjustment_range_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_flip_arrow_pos": {
+   "name": "osd_flip_arrow_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_core_temp_pos": {
+   "name": "osd_core_temp_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_log_status_pos": {
+   "name": "osd_log_status_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_stick_overlay_left_pos": {
+   "name": "osd_stick_overlay_left_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_stick_overlay_right_pos": {
+   "name": "osd_stick_overlay_right_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_stick_overlay_radio_mode": {
+   "name": "osd_stick_overlay_radio_mode",
+   "scope": "master",
+   "defaultValue": "2",
+   "kind": "number",
+   "min": 1,
+   "max": 4
+  },
+  "osd_rate_profile_name_pos": {
+   "name": "osd_rate_profile_name_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_pid_profile_name_pos": {
+   "name": "osd_pid_profile_name_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_profile_name_pos": {
+   "name": "osd_profile_name_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_rcchannels_pos": {
+   "name": "osd_rcchannels_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_camera_frame_pos": {
+   "name": "osd_camera_frame_pos",
+   "scope": "master",
+   "defaultValue": "142",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_efficiency_pos": {
+   "name": "osd_efficiency_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_total_flights_pos": {
+   "name": "osd_total_flights_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_aux_pos": {
+   "name": "osd_aux_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_sys_goggle_voltage_pos": {
+   "name": "osd_sys_goggle_voltage_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_sys_vtx_voltage_pos": {
+   "name": "osd_sys_vtx_voltage_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_sys_bitrate_pos": {
+   "name": "osd_sys_bitrate_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_sys_delay_pos": {
+   "name": "osd_sys_delay_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_sys_distance_pos": {
+   "name": "osd_sys_distance_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_sys_lq_pos": {
+   "name": "osd_sys_lq_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_sys_goggle_dvr_pos": {
+   "name": "osd_sys_goggle_dvr_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_sys_vtx_dvr_pos": {
+   "name": "osd_sys_vtx_dvr_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_sys_warnings_pos": {
+   "name": "osd_sys_warnings_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_sys_vtx_temp_pos": {
+   "name": "osd_sys_vtx_temp_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_sys_fan_speed_pos": {
+   "name": "osd_sys_fan_speed_pos",
+   "scope": "master",
+   "defaultValue": "341",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "osd_stat_bitmask": {
+   "name": "osd_stat_bitmask",
+   "scope": "master",
+   "defaultValue": "1879048228",
+   "kind": "number",
+   "min": 0,
+   "max": 4294967295
+  },
+  "osd_profile": {
+   "name": "osd_profile",
+   "scope": "master",
+   "defaultValue": "1",
+   "kind": "number",
+   "min": 1,
+   "max": 3
+  },
+  "osd_profile_1_name": {
+   "name": "osd_profile_1_name",
+   "scope": "master",
+   "defaultValue": "-",
+   "kind": "string",
+   "minLength": 1,
+   "maxLength": 16
+  },
+  "osd_profile_2_name": {
+   "name": "osd_profile_2_name",
+   "scope": "master",
+   "defaultValue": "-",
+   "kind": "string",
+   "minLength": 1,
+   "maxLength": 16
+  },
+  "osd_profile_3_name": {
+   "name": "osd_profile_3_name",
+   "scope": "master",
+   "defaultValue": "-",
+   "kind": "string",
+   "minLength": 1,
+   "maxLength": 16
+  },
+  "osd_gps_sats_show_pdop": {
+   "name": "osd_gps_sats_show_pdop",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "osd_displayport_device": {
+   "name": "osd_displayport_device",
+   "scope": "master",
+   "defaultValue": "MSP",
+   "kind": "enum",
+   "values": [
+    "NONE",
+    "AUTO",
+    "MAX7456",
+    "MSP",
+    "FRSKYOSD"
+   ]
+  },
+  "osd_rcchannels": {
+   "name": "osd_rcchannels",
+   "scope": "master",
+   "defaultValue": "-1,-1,-1,-1",
+   "kind": "array",
+   "length": 4
+  },
+  "osd_camera_frame_width": {
+   "name": "osd_camera_frame_width",
+   "scope": "master",
+   "defaultValue": "24",
+   "kind": "number",
+   "min": 2,
+   "max": 30
+  },
+  "osd_camera_frame_height": {
+   "name": "osd_camera_frame_height",
+   "scope": "master",
+   "defaultValue": "11",
+   "kind": "number",
+   "min": 2,
+   "max": 16
+  },
+  "osd_stat_avg_cell_value": {
+   "name": "osd_stat_avg_cell_value",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "osd_framerate_hz": {
+   "name": "osd_framerate_hz",
+   "scope": "master",
+   "defaultValue": "12",
+   "kind": "number",
+   "min": 1,
+   "max": 60
+  },
+  "osd_menu_background": {
+   "name": "osd_menu_background",
+   "scope": "master",
+   "defaultValue": "TRANSPARENT",
+   "kind": "enum",
+   "values": [
+    "TRANSPARENT",
+    "BLACK",
+    "GRAY",
+    "LIGHT_GRAY"
+   ]
+  },
+  "osd_aux_channel": {
+   "name": "osd_aux_channel",
+   "scope": "master",
+   "defaultValue": "1",
+   "kind": "number",
+   "min": 1,
+   "max": 18
+  },
+  "osd_aux_scale": {
+   "name": "osd_aux_scale",
+   "scope": "master",
+   "defaultValue": "200",
+   "kind": "number",
+   "min": 1,
+   "max": 1000
+  },
+  "osd_aux_symbol": {
+   "name": "osd_aux_symbol",
+   "scope": "master",
+   "defaultValue": "65",
+   "kind": "number",
+   "min": 0,
+   "max": 255
+  },
+  "osd_canvas_width": {
+   "name": "osd_canvas_width",
+   "scope": "master",
+   "defaultValue": "53",
+   "kind": "number",
+   "min": 0,
+   "max": 63
+  },
+  "osd_canvas_height": {
+   "name": "osd_canvas_height",
+   "scope": "master",
+   "defaultValue": "20",
+   "kind": "number",
+   "min": 0,
+   "max": 31
+  },
+  "osd_craftname_msgs": {
+   "name": "osd_craftname_msgs",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "task_statistics": {
+   "name": "task_statistics",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "debug_mode": {
+   "name": "debug_mode",
+   "scope": "master",
+   "defaultValue": "NONE",
+   "kind": "enum",
+   "values": [
+    "NONE",
+    "CYCLETIME",
+    "BATTERY",
+    "GYRO_FILTERED",
+    "ACCELEROMETER",
+    "PIDLOOP",
+    "GYRO_SCALED",
+    "RC_INTERPOLATION",
+    "ANGLERATE",
+    "ESC_SENSOR",
+    "SCHEDULER",
+    "STACK",
+    "ESC_SENSOR_RPM",
+    "ESC_SENSOR_TMP",
+    "ALTITUDE",
+    "FFT",
+    "FFT_TIME",
+    "FFT_FREQ",
+    "RX_FRSKY_SPI",
+    "RX_SFHSS_SPI",
+    "GYRO_RAW",
+    "DUAL_GYRO_RAW",
+    "DUAL_GYRO_DIFF",
+    "MAX7456_SIGNAL",
+    "MAX7456_SPICLOCK",
+    "SBUS",
+    "FPORT",
+    "RANGEFINDER",
+    "RANGEFINDER_QUALITY",
+    "LIDAR_TF",
+    "ADC_INTERNAL",
+    "RUNAWAY_TAKEOFF",
+    "SDIO",
+    "CURRENT_SENSOR",
+    "USB",
+    "SMARTAUDIO",
+    "RTH",
+    "ITERM_RELAX",
+    "ACRO_TRAINER",
+    "RC_SMOOTHING",
+    "RX_SIGNAL_LOSS",
+    "RC_SMOOTHING_RATE",
+    "ANTI_GRAVITY",
+    "DYN_LPF",
+    "RX_SPEKTRUM_SPI",
+    "DSHOT_RPM_TELEMETRY",
+    "RPM_FILTER",
+    "D_MIN",
+    "AC_CORRECTION",
+    "AC_ERROR",
+    "DUAL_GYRO_SCALED",
+    "DSHOT_RPM_ERRORS",
+    "CRSF_LINK_STATISTICS_UPLINK",
+    "CRSF_LINK_STATISTICS_PWR",
+    "CRSF_LINK_STATISTICS_DOWN",
+    "BARO",
+    "GPS_RESCUE_THROTTLE_PID",
+    "DYN_IDLE",
+    "FEEDFORWARD_LIMIT",
+    "FEEDFORWARD",
+    "BLACKBOX_OUTPUT",
+    "GYRO_SAMPLE",
+    "RX_TIMING",
+    "D_LPF",
+    "VTX_TRAMP",
+    "GHST",
+    "GHST_MSP",
+    "SCHEDULER_DETERMINISM",
+    "TIMING_ACCURACY",
+    "RX_EXPRESSLRS_SPI",
+    "RX_EXPRESSLRS_PHASELOCK",
+    "RX_STATE_TIME",
+    "GPS_RESCUE_VELOCITY",
+    "GPS_RESCUE_HEADING",
+    "GPS_RESCUE_TRACKING",
+    "GPS_CONNECTION",
+    "ATTITUDE",
+    "VTX_MSP",
+    "GPS_DOP",
+    "FAILSAFE",
+    "GYRO_CALIBRATION",
+    "ANGLE_MODE",
+    "ANGLE_TARGET",
+    "CURRENT_ANGLE",
+    "DSHOT_TELEMETRY_COUNTS",
+    "RPM_LIMIT",
+    "RC_STATS",
+    "MAG_CALIB",
+    "MAG_TASK_RATE",
+    "EZLANDING"
+   ]
+  },
+  "rate_6pos_switch": {
+   "name": "rate_6pos_switch",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "cpu_overclock": {
+   "name": "cpu_overclock",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "240MHZ"
+   ]
+  },
+  "pwr_on_arm_grace": {
+   "name": "pwr_on_arm_grace",
+   "scope": "master",
+   "defaultValue": "5",
+   "kind": "number",
+   "min": 0,
+   "max": 30
+  },
+  "enable_stick_arming": {
+   "name": "enable_stick_arming",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "vtx_band": {
+   "name": "vtx_band",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 8
+  },
+  "vtx_channel": {
+   "name": "vtx_channel",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 8
+  },
+  "vtx_power": {
+   "name": "vtx_power",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 7
+  },
+  "vtx_low_power_disarm": {
+   "name": "vtx_low_power_disarm",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON",
+    "UNTIL_FIRST_ARM"
+   ]
+  },
+  "vtx_softserial_alt": {
+   "name": "vtx_softserial_alt",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "vtx_freq": {
+   "name": "vtx_freq",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 5999
+  },
+  "vtx_pit_mode_freq": {
+   "name": "vtx_pit_mode_freq",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 5999
+  },
+  "vtx_halfduplex": {
+   "name": "vtx_halfduplex",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "vcd_video_system": {
+   "name": "vcd_video_system",
+   "scope": "master",
+   "defaultValue": "HD",
+   "kind": "enum",
+   "values": [
+    "AUTO",
+    "PAL",
+    "NTSC",
+    "HD"
+   ]
+  },
+  "vcd_h_offset": {
+   "name": "vcd_h_offset",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -32,
+   "max": 31
+  },
+  "vcd_v_offset": {
+   "name": "vcd_v_offset",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -15,
+   "max": 16
+  },
+  "max7456_clock": {
+   "name": "max7456_clock",
+   "scope": "master",
+   "defaultValue": "NOMINAL",
+   "kind": "enum",
+   "values": [
+    "HALF",
+    "NOMINAL",
+    "DOUBLE"
+   ]
+  },
+  "max7456_spi_bus": {
+   "name": "max7456_spi_bus",
+   "scope": "master",
+   "defaultValue": "2",
+   "kind": "number",
+   "min": 0,
+   "max": 4
+  },
+  "max7456_preinit_opu": {
+   "name": "max7456_preinit_opu",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "displayport_msp_col_adjust": {
+   "name": "displayport_msp_col_adjust",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -6,
+   "max": 0
+  },
+  "displayport_msp_row_adjust": {
+   "name": "displayport_msp_row_adjust",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -3,
+   "max": 0
+  },
+  "displayport_msp_fonts": {
+   "name": "displayport_msp_fonts",
+   "scope": "master",
+   "defaultValue": "0,1,2,3",
+   "kind": "array",
+   "length": 4
+  },
+  "displayport_msp_use_device_blink": {
+   "name": "displayport_msp_use_device_blink",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "displayport_max7456_col_adjust": {
+   "name": "displayport_max7456_col_adjust",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -6,
+   "max": 0
+  },
+  "displayport_max7456_row_adjust": {
+   "name": "displayport_max7456_row_adjust",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -3,
+   "max": 0
+  },
+  "displayport_max7456_inv": {
+   "name": "displayport_max7456_inv",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "displayport_max7456_blk": {
+   "name": "displayport_max7456_blk",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 3
+  },
+  "displayport_max7456_wht": {
+   "name": "displayport_max7456_wht",
+   "scope": "master",
+   "defaultValue": "2",
+   "kind": "number",
+   "min": 0,
+   "max": 3
+  },
+  "esc_sensor_halfduplex": {
+   "name": "esc_sensor_halfduplex",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "esc_sensor_current_offset": {
+   "name": "esc_sensor_current_offset",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 16000
+  },
+  "led_inversion": {
+   "name": "led_inversion",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 7
+  },
+  "camera_control_mode": {
+   "name": "camera_control_mode",
+   "scope": "master",
+   "defaultValue": "HARDWARE_PWM",
+   "kind": "enum",
+   "values": [
+    "HARDWARE_PWM",
+    "SOFTWARE_PWM",
+    "DAC"
+   ]
+  },
+  "camera_control_ref_voltage": {
+   "name": "camera_control_ref_voltage",
+   "scope": "master",
+   "defaultValue": "330",
+   "kind": "number",
+   "min": 200,
+   "max": 400
+  },
+  "camera_control_key_delay": {
+   "name": "camera_control_key_delay",
+   "scope": "master",
+   "defaultValue": "180",
+   "kind": "number",
+   "min": 100,
+   "max": 500
+  },
+  "camera_control_internal_resistance": {
+   "name": "camera_control_internal_resistance",
+   "scope": "master",
+   "defaultValue": "470",
+   "kind": "number",
+   "min": 10,
+   "max": 1000
+  },
+  "camera_control_button_resistance": {
+   "name": "camera_control_button_resistance",
+   "scope": "master",
+   "defaultValue": "450,270,150,68,0",
+   "kind": "array",
+   "length": 5
+  },
+  "camera_control_inverted": {
+   "name": "camera_control_inverted",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "pinio_config": {
+   "name": "pinio_config",
+   "scope": "master",
+   "defaultValue": "1,1,1,1",
+   "kind": "array",
+   "length": 4
+  },
+  "pinio_box": {
+   "name": "pinio_box",
+   "scope": "master",
+   "defaultValue": "40,255,255,255",
+   "kind": "array",
+   "length": 4
+  },
+  "usb_hid_cdc": {
+   "name": "usb_hid_cdc",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "usb_msc_pin_pullup": {
+   "name": "usb_msc_pin_pullup",
+   "scope": "master",
+   "defaultValue": "ON",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "flash_spi_bus": {
+   "name": "flash_spi_bus",
+   "scope": "master",
+   "defaultValue": "3",
+   "kind": "number",
+   "min": 0,
+   "max": 4
+  },
+  "rcdevice_init_dev_attempts": {
+   "name": "rcdevice_init_dev_attempts",
+   "scope": "master",
+   "defaultValue": "6",
+   "kind": "number",
+   "min": 0,
+   "max": 10
+  },
+  "rcdevice_init_dev_attempt_interval": {
+   "name": "rcdevice_init_dev_attempt_interval",
+   "scope": "master",
+   "defaultValue": "1000",
+   "kind": "number",
+   "min": 0,
+   "max": 5000
+  },
+  "rcdevice_protocol_version": {
+   "name": "rcdevice_protocol_version",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 1
+  },
+  "rcdevice_feature": {
+   "name": "rcdevice_feature",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 65535
+  },
+  "gyro_1_bustype": {
+   "name": "gyro_1_bustype",
+   "scope": "master",
+   "defaultValue": "SPI",
+   "kind": "enum",
+   "values": [
+    "NONE",
+    "I2C",
+    "SPI",
+    "SLAVE"
+   ]
+  },
+  "gyro_1_spibus": {
+   "name": "gyro_1_spibus",
+   "scope": "master",
+   "defaultValue": "1",
+   "kind": "number",
+   "min": 0,
+   "max": 4
+  },
+  "gyro_1_i2cBus": {
+   "name": "gyro_1_i2cBus",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 4
+  },
+  "gyro_1_i2c_address": {
+   "name": "gyro_1_i2c_address",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 119
+  },
+  "gyro_1_sensor_align": {
+   "name": "gyro_1_sensor_align",
+   "scope": "master",
+   "defaultValue": "CW0",
+   "kind": "enum",
+   "values": [
+    "DEFAULT",
+    "CW0",
+    "CW90",
+    "CW180",
+    "CW270",
+    "CW0FLIP",
+    "CW90FLIP",
+    "CW180FLIP",
+    "CW270FLIP",
+    "CUSTOM"
+   ]
+  },
+  "gyro_1_align_roll": {
+   "name": "gyro_1_align_roll",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -3600,
+   "max": 3600
+  },
+  "gyro_1_align_pitch": {
+   "name": "gyro_1_align_pitch",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -3600,
+   "max": 3600
+  },
+  "gyro_1_align_yaw": {
+   "name": "gyro_1_align_yaw",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -3600,
+   "max": 3600
+  },
+  "gyro_2_bustype": {
+   "name": "gyro_2_bustype",
+   "scope": "master",
+   "defaultValue": "NONE",
+   "kind": "enum",
+   "values": [
+    "NONE",
+    "I2C",
+    "SPI",
+    "SLAVE"
+   ]
+  },
+  "gyro_2_spibus": {
+   "name": "gyro_2_spibus",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 4
+  },
+  "gyro_2_i2cBus": {
+   "name": "gyro_2_i2cBus",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 4
+  },
+  "gyro_2_i2c_address": {
+   "name": "gyro_2_i2c_address",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 119
+  },
+  "gyro_2_sensor_align": {
+   "name": "gyro_2_sensor_align",
+   "scope": "master",
+   "defaultValue": "DEFAULT",
+   "kind": "enum",
+   "values": [
+    "DEFAULT",
+    "CW0",
+    "CW90",
+    "CW180",
+    "CW270",
+    "CW0FLIP",
+    "CW90FLIP",
+    "CW180FLIP",
+    "CW270FLIP",
+    "CUSTOM"
+   ]
+  },
+  "gyro_2_align_roll": {
+   "name": "gyro_2_align_roll",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -3600,
+   "max": 3600
+  },
+  "gyro_2_align_pitch": {
+   "name": "gyro_2_align_pitch",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -3600,
+   "max": 3600
+  },
+  "gyro_2_align_yaw": {
+   "name": "gyro_2_align_yaw",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -3600,
+   "max": 3600
+  },
+  "i2c1_pullup": {
+   "name": "i2c1_pullup",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "i2c1_clockspeed_khz": {
+   "name": "i2c1_clockspeed_khz",
+   "scope": "master",
+   "defaultValue": "800",
+   "kind": "number",
+   "min": 100,
+   "max": 1300
+  },
+  "i2c2_pullup": {
+   "name": "i2c2_pullup",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "i2c2_clockspeed_khz": {
+   "name": "i2c2_clockspeed_khz",
+   "scope": "master",
+   "defaultValue": "800",
+   "kind": "number",
+   "min": 100,
+   "max": 1300
+  },
+  "i2c3_pullup": {
+   "name": "i2c3_pullup",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "i2c3_clockspeed_khz": {
+   "name": "i2c3_clockspeed_khz",
+   "scope": "master",
+   "defaultValue": "800",
+   "kind": "number",
+   "min": 100,
+   "max": 1300
+  },
+  "mco2_on_pc9": {
+   "name": "mco2_on_pc9",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "scheduler_relax_rx": {
+   "name": "scheduler_relax_rx",
+   "scope": "master",
+   "defaultValue": "25",
+   "kind": "number",
+   "min": 0,
+   "max": 500
+  },
+  "scheduler_relax_osd": {
+   "name": "scheduler_relax_osd",
+   "scope": "master",
+   "defaultValue": "25",
+   "kind": "number",
+   "min": 0,
+   "max": 500
+  },
+  "cpu_late_limit_permille": {
+   "name": "cpu_late_limit_permille",
+   "scope": "master",
+   "defaultValue": "10",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "serialmsp_halfduplex": {
+   "name": "serialmsp_halfduplex",
+   "scope": "master",
+   "defaultValue": "OFF",
+   "kind": "enum",
+   "values": [
+    "OFF",
+    "ON"
+   ]
+  },
+  "timezone_offset_minutes": {
+   "name": "timezone_offset_minutes",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": -780,
+   "max": 780
+  },
+  "rpm_filter_harmonics": {
+   "name": "rpm_filter_harmonics",
+   "scope": "master",
+   "defaultValue": "3",
+   "kind": "number",
+   "min": 0,
+   "max": 3
+  },
+  "rpm_filter_weights": {
+   "name": "rpm_filter_weights",
+   "scope": "master",
+   "defaultValue": "100,100,100",
+   "kind": "array",
+   "length": 3
+  },
+  "rpm_filter_q": {
+   "name": "rpm_filter_q",
+   "scope": "master",
+   "defaultValue": "500",
+   "kind": "number",
+   "min": 250,
+   "max": 3000
+  },
+  "rpm_filter_min_hz": {
+   "name": "rpm_filter_min_hz",
+   "scope": "master",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 30,
+   "max": 200
+  },
+  "rpm_filter_fade_range_hz": {
+   "name": "rpm_filter_fade_range_hz",
+   "scope": "master",
+   "defaultValue": "50",
+   "kind": "number",
+   "min": 0,
+   "max": 1000
+  },
+  "rpm_filter_lpf_hz": {
+   "name": "rpm_filter_lpf_hz",
+   "scope": "master",
+   "defaultValue": "150",
+   "kind": "number",
+   "min": 100,
+   "max": 500
+  },
+  "stats_min_armed_time_s": {
+   "name": "stats_min_armed_time_s",
+   "scope": "master",
+   "defaultValue": "-1",
+   "kind": "number",
+   "min": -1,
+   "max": 127
+  },
+  "stats_total_flights": {
+   "name": "stats_total_flights",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 4294967295
+  },
+  "stats_total_time_s": {
+   "name": "stats_total_time_s",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 4294967295
+  },
+  "stats_total_dist_m": {
+   "name": "stats_total_dist_m",
+   "scope": "master",
+   "defaultValue": "0",
+   "kind": "number",
+   "min": 0,
+   "max": 4294967295
+  },
+  "craft_name": {
+   "name": "craft_name",
+   "scope": "master",
+   "defaultValue": "-",
+   "kind": "string",
+   "minLength": 1,
+   "maxLength": 16
+  },
+  "pilot_name": {
+   "name": "pilot_name",
+   "scope": "master",
+   "defaultValue": "-",
+   "kind": "string",
+   "minLength": 1,
+   "maxLength": 16
+  },
+  "altitude_source": {
+   "name": "altitude_source",
+   "scope": "master",
+   "defaultValue": "DEFAULT",
+   "kind": "enum",
+   "values": [
+    "DEFAULT",
+    "BARO_ONLY",
+    "GPS_ONLY"
+   ]
+  },
+  "altitude_prefer_baro": {
+   "name": "altitude_prefer_baro",
+   "scope": "master",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 0,
+   "max": 100
+  },
+  "altitude_lpf": {
+   "name": "altitude_lpf",
+   "scope": "master",
+   "defaultValue": "300",
+   "kind": "number",
+   "min": 10,
+   "max": 1000
+  },
+  "altitude_d_lpf": {
+   "name": "altitude_d_lpf",
+   "scope": "master",
+   "defaultValue": "100",
+   "kind": "number",
+   "min": 10,
+   "max": 1000
+  },
+  "box_user_1_name": {
+   "name": "box_user_1_name",
+   "scope": "master",
+   "defaultValue": "-",
+   "kind": "string",
+   "minLength": 1,
+   "maxLength": 16
+  },
+  "box_user_2_name": {
+   "name": "box_user_2_name",
+   "scope": "master",
+   "defaultValue": "-",
+   "kind": "string",
+   "minLength": 1,
+   "maxLength": 16
+  },
+  "box_user_3_name": {
+   "name": "box_user_3_name",
+   "scope": "master",
+   "defaultValue": "-",
+   "kind": "string",
+   "minLength": 1,
+   "maxLength": 16
+  },
+  "box_user_4_name": {
+   "name": "box_user_4_name",
+   "scope": "master",
+   "defaultValue": "-",
+   "kind": "string",
+   "minLength": 1,
+   "maxLength": 16
+  }
+ },
+ "commands": {
+  "adjrange": {
+   "name": "adjrange",
+   "description": "configure adjustment ranges",
+   "usage": [
+    "<index> <unused> <range channel> <start> <end> <function> <select channel> [<center> <scale>]"
+   ]
+  },
+  "aux": {
+   "name": "aux",
+   "description": "configure modes",
+   "usage": [
+    "<index> <mode> <aux> <start> <end> <logic>"
+   ]
+  },
+  "batch": {
+   "name": "batch",
+   "description": "start or end a batch of commands",
+   "usage": [
+    "start | end"
+   ]
+  },
+  "beacon": {
+   "name": "beacon",
+   "description": "enable/disable Dshot beacon for a condition",
+   "usage": [
+    "list",
+    "<->[name]"
+   ]
+  },
+  "beeper": {
+   "name": "beeper",
+   "description": "enable/disable beeper for a condition",
+   "usage": [
+    "list",
+    "<->[name]"
+   ]
+  },
+  "bind_rx": {
+   "name": "bind_rx",
+   "description": "initiate binding for RX SPI, SRXL2 or CRSF",
+   "usage": []
+  },
+  "bl": {
+   "name": "bl",
+   "description": "reboot into bootloader",
+   "usage": [
+    "[rom]"
+   ]
+  },
+  "board_name": {
+   "name": "board_name",
+   "description": "get / set the name of the board model",
+   "usage": [
+    "[board name]"
+   ]
+  },
+  "defaults": {
+   "name": "defaults",
+   "description": "reset to defaults and reboot",
+   "usage": [
+    "{nosave}"
+   ]
+  },
+  "diff": {
+   "name": "diff",
+   "description": "list configuration changes from default",
+   "usage": [
+    "[master|profile|rates|hardware|all] {defaults|bare}"
+   ]
+  },
+  "dma": {
+   "name": "dma",
+   "description": "show/set DMA assignments",
+   "usage": [
+    "<> | <device> <index> list | <device> <index> [<option>|none] | list | show"
+   ]
+  },
+  "dshot_telemetry_info": {
+   "name": "dshot_telemetry_info",
+   "description": "display dshot telemetry info and stats",
+   "usage": []
+  },
+  "dshotprog": {
+   "name": "dshotprog",
+   "description": "program DShot ESC(s)",
+   "usage": [
+    "<index> <command>+"
+   ]
+  },
+  "dump": {
+   "name": "dump",
+   "description": "dump configuration",
+   "usage": [
+    "[master|profile|rates|hardware|all] {defaults|bare}"
+   ]
+  },
+  "escprog": {
+   "name": "escprog",
+   "description": "passthrough esc to serial",
+   "usage": [
+    "<mode [sk/bl/ki/cc]> <index>"
+   ]
+  },
+  "exit": {
+   "name": "exit",
+   "description": "exit command line interface and reboot (default)",
+   "usage": [
+    "[noreboot]"
+   ]
+  },
+  "feature": {
+   "name": "feature",
+   "description": "configure features",
+   "usage": [
+    "list",
+    "<->[name]"
+   ]
+  },
+  "flash_erase": {
+   "name": "flash_erase",
+   "description": "erase flash chip",
+   "usage": []
+  },
+  "flash_info": {
+   "name": "flash_info",
+   "description": "show flash chip info",
+   "usage": []
+  },
+  "flash_read": {
+   "name": "flash_read",
+   "description": "",
+   "usage": [
+    "<length> <address>"
+   ]
+  },
+  "flash_scan": {
+   "name": "flash_scan",
+   "description": "scan flash device for errors",
+   "usage": []
+  },
+  "flash_write": {
+   "name": "flash_write",
+   "description": "",
+   "usage": [
+    "<address> <message>"
+   ]
+  },
+  "get": {
+   "name": "get",
+   "description": "get variable value",
+   "usage": [
+    "[name]"
+   ]
+  },
+  "gyroregisters": {
+   "name": "gyroregisters",
+   "description": "dump gyro config registers contents",
+   "usage": []
+  },
+  "help": {
+   "name": "help",
+   "description": "display command help",
+   "usage": [
+    "[search string]"
+   ]
+  },
+  "manufacturer_id": {
+   "name": "manufacturer_id",
+   "description": "get / set the id of the board manufacturer",
+   "usage": [
+    "[manufacturer id]"
+   ]
+  },
+  "map": {
+   "name": "map",
+   "description": "configure rc channel order",
+   "usage": [
+    "[<map>]"
+   ]
+  },
+  "mcu_id": {
+   "name": "mcu_id",
+   "description": "id of the microcontroller",
+   "usage": []
+  },
+  "mixer": {
+   "name": "mixer",
+   "description": "configure mixer",
+   "usage": [
+    "list",
+    "<name>"
+   ]
+  },
+  "mmix": {
+   "name": "mmix",
+   "description": "custom motor mixer",
+   "usage": []
+  },
+  "motor": {
+   "name": "motor",
+   "description": "get/set motor",
+   "usage": [
+    "<index> [<value>]"
+   ]
+  },
+  "msc": {
+   "name": "msc",
+   "description": "switch into msc mode",
+   "usage": [
+    "[<timezone offset minutes>]"
+   ]
+  },
+  "play_sound": {
+   "name": "play_sound",
+   "description": "",
+   "usage": [
+    "[<index>]"
+   ]
+  },
+  "profile": {
+   "name": "profile",
+   "description": "change profile",
+   "usage": [
+    "[<index>]"
+   ]
+  },
+  "rateprofile": {
+   "name": "rateprofile",
+   "description": "change rate profile",
+   "usage": [
+    "[<index>]"
+   ]
+  },
+  "rc_smoothing_info": {
+   "name": "rc_smoothing_info",
+   "description": "show rc_smoothing operational settings",
+   "usage": []
+  },
+  "resource": {
+   "name": "resource",
+   "description": "show/set resources",
+   "usage": [
+    "<> | <resource name> <index> [<pin>|none] | show [all]"
+   ]
+  },
+  "rxfail": {
+   "name": "rxfail",
+   "description": "show/set rx failsafe settings",
+   "usage": []
+  },
+  "rxrange": {
+   "name": "rxrange",
+   "description": "configure rx channel ranges",
+   "usage": []
+  },
+  "save": {
+   "name": "save",
+   "description": "save and reboot (default)",
+   "usage": [
+    "[noreboot]"
+   ]
+  },
+  "serial": {
+   "name": "serial",
+   "description": "configure serial ports",
+   "usage": []
+  },
+  "serialpassthrough": {
+   "name": "serialpassthrough",
+   "description": "passthrough serial data data from port 1 to VCP / port 2",
+   "usage": [
+    "<id1> [<baud1>] [<mode1>] [none|<dtr pinio>|reset] [<id2>] [<baud2>] [<mode2>]"
+   ]
+  },
+  "servo": {
+   "name": "servo",
+   "description": "configure servos",
+   "usage": []
+  },
+  "set": {
+   "name": "set",
+   "description": "change setting",
+   "usage": [
+    "[<name>=<value>]"
+   ]
+  },
+  "signature": {
+   "name": "signature",
+   "description": "get / set the board type signature",
+   "usage": [
+    "[signature]"
+   ]
+  },
+  "simplified_tuning": {
+   "name": "simplified_tuning",
+   "description": "applies or disables simplified tuning",
+   "usage": [
+    "apply | disable"
+   ]
+  },
+  "smix": {
+   "name": "smix",
+   "description": "servo mixer",
+   "usage": [
+    "<rule> <servo> <source> <rate> <speed> <min> <max> <box>",
+    "reset",
+    "load <mixer>",
+    "reverse <servo> <source> r|n"
+   ]
+  },
+  "status": {
+   "name": "status",
+   "description": "show status",
+   "usage": []
+  },
+  "tasks": {
+   "name": "tasks",
+   "description": "show task stats",
+   "usage": []
+  },
+  "timer": {
+   "name": "timer",
+   "description": "show/set timers",
+   "usage": [
+    "<> | <pin> list | <pin> [af<alternate function>|none|<option(deprecated)>] | list | show"
+   ]
+  },
+  "version": {
+   "name": "version",
+   "description": "show version",
+   "usage": []
+  },
+  "vtx": {
+   "name": "vtx",
+   "description": "vtx channels on switch",
+   "usage": [
+    "<index> <aux_channel> <vtx_band> <vtx_channel> <vtx_power> <start_range> <end_range>"
+   ]
+  },
+  "vtx_info": {
+   "name": "vtx_info",
+   "description": "vtx power config dump",
+   "usage": []
+  },
+  "vtxtable": {
+   "name": "vtxtable",
+   "description": "vtx frequency table",
+   "usage": [
+    "<band> <bandname> <bandletter> [FACTORY|CUSTOM] <freq> ... <freq>"
+   ]
+  }
+ }
+}

@@ -1,0 +1,22 @@
+dma show
+
+Currently active DMA:
+--------------------
+DMA1 Stream 0: SPI_SDI 3
+DMA1 Stream 1: FREE
+DMA1 Stream 2: FREE
+DMA1 Stream 3: SPI_SDI 2
+DMA1 Stream 4: SPI_SDO 2
+DMA1 Stream 5: SPI_SDO 3
+DMA1 Stream 6: FREE
+DMA1 Stream 7: FREE
+DMA2 Stream 0: ADC
+DMA2 Stream 1: FREE
+DMA2 Stream 2: SPI_SDI 1
+DMA2 Stream 3: SPI_SDO 1
+DMA2 Stream 4: DSHOT_BITBANG 1
+DMA2 Stream 5: FREE
+DMA2 Stream 6: FREE
+DMA2 Stream 7: DSHOT_BITBANG 3
+
+# 

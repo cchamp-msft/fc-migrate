@@ -1,0 +1,23 @@
+{
+  "name": "@bf-migrate/worker",
+  "version": "0.1.0",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "dev": "node -e \"require('fs').mkdirSync('../web/dist',{recursive:true})\" && wrangler dev",
+    "deploy": "pnpm --filter @bf-migrate/web build && wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "try": "tsx scripts/try-provider.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "latest",
+    "@bf-migrate/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "~6.0.3",
+    "wrangler": "^4.0.0"
+  }
+}

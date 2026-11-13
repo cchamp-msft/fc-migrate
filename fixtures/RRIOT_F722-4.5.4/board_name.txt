@@ -1,0 +1,4 @@
+board_name
+board_name RRIOT_F722
+
+# 

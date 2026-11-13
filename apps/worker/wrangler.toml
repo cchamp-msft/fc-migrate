@@ -1,0 +1,60 @@
+name = "bf-migrate"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Variables set in the Cloudflare dashboard survive a deploy. LLM_ENABLED lives
+# there on purpose, so suggestions can be switched on and off without a release.
+keep_vars = true
+
+# The site lives at fc-migrate.com. Custom domains create their own DNS records and
+# certificates. A redirect rule on the zone sends www to the bare domain (see docs/PLAN.md).
+# The workers.dev address stays on while visitors move over.
+routes = [
+  { pattern = "fc-migrate.com", custom_domain = true },
+  { pattern = "www.fc-migrate.com", custom_domain = true },
+]
+workers_dev = true
+
+# One Worker serves the site and its API from the same origin. Only /api/* runs
+# this script; everything else is a static file from the web build.
+[assets]
+directory = "../web/dist"
+run_worker_first = ["/api/*"]
+
+# Usage limits. The API stays shut if either binding is missing.
+# Every call but /status, per visitor address: 10 a minute. Also slows passphrase guessing.
+[[ratelimits]]
+name = "API_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }
+
+# Model calls per UTC day: 50 per visitor and 200 in total, unless DAILY_LIMIT_PER_VISITOR
+# or DAILY_LIMIT_TOTAL is set in the dashboard.
+[[durable_objects.bindings]]
+name = "BUDGET"
+class_name = "DailyBudget"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DailyBudget"]
+
+[vars]
+# Comma-separated origins allowed to call this API from another origin. The site
+# itself calls same-origin and needs no entry here.
+ALLOWED_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173"
+DEFAULT_PROVIDER = "opus"
+
+# Plain variable, set in the dashboard (Settings > Variables and Secrets):
+#   LLM_ENABLED              "true" turns AI suggestions on; anything else turns them off
+#   DAILY_LIMIT_PER_VISITOR  optional, model calls per visitor per day (default 50)
+#   DAILY_LIMIT_TOTAL        optional, model calls per day for everyone (default 200)
+#
+# Secrets, set with `wrangler secret put`, or in .dev.vars locally:
+#   PROXY_TOKEN        passphrase every caller must send; case and separators are ignored
+#   ANTHROPIC_API_KEY
+#   XAI_API_KEY        with GROK_MODEL in vars
+#   DEEPSEEK_API_KEY   with DEEPSEEK_MODEL in vars
+#
+# Strata is for local development only, through STRATA_BASE_URL and STRATA_API_KEY
+# in .dev.vars. The deployed Worker deliberately has no route to it.

@@ -1,0 +1,22 @@
+node_modules/
+dist/
+coverage/
+*.log
+*.tsbuildinfo
+.DS_Store
+.vite/
+.wrangler/
+.dev.vars
+.env
+.env.*
+!.env.example
+
+# Local-only working notes and hardware captures that are not test fixtures
+.local/
+
+# Temporary worktrees made by coding agents
+.claude/worktrees/
+
+# Firmware images and readback dumps are never committed
+*.hex
+*.bin

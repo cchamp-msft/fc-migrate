@@ -1,0 +1,23 @@
+timer show
+
+Currently active Timers:
+-----------------------
+TIM1:
+    CH3 : CAMERA_CONTROL
+TIM2: FREE
+TIM3: FREE
+TIM4: FREE
+TIM5: FREE
+TIM6: FREE
+TIM7: FREE
+TIM8:
+    CH3 : DSHOT_BITBANG 1
+    CH4 : DSHOT_BITBANG 3
+TIM9: FREE
+TIM10: FREE
+TIM11: FREE
+TIM12: FREE
+TIM13: FREE
+TIM14: FREE
+
+# 

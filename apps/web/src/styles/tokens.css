@@ -1,0 +1,249 @@
+/*
+ * Design tokens. A theme sets the palette for one family in one mode; components
+ * only ever use these variables, so adding a theme needs no component changes.
+ */
+:root {
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+  --radius-s: 6px;
+  --radius-m: 10px;
+  --radius-l: 14px;
+  --sidebar-width: 15.5rem;
+
+  --ok: #16a34a;
+  --ok-soft: color-mix(in srgb, var(--ok) 14%, transparent);
+  --warn: #d97706;
+  --warn-soft: color-mix(in srgb, var(--warn) 14%, transparent);
+  --danger: #dc2626;
+  --danger-soft: color-mix(in srgb, var(--danger) 14%, transparent);
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 6px 20px rgb(0 0 0 / 0.06);
+  --wash: none;
+}
+
+:root[data-mode="dark"] {
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --danger: #f87171;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
+  color-scheme: dark;
+}
+
+:root[data-mode="light"] {
+  color-scheme: light;
+}
+
+/* Mono: near monochrome, with colour kept for the brand mark and status. */
+:root[data-theme="mono"][data-mode="light"] {
+  --bg: #f6f6f7;
+  --surface: #ffffff;
+  --surface-2: #f0f0f2;
+  --border: #e2e2e6;
+  --text: #18181b;
+  --muted: #6b6b76;
+  --accent: #18181b;
+  --on-accent: #ffffff;
+  --brand: #e8a400;
+  --sidebar: #ffffff;
+  --on-sidebar: #18181b;
+  --sidebar-muted: #6b6b76;
+  --sidebar-active: #efeff1;
+  --sidebar-border: #e2e2e6;
+}
+
+:root[data-theme="mono"][data-mode="dark"] {
+  --bg: #0e0e10;
+  --surface: #17171a;
+  --surface-2: #202024;
+  --border: #2c2c31;
+  --text: #f4f4f5;
+  --muted: #a0a0ab;
+  --accent: #f4f4f5;
+  --on-accent: #17171a;
+  --brand: #ffbb00;
+  --sidebar: #131316;
+  --on-sidebar: #f4f4f5;
+  --sidebar-muted: #a0a0ab;
+  --sidebar-active: #25252a;
+  --sidebar-border: #2c2c31;
+}
+
+/* Deep purple */
+:root[data-theme="purple"][data-mode="light"] {
+  --bg: #f7f4fe;
+  --surface: #ffffff;
+  --surface-2: #f0eafb;
+  --border: #e1d8f5;
+  --text: #221236;
+  --muted: #6a5a85;
+  --accent: #5b21b6;
+  --on-accent: #ffffff;
+  --brand: #7c3aed;
+  --sidebar: #2e1065;
+  --on-sidebar: #f3edff;
+  --sidebar-muted: #c1b1e4;
+  --sidebar-active: #47208f;
+  --sidebar-border: #431e85;
+}
+
+:root[data-theme="purple"][data-mode="dark"] {
+  --bg: #110a1d;
+  --surface: #1b1230;
+  --surface-2: #261a40;
+  --border: #372753;
+  --text: #f2ecff;
+  --muted: #ab9bca;
+  --accent: #a78bfa;
+  --on-accent: #1a0f2e;
+  --brand: #a78bfa;
+  --sidebar: #160d27;
+  --on-sidebar: #f2ecff;
+  --sidebar-muted: #ab9bca;
+  --sidebar-active: #2d1e4c;
+  --sidebar-border: #2e2047;
+  --wash: radial-gradient(60rem 30rem at 85% -10%, rgb(124 58 237 / 0.18), transparent 70%);
+}
+
+/* Deep red */
+:root[data-theme="red"][data-mode="light"] {
+  --bg: #fff6f5;
+  --surface: #ffffff;
+  --surface-2: #fdeceb;
+  --border: #f4d9d7;
+  --text: #2b1012;
+  --muted: #875c5f;
+  --accent: #b01c1c;
+  --on-accent: #ffffff;
+  --brand: #dc2626;
+  --sidebar: #5f0f13;
+  --on-sidebar: #ffefee;
+  --sidebar-muted: #e9b6b5;
+  --sidebar-active: #80191e;
+  --sidebar-border: #771a1e;
+}
+
+:root[data-theme="red"][data-mode="dark"] {
+  --bg: #160a0b;
+  --surface: #221113;
+  --surface-2: #2f181b;
+  --border: #452226;
+  --text: #fdecec;
+  --muted: #c59da0;
+  --accent: #f87171;
+  --on-accent: #2a0b0c;
+  --brand: #f87171;
+  --sidebar: #1b0c0e;
+  --on-sidebar: #fdecec;
+  --sidebar-muted: #c59da0;
+  --sidebar-active: #3a1a1e;
+  --sidebar-border: #3a1c20;
+  --wash: radial-gradient(60rem 30rem at 85% -10%, rgb(220 38 38 / 0.16), transparent 70%);
+}
+
+/* Blue and teal */
+:root[data-theme="teal"][data-mode="light"] {
+  --bg: #f1fafb;
+  --surface: #ffffff;
+  --surface-2: #e4f4f5;
+  --border: #d0e9eb;
+  --text: #0b2a31;
+  --muted: #557a82;
+  --accent: #0e7490;
+  --on-accent: #ffffff;
+  --brand: #0d9488;
+  --sidebar: #0c3a4a;
+  --on-sidebar: #e7f8fa;
+  --sidebar-muted: #a5cfd7;
+  --sidebar-active: #145267;
+  --sidebar-border: #154d60;
+}
+
+:root[data-theme="teal"][data-mode="dark"] {
+  --bg: #071319;
+  --surface: #0e1f27;
+  --surface-2: #152c36;
+  --border: #1f3f4b;
+  --text: #e6f7fa;
+  --muted: #8fb4be;
+  --accent: #2dd4bf;
+  --on-accent: #04201c;
+  --brand: #2dd4bf;
+  --sidebar: #09181f;
+  --on-sidebar: #e6f7fa;
+  --sidebar-muted: #8fb4be;
+  --sidebar-active: #173440;
+  --sidebar-border: #18323d;
+  --wash: radial-gradient(60rem 30rem at 85% -10%, rgb(14 165 233 / 0.16), transparent 70%);
+}
+
+/* Betaflight: the classic Configurator yellow, used boldly. */
+:root[data-theme="betaflight"][data-mode="light"] {
+  --bg: #f4f4f4;
+  --surface: #ffffff;
+  --surface-2: #f4efe0;
+  --border: #e0e0e0;
+  --text: #2b2b2b;
+  --muted: #6f6f6f;
+  --accent: #ffbb00;
+  --on-accent: #2b2b2b;
+  --brand: #2b2b2b;
+  --sidebar: #ffbb00;
+  --on-sidebar: #2b2b2b;
+  --sidebar-muted: #5e4a10;
+  --sidebar-active: #ffdc7a;
+  --sidebar-border: #e6a800;
+}
+
+:root[data-theme="betaflight"][data-mode="dark"] {
+  --bg: #1b1b1b;
+  --surface: #272727;
+  --surface-2: #323232;
+  --border: #3f3f3f;
+  --text: #f2f2f2;
+  --muted: #b5b5b5;
+  --accent: #ffbb00;
+  --on-accent: #1b1b1b;
+  --brand: #ffbb00;
+  --sidebar: #2d2d2d;
+  --on-sidebar: #f2f2f2;
+  --sidebar-muted: #b5b5b5;
+  --sidebar-active: #4a3c12;
+  --sidebar-border: #3f3f3f;
+}
+
+/* Sunset: Betaflight yellow washed through orange into violet. */
+:root[data-theme="sunset"][data-mode="light"] {
+  --bg: #fff8f1;
+  --surface: #fffdfb;
+  --surface-2: #ffeee0;
+  --border: #f7dfca;
+  --text: #2e1a2b;
+  --muted: #80616f;
+  --accent: #cf4a0f;
+  --on-accent: #ffffff;
+  --brand: #ffffff;
+  --sidebar: linear-gradient(175deg, #ffb100 0%, #ff7a18 34%, #e0357a 72%, #6a2fb5 100%);
+  --on-sidebar: #ffffff;
+  --sidebar-muted: #fff0dc;
+  --sidebar-active: rgb(255 255 255 / 0.24);
+  --sidebar-border: rgb(255 255 255 / 0.28);
+  --wash: radial-gradient(70rem 32rem at 90% -12%, rgb(255 138 40 / 0.2), transparent 70%);
+}
+
+:root[data-theme="sunset"][data-mode="dark"] {
+  --bg: #150c1c;
+  --surface: #221428;
+  --surface-2: #2e1c36;
+  --border: #452a4e;
+  --text: #fff1e6;
+  --muted: #c7a7bb;
+  --accent: #ff9a3d;
+  --on-accent: #26101f;
+  --brand: #ffffff;
+  --sidebar: linear-gradient(175deg, #c97a00 0%, #c24a10 32%, #92205c 68%, #3f1c74 100%);
+  --on-sidebar: #fff6ec;
+  --sidebar-muted: #f5d9c4;
+  --sidebar-active: rgb(255 255 255 / 0.18);
+  --sidebar-border: rgb(255 255 255 / 0.2);
+  --wash: radial-gradient(70rem 32rem at 90% -12%, rgb(224 53 122 / 0.2), transparent 70%);
+}

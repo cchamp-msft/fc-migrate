@@ -1,0 +1,102 @@
+help
+adjrange - configure adjustment ranges
+	<index> <unused> <range channel> <start> <end> <function> <select channel> [<center> <scale>]
+aux - configure modes
+	<index> <mode> <aux> <start> <end> <logic>
+batch - start or end a batch of commands
+	start | end
+beacon - enable/disable Dshot beacon for a condition
+	list
+	<->[name]
+beeper - enable/disable beeper for a condition
+	list
+	<->[name]
+bind_rx - initiate binding for RX SPI, SRXL2 or CRSF
+bl - reboot into bootloader
+	[rom]
+board_name - get / set the name of the board model
+	[board name]
+defaults - reset to defaults and reboot
+	{nosave}
+diff - list configuration changes from default
+	[master|profile|rates|hardware|all] {defaults|bare}
+dma - show/set DMA assignments
+	<> | <device> <index> list | <device> <index> [<option>|none] | list | show
+dshot_telemetry_info - display dshot telemetry info and stats
+dshotprog - program DShot ESC(s)
+	<index> <command>+
+dump - dump configuration
+	[master|profile|rates|hardware|all] {defaults|bare}
+escprog - passthrough esc to serial
+	<mode [sk/bl/ki/cc]> <index>
+exit - exit command line interface and reboot (default)
+	[noreboot]
+feature - configure features
+	list
+	<->[name]
+flash_erase - erase flash chip
+flash_info - show flash chip info
+flash_read
+	<length> <address>
+flash_scan - scan flash device for errors
+flash_write
+	<address> <message>
+get - get variable value
+	[name]
+gyroregisters - dump gyro config registers contents
+help - display command help
+	[search string]
+manufacturer_id - get / set the id of the board manufacturer
+	[manufacturer id]
+map - configure rc channel order
+	[<map>]
+mcu_id - id of the microcontroller
+mixer - configure mixer
+	list
+	<name>
+mmix - custom motor mixer
+motor - get/set motor
+	<index> [<value>]
+msc - switch into msc mode
+	[<timezone offset minutes>]
+play_sound
+	[<index>]
+profile - change profile
+	[<index>]
+rateprofile - change rate profile
+	[<index>]
+rc_smoothing_info - show rc_smoothing operational settings
+resource - show/set resources
+	<> | <resource name> <index> [<pin>|none] | show [all]
+rxfail - show/set rx failsafe settings
+rxrange - configure rx channel ranges
+save - save and reboot (default)
+	[noreboot]
+serial - configure serial ports
+serialpassthrough - passthrough serial data data from port 1 to VCP / port 2
+	<id1> [<baud1>] [<mode1>] [none|<dtr pinio>|reset] [<id2>] [<baud2>] [<mode2>]
+servo - configure servos
+set - change setting
+	[<name>=<value>]
+signature - get / set the board type signature
+	[signature]
+simplified_tuning - applies or disables simplified tuning
+	apply | disable
+smix - servo mixer
+	<rule> <servo> <source> <rate> <speed> <min> <max> <box>
+	reset
+	load <mixer>
+	reverse <servo> <source> r|n
+status - show status
+tasks - show task stats
+timer - show/set timers
+	<> | <pin> list | <pin> [af<alternate function>|none|<option(deprecated)>] | list | show
+version - show version
+vtx - vtx channels on switch
+	<index> <aux_channel> <vtx_band> <vtx_channel> <vtx_power> <start_range> <end_range>
+vtx_info - vtx power config dump
+vtxtable - vtx frequency table
+	<band> <bandname> <bandletter> [FACTORY|CUSTOM] <freq> ... <freq>
+
+
+# 

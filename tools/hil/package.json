@@ -1,0 +1,27 @@
+{
+  "name": "@bf-migrate/hil",
+  "version": "0.1.0",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "firmware": "tsx src/fetch-firmware.ts",
+    "capture": "tsx src/capture-schema.ts",
+    "flash": "tsx src/flash.ts",
+    "migrate": "tsx src/migrate-run.ts",
+    "bootstrap": "tsx src/bootstrap-run.ts",
+    "stlink": "tsx src/stlink-readonly.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bf-migrate/core": "workspace:*",
+    "serialport": "^13.0.0",
+    "usb": "^2.19.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "~6.0.3"
+  }
+}

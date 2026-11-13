@@ -1,0 +1,115 @@
+diff all
+
+# version
+# Betaflight / STM32F7X2 (S7X2) 4.5.4 May 10 2026 / 03:09:43 (norevision) MSP API: 1.46
+# config rev: c2ca1b0
+
+# start the command batch
+batch start
+
+# reset configuration to default settings
+defaults nosave
+
+board_name RRIOT_F722
+manufacturer_id EASP
+mcu_id 0037004b3433510e37313337
+signature 
+
+# name: RRIOT SHORTY
+
+# feature
+feature SERVO_TILT
+feature TELEMETRY
+feature OSD
+feature CHANNEL_FORWARDING
+
+# serial
+serial 0 64 115200 57600 0 115200
+serial 1 8192 115200 57600 0 115200
+
+# aux
+aux 0 0 0 1700 2100 0 0
+aux 1 13 3 1700 2100 0 0
+aux 2 35 2 1700 2100 0 0
+
+# vtxtable
+vtxtable bands 1
+vtxtable channels 8
+vtxtable band 1 R        R CUSTOM  5658 5695 5732 5769 5806 5843 5880 5917
+vtxtable powerlevels 5
+vtxtable powervalues 25 100 200 500 1000
+vtxtable powerlabels 25 100 200 500 1W
+
+# master
+set dyn_notch_count = 1
+set dyn_notch_q = 500
+set acc_calibration = 55,-19,9,1
+set dshot_bidir = ON
+set motor_output_reordering = 1,0,3,2,4,5,6,7
+set ibat_lpf_period = 30
+set vbat_scale = 101
+set ibata_scale = 112
+set yaw_motors_reversed = ON
+set osd_units = BRITISH
+set osd_show_spec_prearm = OFF
+set osd_link_quality_pos = 2072
+set osd_tim_2_pos = 2104
+set osd_throttle_pos = 2419
+set osd_craft_name_pos = 2048
+set osd_altitude_pos = 18790
+set osd_warnings_pos = 14569
+set osd_avg_cell_voltage_pos = 2347
+set osd_disarmed_pos = 2250
+set osd_pid_profile_name_pos = 32
+set osd_stat_bitmask = 14124
+set osd_displayport_device = AUTO
+set osd_canvas_width = 30
+set osd_canvas_height = 13
+set vtx_band = 1
+set vtx_channel = 6
+set vtx_power = 5
+set vtx_freq = 5843
+set vcd_video_system = AUTO
+set craft_name = RRIOT SHORTY
+
+profile 0
+
+# profile 0
+set throttle_boost = 0
+set dyn_idle_min_rpm = 30
+
+profile 1
+
+profile 2
+
+profile 3
+
+# restore original profile selection
+profile 0
+
+rateprofile 0
+
+rateprofile 1
+
+# rateprofile 1
+set rateprofile_name = N00HTNZZ
+set roll_rc_rate = 15
+set pitch_rc_rate = 15
+set yaw_rc_rate = 17
+set roll_expo = 34
+set pitch_expo = 34
+set yaw_expo = 58
+set roll_srate = 74
+set pitch_srate = 74
+set yaw_srate = 74
+
+rateprofile 2
+
+rateprofile 3
+
+# restore original rateprofile selection
+rateprofile 1
+
+# save configuration
+save
+# 

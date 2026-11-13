@@ -1,0 +1,36 @@
+{
+  "name": "bf-migrate",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Unofficial Betaflight firmware upgrade and configuration migration tool.",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @bf-migrate/web dev",
+    "dev:api": "pnpm --filter @bf-migrate/worker dev",
+    "build": "pnpm --filter @bf-migrate/web build",
+    "preview": "pnpm --filter @bf-migrate/web preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "pnpm -r --parallel typecheck",
+    "lint": "eslint . --max-warnings 0",
+    "commitlint": "commitlint",
+    "hil": "pnpm --filter @bf-migrate/hil start"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "eslint-plugin-vue": "^10.12.0",
+    "globals": "^17.14.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.0.5",
+    "vue-eslint-parser": "^10.4.2"
+  }
+}

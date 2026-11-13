@@ -1,0 +1,6 @@
+version
+# Betaflight / STM32F7X2 (S7X2) 4.5.4 May 10 2026 / 03:09:43 (norevision) MSP API: 1.46
+# config rev: c2ca1b0
+# board: manufacturer_id: EASP, board_name: RRIOT_F722
+
+# 

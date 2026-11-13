@@ -1,0 +1,16 @@
+status
+MCU F722 Clock=216MHz, Vref=3.28V, Core temp=51degC
+Stack size: 2048, Stack address: 0x20010000
+Configuration: CONFIGURED, size: 3806, max available: 16384
+Devices detected: SPI:1, I2C:1
+Gyros detected: gyro 1 locked dma
+GYRO=BMI270, ACC=BMI270, BARO=BMP388
+OSD: MAX7456 (30 x 13)
+System Uptime: 369 seconds, Current Time: 2026-11-08T14:29:50.830+00:00
+CPU:21%, cycle time: 318, GYRO rate: 3144, RX rate: 15, System rate: 9
+Voltage: 4 * 0.01V (0S battery - NOT PRESENT)
+I2C Errors: 0
+FLASH: JEDEC ID=0x00ef4018 16M
+Arming disable flags: RXLOSS CLI MSP DSHOT_TELEM
+
+# 
