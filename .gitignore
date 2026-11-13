@@ -17,6 +17,8 @@ coverage/
 # Temporary worktrees made by coding agents
 .claude/worktrees/
 
-# Firmware images and readback dumps are never committed
+# Firmware images and readback dumps are never committed, except the
+# fc-migrate-firmware releases the site serves (pinned in src/data/hosted-firmware.ts)
 *.hex
 *.bin
+!apps/web/public/firmware/**/*.hex
