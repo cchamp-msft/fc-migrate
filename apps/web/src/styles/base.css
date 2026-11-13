@@ -230,12 +230,24 @@ kbd {
   margin-top: 0.15rem;
 }
 
+/* Warnings must not read as decoration: a solid edge, a coloured icon, heavier text for danger. */
 .notice-warn {
   background: var(--warn-soft);
+  border-left: 4px solid var(--warn);
+}
+
+.notice-warn > svg {
+  color: var(--warn);
 }
 
 .notice-danger {
   background: var(--danger-soft);
+  border-left: 4px solid var(--danger);
+  font-weight: 600;
+}
+
+.notice-danger > svg {
+  color: var(--danger);
 }
 
 .segmented {
