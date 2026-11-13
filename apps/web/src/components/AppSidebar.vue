@@ -12,8 +12,10 @@ const nav = [
   { to: "/cli", label: "CLI", icon: SquareTerminal },
   { to: "/migrate", label: "Migrate", icon: Wand },
   { to: "/bootstrap", label: "Bootstrap", icon: Rocket },
-  { to: "/alpha", label: "Alpha Migrate", icon: Cpu },
 ];
+
+/** Shown in the menu but not reachable while they are being repaired. */
+const closed = [{ label: "Alpha Migrate", icon: Cpu }];
 
 const secondary = [
   { to: "/appearance", label: "Appearance", icon: Palette },
@@ -50,6 +52,10 @@ const busyLabel = computed(() => (connection.status === "rebooting" ? "Restartin
       <RouterLink v-for="item in nav" :key="item.to" :to="item.to" class="nav-item">
         <component :is="item.icon" :size="17" /> {{ item.label }}
       </RouterLink>
+      <span v-for="item in closed" :key="item.label" class="nav-item nav-closed" aria-disabled="true">
+        <component :is="item.icon" :size="17" /> {{ item.label }}
+        <span class="closed-tag">Closed for repair</span>
+      </span>
     </nav>
 
     <nav class="nav nav-secondary" aria-label="Application">
@@ -171,6 +177,25 @@ const busyLabel = computed(() => (connection.status === "rebooting" ? "Restartin
 .nav-item.router-link-exact-active {
   background: var(--sidebar-active);
   font-weight: 650;
+}
+
+.nav-closed {
+  flex-wrap: wrap;
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.nav-closed:hover {
+  background: none;
+}
+
+.closed-tag {
+  padding: 0 0.35rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .spin {
