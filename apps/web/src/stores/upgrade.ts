@@ -16,9 +16,17 @@ import { defineStore } from "pinia";
 import { computed, ref, shallowRef, watch } from "vue";
 import { useConnectionStore } from "./connection";
 import { STM32_DFU_FILTER, waitForAuthorizedDfuDevice } from "../utils/dfu-device";
+import type { ChosenImage } from "../utils/firmware-image";
 import { saveFile } from "../utils/save-file";
 
 export type UpgradeStep = "idle" | "backup" | "build" | "bootloader" | "permission" | "flash" | "reconnect" | "apply" | "review" | "saving" | "done" | "failed";
+
+/** Where an upgrade's firmware comes from. */
+export type FirmwareSource =
+  /** Betaflight's cloud build, with these build options (defines). */
+  | { kind: "cloud"; options: readonly string[] }
+  /** A file already loaded and checked: this site's own release, or the pilot's. */
+  | { kind: "image"; chosen: ChosenImage };
 
 const INTERNAL_FLASH_START = 0x08000000;
 
@@ -64,7 +72,7 @@ export const useUpgradeStore = defineStore("upgrade", () => {
   );
 
   /** Backs up, builds, and reboots to the bootloader. Flashing continues in `flashWith`. */
-  async function start(chosenPlan: MigrationPlan): Promise<void> {
+  async function start(chosenPlan: MigrationPlan, source: FirmwareSource): Promise<void> {
     reset();
     plan.value = chosenPlan;
     const identity = connection.identity;
@@ -80,14 +88,21 @@ export const useUpgradeStore = defineStore("upgrade", () => {
       saveFile(`backup_${stem}_dump.txt`, `${snapshot.dumpAll}\n`, "text/plain");
 
       step.value = "build";
-      message.value = `Requesting ${chosenPlan.targetVersion} with this board's options`;
-      const api = new BuildApi();
-      const defines = identity.buildOptions.flatMap((entry) => (entry.option ? [entry.option.define] : []));
-      const selection = selectBuildOptions(defines, await api.getOptions(chosenPlan.targetVersion));
-      unavailableOptions.value = selection.unavailable;
-      const ticket = await api.requestBuild({ target: identity.board.boardName, release: chosenPlan.targetVersion, options: selection.options });
-      await api.waitForBuild(ticket.key, (state) => (message.value = `Firmware build: ${state}`));
-      firmware.value = parseIntelHex(await api.downloadFirmware(ticket.url));
+      if (source.kind === "cloud") {
+        message.value = `Requesting ${chosenPlan.targetVersion} with the chosen build options`;
+        const api = new BuildApi();
+        const selection = selectBuildOptions(source.options, await api.getOptions(chosenPlan.targetVersion));
+        unavailableOptions.value = selection.unavailable;
+        const ticket = await api.requestBuild({ target: identity.board.boardName, release: chosenPlan.targetVersion, options: selection.options });
+        await api.waitForBuild(ticket.key, (state) => (message.value = `Firmware build: ${state}`));
+        firmware.value = parseIntelHex(await api.downloadFirmware(ticket.url));
+      } else {
+        // Checked when it was chosen; checked again here, so nothing unchecked reaches the board.
+        const { check } = source.chosen;
+        if (!check.ok || check.demo) throw new Error(`${source.chosen.name} did not pass its checks: ${check.errors.join(" ") || "it is not firmware for this board."} Nothing was written.`);
+        message.value = `Using ${source.chosen.name}`;
+        firmware.value = source.chosen.image;
+      }
 
       step.value = "bootloader";
       message.value = "Restarting the board into its bootloader";

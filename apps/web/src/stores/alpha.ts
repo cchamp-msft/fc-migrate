@@ -1,11 +1,9 @@
 import {
   ALPHA_TEXTS,
   buildBoardReport,
-  checkAlphaImage,
   classifyBoard,
   DfuFlasher,
   isMigratedAlpha,
-  parseIntelHex,
   SessionError,
   type AlphaTextKey,
   type Classification,
@@ -13,14 +11,13 @@ import {
   type DfuProgress,
   type G4Readings,
   type G4Session,
-  type HexImage,
-  type ImageCheck,
   type UsbDeviceLike,
 } from "@bf-migrate/core";
 import { defineStore } from "pinia";
 import { computed, ref, shallowRef } from "vue";
-import { ALPHA_HD_FIRMWARE, type HostedFirmware } from "../data/hosted-firmware";
+import { ALPHA_HD_FIRMWARE } from "../data/hosted-firmware";
 import { STM32_DFU_FILTER, waitForAuthorizedDfuDevice } from "../utils/dfu-device";
+import { loadHostedAlphaImage, readAlphaImage, type ChosenImage } from "../utils/firmware-image";
 import { saveFile } from "../utils/save-file";
 import { useConnectionStore } from "./connection";
 
@@ -51,38 +48,9 @@ export type AlphaStep =
   | "stopped"
   | "failed";
 
-export interface ChosenImage {
-  name: string;
-  image: HexImage;
-  check: ImageCheck;
-  sha256: string;
-  /** Set when the image is this site's own release rather than the pilot's file. */
-  hosted?: HostedFirmware;
-}
+export type { ChosenImage };
 
 export type UsbStep = "idle" | "working" | "permission" | "done" | "failed";
-
-async function sha256Of(data: string | Uint8Array<ArrayBuffer>): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", typeof data === "string" ? new TextEncoder().encode(data) : data);
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-/** Downloads one of this site's releases. Refused unless its bytes match the pinned SHA-256. */
-async function fetchHosted(firmware: HostedFirmware): Promise<string> {
-  const response = await fetch(`${import.meta.env.BASE_URL}${firmware.path}`, { cache: "no-cache" });
-  if (!response.ok) throw new Error(`Could not download ${firmware.fileName} (HTTP ${response.status}). Nothing was written.`);
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  if ((await sha256Of(bytes)) !== firmware.sha256) {
-    throw new Error(`The downloaded ${firmware.fileName} does not match release ${firmware.release}'s SHA-256, so it was not used. Nothing was written.`);
-  }
-  return new TextDecoder().decode(bytes);
-}
-
-/** Parses and checks a chosen file. Only the simulated board accepts the demo's stand-in. */
-async function readImage(name: string, text: string, forHardware: boolean): Promise<ChosenImage> {
-  const image = parseIntelHex(text);
-  return { name, image, check: checkAlphaImage(image, { forHardware }), sha256: await sha256Of(text) };
-}
 
 const DEMO_ON_HARDWARE = "The demo's stand-in image is not firmware and would lock a real board up. Choose a Betaflight .hex file for this board.";
 
@@ -249,7 +217,7 @@ export const useAlphaStore = defineStore("alpha", () => {
 
   async function chooseImage(name: string, text: string): Promise<void> {
     try {
-      chosen.value = await readImage(name, text, !simulated.value);
+      chosen.value = await readAlphaImage(name, text, !simulated.value);
     } catch (reason) {
       chosen.value = undefined;
       error.value = describeError(reason);
@@ -265,8 +233,7 @@ export const useAlphaStore = defineStore("alpha", () => {
       usbMessage.value = "";
     } else error.value = "";
     try {
-      const text = await fetchHosted(firmware);
-      const loaded: ChosenImage = { ...(await readImage(firmware.fileName, text, target === "usb" || !simulated.value)), hosted: firmware };
+      const loaded = await loadHostedAlphaImage(firmware, target === "usb" || !simulated.value);
       if (target === "usb") usbChosen.value = loaded;
       else chosen.value = loaded;
     } catch (reason) {
@@ -286,7 +253,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     usbStep.value = "idle";
     usbMessage.value = "";
     try {
-      usbChosen.value = await readImage(name, text, true);
+      usbChosen.value = await readAlphaImage(name, text, true);
     } catch (reason) {
       usbChosen.value = undefined;
       usbStep.value = "failed";
