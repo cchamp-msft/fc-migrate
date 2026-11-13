@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CircleAlert } from "lucide-vue-next";
-import type { ChosenImage } from "../stores/alpha";
+import type { ChosenImage } from "../utils/firmware-image";
 
 defineProps<{ image: ChosenImage }>();
 

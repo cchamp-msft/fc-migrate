@@ -3,16 +3,21 @@ import type { MigrationPlan } from "@bf-migrate/core";
 import { CircleAlert, CircleCheck, LoaderCircle } from "lucide-vue-next";
 import { computed, ref } from "vue";
 import { useConnectionStore } from "../stores/connection";
-import { useUpgradeStore } from "../stores/upgrade";
+import { useUpgradeStore, type FirmwareSource } from "../stores/upgrade";
 import { isWebUsbAvailable } from "../transport/web-serial";
 
-const props = defineProps<{ plan: MigrationPlan }>();
+/** `source` is where the firmware comes from; without it the upgrade cannot start. */
+const props = defineProps<{ plan: MigrationPlan; source?: FirmwareSource }>();
 
 const connection = useConnectionStore();
 const upgrade = useUpgradeStore();
 const acknowledged = ref(false);
 
-const canStart = computed(() => connection.isConnected && !connection.isDemo && isWebUsbAvailable() && acknowledged.value && !upgrade.running);
+const canStart = computed(() => connection.isConnected && !connection.isDemo && isWebUsbAvailable() && acknowledged.value && !upgrade.running && !!props.source);
+
+function begin(): void {
+  if (props.source) void upgrade.start(props.plan, props.source);
+}
 const percent = computed(() => {
   const update = upgrade.progress;
   return update && update.total > 0 ? Math.round((update.done / update.total) * 100) : undefined;
@@ -30,7 +35,8 @@ const clean = computed(() => upgrade.rejected.length === 0 && upgrade.mismatches
       <div v-if="connection.isDemo" class="notice"><CircleAlert :size="18" /><span>The demo board cannot be flashed. Connect a real flight controller to upgrade.</span></div>
       <template v-else>
         <label class="ack"><input v-model="acknowledged" type="checkbox" /> Propellers are off, and I have read the items above.</label>
-        <button class="btn btn-primary" :disabled="!canStart" @click="upgrade.start(props.plan)">Back up and upgrade</button>
+        <button class="btn btn-primary" :disabled="!canStart" @click="begin()">Back up and upgrade</button>
+        <p v-if="!props.source" class="muted small">Choose the firmware above first.</p>
       </template>
     </template>
 

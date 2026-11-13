@@ -12,6 +12,8 @@ export interface HostedFirmware {
   /** The revision the firmware reports in `version`. */
   revision: string;
   boardName: string;
+  /** The build options it was built with; a hosted build cannot change them. */
+  options: readonly string[];
   /** Path under the site's base URL. */
   path: string;
   /** File name offered when the pilot saves it. */
@@ -30,6 +32,7 @@ export const ALPHA_HD_FIRMWARE: HostedFirmware = {
   betaflight: "2026.6.2",
   revision: "988912efd",
   boardName: "TMOTORG4ALPHAHD",
+  options: ["USE_SERIALRX", "USE_SERIALRX_CRSF", "USE_SERIALRX_SBUS", "USE_TELEMETRY", "USE_TELEMETRY_CRSF", "USE_OSD_HD", "USE_DSHOT", "USE_LED_STRIP", "USE_PINIO", "USE_VTX"],
   path: "firmware/v2026.6.2-1/betaflight_2026.6.2_STM32G474_TMOTORG4ALPHAHD.hex",
   fileName: "betaflight_2026.6.2_STM32G474_TMOTORG4ALPHAHD.hex",
   sha256: "73e4d2aa796fcf4eb97c6021f822d8cf15d14b41d4cafc8d9f6a4c6588e30b59",

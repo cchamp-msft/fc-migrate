@@ -26,20 +26,25 @@ describe("compareVersions", () => {
 });
 
 describe("upgradeTargets", () => {
-  it("offers a newer patch on the same release line", () => {
-    expect(names(upgradeTargets("2026.6.1", RELEASES, false))).toEqual(["2026.6.2"]);
+  it("offers a newer patch on the same release line, and the release it runs", () => {
+    expect(names(upgradeTargets("2026.6.1", RELEASES, false))).toEqual(["2026.6.2", "2026.6.1"]);
   });
 
-  it("offers nothing stable from the newest stable release", () => {
-    expect(upgradeTargets("2026.6.2", RELEASES, false)).toEqual([]);
+  it("offers only a rebuild of the newest stable release", () => {
+    expect(names(upgradeTargets("2026.6.2", RELEASES, false))).toEqual(["2026.6.2"]);
   });
 
-  it("adds unstable releases only when asked", () => {
-    expect(names(upgradeTargets("2026.6.2", RELEASES, true))).toEqual(["2026.12.0-alpha"]);
+  it("adds unstable releases only when asked, but always offers the release it runs", () => {
+    expect(names(upgradeTargets("2026.6.2", RELEASES, true))).toEqual(["2026.12.0-alpha", "2026.6.2"]);
+    expect(names(upgradeTargets("2026.12.0-alpha", RELEASES, false))).toEqual(["2026.12.0-alpha"]);
   });
 
   it("offers every newer release to an older board, newest first", () => {
     expect(names(upgradeTargets("4.5.4", RELEASES, false))).toEqual(["2026.6.2", "2026.6.1", "2025.12.5", "4.5.5"]);
+  });
+
+  it("never offers an older release", () => {
+    expect(names(upgradeTargets("2026.6.1", RELEASES, true))).not.toContain("2025.12.5");
   });
 
   it("leaves out release lines migration does not know", () => {

@@ -122,6 +122,10 @@ Stored schemas are data in `data/schemas/<version>.json`. When connected, the li
 
 If anything fails before `save`, the board has not stored the result. The backup and firmware dump stay available for rollback.
 
+The target can be any newer release on a line migration understands, or the release the board runs now: migrating to it rebuilds the board and sends its settings back. The firmware comes from Betaflight's cloud build, with build options ticked from what the board has now; the pilot can change them, and options the target does not offer are listed as left out.
+
+A G4 Alpha migrated to Betaflight is called out on the Migrate page. The cloud build does not carry it, so its firmware is this site's own release (pinned by SHA-256, as on the Alpha page) or the pilot's .hex, checked with the same image check. Its build options are fixed by the build. The pilot's file is warned about when it does not name the target version the settings are planned for.
+
 ### 6.2 What each line becomes
 
 | Outcome | Meaning |
