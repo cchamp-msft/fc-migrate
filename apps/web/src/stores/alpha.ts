@@ -19,6 +19,7 @@ import {
 } from "@bf-migrate/core";
 import { defineStore } from "pinia";
 import { computed, ref, shallowRef } from "vue";
+import { ALPHA_HD_FIRMWARE, type HostedFirmware } from "../data/hosted-firmware";
 import { STM32_DFU_FILTER, waitForAuthorizedDfuDevice } from "../utils/dfu-device";
 import { saveFile } from "../utils/save-file";
 import { useConnectionStore } from "./connection";
@@ -55,13 +56,26 @@ export interface ChosenImage {
   image: HexImage;
   check: ImageCheck;
   sha256: string;
+  /** Set when the image is this site's own release rather than the pilot's file. */
+  hosted?: HostedFirmware;
 }
 
 export type UsbStep = "idle" | "working" | "permission" | "done" | "failed";
 
-async function sha256Of(text: string): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+async function sha256Of(data: string | Uint8Array<ArrayBuffer>): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", typeof data === "string" ? new TextEncoder().encode(data) : data);
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+/** Downloads one of this site's releases. Refused unless its bytes match the pinned SHA-256. */
+async function fetchHosted(firmware: HostedFirmware): Promise<string> {
+  const response = await fetch(`${import.meta.env.BASE_URL}${firmware.path}`, { cache: "no-cache" });
+  if (!response.ok) throw new Error(`Could not download ${firmware.fileName} (HTTP ${response.status}). Nothing was written.`);
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  if ((await sha256Of(bytes)) !== firmware.sha256) {
+    throw new Error(`The downloaded ${firmware.fileName} does not match release ${firmware.release}'s SHA-256, so it was not used. Nothing was written.`);
+  }
+  return new TextDecoder().decode(bytes);
 }
 
 /** Parses and checks a chosen file. Only the simulated board accepts the demo's stand-in. */
@@ -114,6 +128,8 @@ export const useAlphaStore = defineStore("alpha", () => {
   /** True between attaching under reset and the pilot releasing the button. */
   const awaitingRelease = ref(false);
   const usbStep = ref<UsbStep>("idle");
+  /** True while this site's release is downloading. */
+  const hostedLoading = ref(false);
   const usbMessage = ref("");
   const usbProgress = ref<DfuProgress>();
 
@@ -240,6 +256,32 @@ export const useAlphaStore = defineStore("alpha", () => {
     }
   }
 
+  /** Loads this site's release for the board, for the ST-Link flow or the USB rewrite. */
+  async function chooseHosted(target: "stlink" | "usb"): Promise<void> {
+    const firmware = ALPHA_HD_FIRMWARE;
+    hostedLoading.value = true;
+    if (target === "usb") {
+      usbStep.value = "idle";
+      usbMessage.value = "";
+    } else error.value = "";
+    try {
+      const text = await fetchHosted(firmware);
+      const loaded: ChosenImage = { ...(await readImage(firmware.fileName, text, target === "usb" || !simulated.value)), hosted: firmware };
+      if (target === "usb") usbChosen.value = loaded;
+      else chosen.value = loaded;
+    } catch (reason) {
+      if (target === "usb") {
+        usbChosen.value = undefined;
+        failUsb(reason);
+      } else {
+        chosen.value = undefined;
+        error.value = describeError(reason);
+      }
+    } finally {
+      hostedLoading.value = false;
+    }
+  }
+
   async function chooseUsbImage(name: string, text: string): Promise<void> {
     usbStep.value = "idle";
     usbMessage.value = "";
@@ -278,6 +320,8 @@ export const useAlphaStore = defineStore("alpha", () => {
   async function unlock(typed: string): Promise<void> {
     const current = session.value;
     if (!current || typed.trim() !== ALPHA_TEXTS.unlock.typed || classification.value?.kind !== "locked") return;
+    // Every stage can be opened at any time, so the one-way step checks its own prerequisites.
+    if (!reportSaved.value || !chosen.value?.check.ok) return;
     confirm("unlock");
     const ok = await run("Removing read protection. The chip is erasing itself; this takes a few seconds", () => current.removeReadProtection({ clearSwBoot0: clearBootPin.value && !!classification.value?.bootPinHonoured }), "probe");
     if (!ok) return;
@@ -297,6 +341,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     const image = chosen.value;
     const found = classification.value;
     if (!current || !image?.check.ok || !found) return;
+    if (found.kind === "locked" || found.kind === "wrong-chip" || found.kind === "protected") return;
     if (image.check.demo && !simulated.value) return fail(new Error(DEMO_ON_HARDWARE), "probe");
     confirm(found.kind === "blank" ? "write" : "rewrite");
     const blocks = image.image.data;
@@ -411,6 +456,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     usbStep,
     usbMessage,
     usbProgress,
+    hostedLoading,
     confirm,
     goTo,
     reset,
@@ -420,6 +466,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     saveReport,
     chooseImage,
     chooseUsbImage,
+    chooseHosted,
     firmwareConfirmed,
     unlock,
     write,
