@@ -21,22 +21,20 @@ export interface AlphaPhotos {
 
 const base = `${import.meta.env.BASE_URL}alpha/`;
 
-const hdSwd: BoardPhoto = {
-  src: `${base}g4-hd/swd-pads.jpg`,
-  alt: "Component side of the Pacer G4 Alpha HD with the SWDIO pad, the SWCLK pad and the reset button marked",
-  caption: "Component side: SWDIO to the upper pad, SWCLK to the lower pad. The reset button is marked in yellow.",
-};
-
 const hdPadSide: BoardPhoto = {
   src: `${base}g4-hd/pad-side.jpg`,
   alt: "Pad side of the Pacer G4 Alpha HD with a GND pad and the T1, R1, 5V and ground pads marked",
-  caption: "Pad side: ST-Link GND in green (any GND or - pad works). The receiver goes on the orange pads.",
+  caption: "Pad side: the green pad is another place for the ST-Link's GND. The orange pads are where the receiver goes under Betaflight, not the receiver plug: T1 to its RX, R1 to its TX, plus 5V and -.",
 };
 
 export const ALPHA_PHOTOS: Partial<Record<AlphaBoard["id"], AlphaPhotos>> = {
   hd: {
     wiring: [
-      hdSwd,
+      {
+        src: `${base}g4-hd/swd-pads.jpg`,
+        alt: "Component side of the Pacer G4 Alpha HD with the SWDIO, SWCLK and GND pads marked",
+        caption: "Component side: SWDIO to the upper pad beside the USB-C socket, SWCLK to the lower one, GND to the upper pad on the right edge.",
+      },
       {
         src: `${base}g4-hd/swd-pads-closeup.jpg`,
         alt: "Close-up of the two SWD pads between the USB-C socket and the chip",
@@ -44,10 +42,14 @@ export const ALPHA_PHOTOS: Partial<Record<AlphaBoard["id"], AlphaPhotos>> = {
       },
       hdPadSide,
     ],
-    reset: hdSwd,
+    reset: {
+      src: `${base}g4-hd/reset-button.jpg`,
+      alt: "The reset button beside the USB-C socket on the Pacer G4 Alpha HD, marked in yellow",
+      caption: "The reset button, beside the USB-C socket.",
+    },
     receiver: {
       ...hdPadSide,
-      caption: "Wire the receiver to the orange pads: T1 to its RX, R1 to its TX, plus 5V and -.",
+      caption: "Wire the receiver to the orange pads: T1 to its RX, R1 to its TX, plus 5V and -. Not the receiver plug.",
     },
   },
 };
