@@ -187,7 +187,10 @@ function kb(bytes: number): string {
 
     <section v-if="alpha.migratedOverUsb" class="card">
       <h2>This board is already migrated</h2>
-      <p class="muted lead">It runs Betaflight as TMOTORG4ALPHAHD. Betaflight's own firmware list does not carry this board yet, so new firmware comes from a file. It is written over USB, keeping your settings. No ST-Link is needed.</p>
+      <p class="muted lead">
+        It runs Betaflight as TMOTORG4ALPHAHD. Betaflight's own firmware list does not carry this board yet, so new firmware is fc-migrate's build or a file, written over USB with no ST-Link. The settings area is left alone, so a build of the same Betaflight version keeps your settings. A different version may reset them on first start: to move settings to a new version, use
+        <RouterLink to="/migrate">Migrate</RouterLink>, which sends them back and checks them.
+      </p>
       <AlphaImageFacts v-if="alpha.usbChosen" :image="alpha.usbChosen" />
       <div class="actions">
         <button class="btn" :disabled="usbBusy || alpha.hostedLoading" @click="alpha.chooseHosted('usb')"><PackageCheck :size="15" /> Use fc-migrate's build ({{ ALPHA_HD_FIRMWARE.release }})</button>

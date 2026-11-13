@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { DEMO_IMAGE_MARKER } from "../src/firmware/demo-image.js";
 import type { HexBlock } from "../src/firmware/hex.js";
 import { openStlinkG4Session, STLINK_USB_FILTERS, type StlinkOpenOptions } from "../src/stlink/index.js";
 import { SessionError, type G4Session, type SessionErrorKind } from "../src/targets/stm32g4/session.js";
@@ -214,6 +215,28 @@ describe("Alpha scenarios end to end", () => {
     expect((await session.readAll()).configMagic).toBe(0xbe);
     await session.resetAndRun();
     await session.close();
+  });
+
+  it("refuses the demo's stand-in before erasing or writing, unless the simulator allows it", async () => {
+    const demo = testImage();
+    demo[0]!.bytes.set(new TextEncoder().encode(DEMO_IMAGE_MARKER), 0x40);
+
+    const r = rig("migratedBetaflight");
+    const before = r.sim.chip.readFlash(0x08000000, 0x8000);
+    const session = await r.open();
+    expect((await expectSessionError(session.erase(demo, "pages"), "refused")).message).toContain("demo's stand-in");
+    await expectSessionError(session.erase(demo, "mass"), "refused");
+    await expectSessionError(session.program(demo), "refused");
+    // Nothing changed, and the session still works for a real image.
+    expect(r.sim.chip.readFlash(0x08000000, 0x8000)).toEqual(before);
+    await writeImage(session, testImage());
+    await session.close();
+
+    const allowed = rig("migratedBetaflight");
+    const simulated = await allowed.open({ allowDemoImage: true });
+    await writeImage(simulated, demo);
+    expectImageInFlash(allowed.sim, demo);
+    await simulated.close();
   });
 
   it("blankAfterErase: writes straight away", async () => {

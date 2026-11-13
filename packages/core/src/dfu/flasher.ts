@@ -19,6 +19,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { DEMO_IMAGE_REFUSED, isDemoImage } from "../firmware/demo-image.js";
 import type { HexImage } from "../firmware/hex.js";
 import type { UsbControlSetup, UsbDeviceLike, UsbTransferStatus } from "./usb-device.js";
 
@@ -172,6 +173,14 @@ export class DfuAddressError extends DfuError {
   constructor(stage: DfuStage, message: string) {
     super(stage, message);
     this.name = "DfuAddressError";
+  }
+}
+
+/** The image must never be written, whatever the device: raised before any device traffic. */
+export class DfuRefusedError extends DfuError {
+  constructor(stage: DfuStage, message: string) {
+    super(stage, message);
+    this.name = "DfuRefusedError";
   }
 }
 
@@ -527,6 +536,8 @@ export class DfuFlasher {
   flash(firmware: HexImage, options: DfuFlashOptions = {}): Promise<void> {
     return this.exclusive("erase", async () => {
       const { regions, flash } = this.requireLayout();
+      // The last gate before a real board's flash: no caller can hand the demo's stand-in through.
+      if (isDemoImage(firmware.data)) throw new DfuRefusedError("erase", DEMO_IMAGE_REFUSED);
       assertFirmwareFits(firmware, flash);
       try {
         await this.clearStatus();

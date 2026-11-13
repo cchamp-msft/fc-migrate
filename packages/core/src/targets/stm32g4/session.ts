@@ -103,7 +103,9 @@ export type SessionErrorKind =
   /** The flash controller stayed busy, or a transfer did not complete, in time. */
   | "timeout"
   /** The flash controller reported an error flag, or a write did not take. */
-  | "flash";
+  | "flash"
+  /** The image must never be written (the demo's stand-in). Raised before anything changes. */
+  | "refused";
 
 export class SessionError extends Error {
   constructor(
@@ -123,6 +125,11 @@ export interface OpenOptions {
    * the chip is still held in reset. The app then tells the pilot to release the button.
    */
   onAttached?: () => void;
+  /**
+   * The simulated chip only: lets the demo's stand-in image be written, so the walkthrough
+   * can finish. A session on real hardware never sets it, and refuses that image.
+   */
+  allowDemoImage?: boolean;
 }
 
 /** Opens a session on a probe the user already chose. Implemented by the ST-Link layer. */

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { ALPHA_TEXTS, activeProtections, buildBoardReport, checkAlphaImage, classifyBoard, DEMO_IMAGE_MARKER, isMigratedAlpha } from "../src/alpha/alpha.js";
+import { ALPHA_TEXTS, activeProtections, buildBoardReport, checkAlphaImage, classifyBoard, isMigratedAlpha } from "../src/alpha/alpha.js";
+import { DEMO_IMAGE_MARKER } from "../src/firmware/demo-image.js";
 import type { HexImage } from "../src/firmware/hex.js";
 import type { G4Readings } from "../src/targets/stm32g4/session.js";
 
