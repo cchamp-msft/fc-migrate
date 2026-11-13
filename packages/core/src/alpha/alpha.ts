@@ -40,6 +40,12 @@ const ALPHA_IMAGE_START = 0x08003800;
 const SRAM_START = 0x20000000;
 const SRAM_END = 0x20020000;
 
+/**
+ * Carried by the demo's stand-in image. It is not firmware: written to a real board it
+ * locks the core up at the first instruction, so only the simulated board accepts it.
+ */
+export const DEMO_IMAGE_MARKER = "fc-migrate demo image, not firmware";
+
 /** True when a board connected over USB is a G4 Alpha already running Betaflight. */
 export function isMigratedAlpha(identity: Pick<FcIdentity, "variant" | "board">): boolean {
   return (
@@ -152,6 +158,25 @@ export interface ImageCheck {
   bytes: number;
   /** True when the image overwrites the settings area, so a rewrite cannot keep settings. */
   coversSettings: boolean;
+  /** True for the demo's stand-in image, which only the simulated board accepts. */
+  demo: boolean;
+}
+
+export interface ImageCheckOptions {
+  board?: AlphaBoard;
+  /**
+   * False only when the image is for the simulated board. Defaults to true, so an image
+   * checked without saying where it goes is held to the real-hardware rules.
+   */
+  forHardware?: boolean;
+}
+
+/** Vector table entries a G4 needs before Betaflight can catch anything: reset, NMI and HardFault. */
+const REQUIRED_VECTORS = [4, 8, 12];
+
+/** True when the address holds bytes from the image. */
+function inImage(image: HexImage, address: number): boolean {
+  return image.data.some((block) => address >= block.address && address < block.address + block.bytes.length);
 }
 
 function contains(image: HexImage, text: string): boolean {
@@ -172,23 +197,34 @@ function bytesAt(image: HexImage, address: number, length: number): Uint8Array |
 }
 
 /** Decides whether an image is safe to write to a G4 Alpha. */
-export function checkAlphaImage(image: HexImage, board: AlphaBoard = ALPHA_BOARDS[0]!): ImageCheck {
+export function checkAlphaImage(image: HexImage, options: ImageCheckOptions = {}): ImageCheck {
+  const board = options.board ?? ALPHA_BOARDS[0]!;
   const errors: string[] = [];
   const warnings: string[] = [];
   const lowest = Math.min(...image.data.map((block) => block.address));
   const outside = image.data.find((block) => block.address < FLASH_START || block.address + block.bytes.length > FLASH_END);
   const coversSettings = image.data.some((block) => block.address < CONFIG_END && block.address + block.bytes.length > CONFIG_AREA);
+  const demo = contains(image, DEMO_IMAGE_MARKER);
 
   if (image.data.length === 0 || image.bytesTotal === 0) {
     errors.push("The file holds no firmware.");
-    return { ok: false, errors, warnings, bytes: 0, coversSettings };
+    return { ok: false, errors, warnings, bytes: 0, coversSettings, demo };
   }
+  if (demo && options.forHardware !== false) errors.push("This is the demo's stand-in image, not firmware. A real board would lock up on it, so only the simulated board accepts it.");
   if (outside) errors.push(`It writes outside the main flash, at 0x${outside.address.toString(16)}. That could change option bytes, so it is refused.`);
   if (lowest === ALPHA_IMAGE_START) errors.push("This is an Alpha firmware image. It needs FETtec's bootloader, which the migration erases for good, so it cannot run.");
   else if (lowest !== FLASH_START) errors.push(`It starts at 0x${lowest.toString(16)}, not at the start of flash (0x08000000), so the board would not boot.`);
 
-  const head = bytesAt(image, FLASH_START, 8);
+  const head = bytesAt(image, FLASH_START, 16);
   if (lowest === FLASH_START && (!head || !validVectorTable(head))) errors.push("Its first bytes are not a valid program start, so the board would not boot.");
+  else if (head) {
+    const view = new DataView(head.buffer, head.byteOffset, head.byteLength);
+    const handlers = REQUIRED_VECTORS.map((offset) => view.getUint32(offset, true));
+    // Each must be a Thumb address the image itself writes; anything else faults into lockup.
+    if (handlers.some((handler) => (handler & 1) !== 1 || !inImage(image, handler & ~1))) {
+      errors.push("Its reset or fault handlers point outside the file, so the board would lock up instead of starting.");
+    }
+  }
   if (!contains(image, "Betaflight") && !contains(image, "BTFL")) errors.push("It does not look like Betaflight.");
 
   let boardName: string | undefined;
@@ -199,7 +235,7 @@ export function checkAlphaImage(image: HexImage, board: AlphaBoard = ALPHA_BOARD
   } else warnings.push(`This image does not name ${board.boardName}. Firmware for another board has the wrong pins and may not fly.`);
 
   if (coversSettings) warnings.push("It also writes the settings area, so any saved Betaflight settings are replaced.");
-  return { ok: errors.length === 0, errors, warnings, boardName, bytes: image.bytesTotal, coversSettings };
+  return { ok: errors.length === 0, errors, warnings, boardName, bytes: image.bytesTotal, coversSettings, demo };
 }
 
 // ---------------------------------------------------------------------------

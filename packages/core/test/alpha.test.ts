@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ALPHA_TEXTS, activeProtections, buildBoardReport, checkAlphaImage, classifyBoard, isMigratedAlpha } from "../src/alpha/alpha.js";
+import { ALPHA_TEXTS, activeProtections, buildBoardReport, checkAlphaImage, classifyBoard, DEMO_IMAGE_MARKER, isMigratedAlpha } from "../src/alpha/alpha.js";
 import type { HexImage } from "../src/firmware/hex.js";
 import type { G4Readings } from "../src/targets/stm32g4/session.js";
 
@@ -10,18 +10,19 @@ function readings(overrides: Partial<G4Readings> = {}): G4Readings {
   return { devId: 0x469, flashSizeKb: 512, uid: "0123456789ABCDEF01234567", optr: 0xfbeff800, ...UNPROTECTED, ...overrides };
 }
 
-function program(): Uint8Array {
+/** A vector table: stack, then reset, NMI and HardFault as Thumb addresses inside the first block. */
+function program(handlers: number[] = [0x08000201, 0x08000201, 0x08000201]): Uint8Array {
   const head = new Uint8Array(1024).fill(0);
   const view = new DataView(head.buffer);
   view.setUint32(0, 0x20020000, true);
-  view.setUint32(4, 0x08000201, true);
+  handlers.forEach((handler, index) => view.setUint32(4 + index * 4, handler, true));
   return head;
 }
 
-function image(blocks: { address: number; text?: string; head?: boolean; size?: number }[]): HexImage {
+function image(blocks: { address: number; text?: string; head?: boolean | Uint8Array; size?: number }[]): HexImage {
   const data = blocks.map(({ address, text = "", head = false, size = 4096 }) => {
     const bytes = new Uint8Array(size).fill(0);
-    if (head) bytes.set(program().subarray(0, 8));
+    if (head) bytes.set((head === true ? program() : head).subarray(0, 16));
     if (text) bytes.set(new TextEncoder().encode(text), 64);
     return { address, bytes };
   });
@@ -62,7 +63,29 @@ describe("classifying a G4 Alpha over SWD", () => {
 describe("checking a firmware image", () => {
   it("accepts a Betaflight build for this board", () => {
     const result = checkAlphaImage(image([{ address: 0x08000000, head: true, text: "Betaflight TMOTORG4ALPHAHD" }, { address: 0x08006000 }]));
-    expect(result).toMatchObject({ ok: true, errors: [], warnings: [], boardName: "TMOTORG4ALPHAHD", coversSettings: false });
+    expect(result).toMatchObject({ ok: true, errors: [], warnings: [], boardName: "TMOTORG4ALPHAHD", coversSettings: false, demo: false });
+  });
+
+  it("refuses the demo's stand-in image unless it is for the simulated board", () => {
+    const demo = image([{ address: 0x08000000, head: true, text: `Betaflight TMOTORG4ALPHAHD\u0000${DEMO_IMAGE_MARKER}` }, { address: 0x08006000 }]);
+    const forHardware = checkAlphaImage(demo);
+    expect(forHardware).toMatchObject({ ok: false, demo: true });
+    expect(forHardware.errors[0]).toContain("demo's stand-in");
+    expect(checkAlphaImage(demo, { forHardware: true }).ok).toBe(false);
+    expect(checkAlphaImage(demo, { forHardware: false })).toMatchObject({ ok: true, demo: true });
+  });
+
+  it("refuses an image whose reset or fault handlers are not in it, which locks the core up", () => {
+    const text = "Betaflight TMOTORG4ALPHAHD";
+    // The stand-in that reached a real board: reset in the image, NMI and HardFault zero.
+    const zeroFaults = checkAlphaImage(image([{ address: 0x08000000, head: program([0x08000201, 0, 0]), text }]));
+    expect(zeroFaults.errors).toContain("Its reset or fault handlers point outside the file, so the board would lock up instead of starting.");
+    // Odd but outside anything the image writes, and inside but not Thumb.
+    expect(checkAlphaImage(image([{ address: 0x08000000, head: program([0x08000201, 0x08040001, 0x08000201]), text }])).ok).toBe(false);
+    expect(checkAlphaImage(image([{ address: 0x08000000, head: program([0x08000201, 0x08000200, 0x08000201]), text }])).ok).toBe(false);
+    // Handlers in a later block, as in a real Betaflight build.
+    const real = image([{ address: 0x08000000, head: program([0x08006101, 0x08006201, 0x08006301]), text }, { address: 0x08006000 }]);
+    expect(checkAlphaImage(real).ok).toBe(true);
   });
 
   it("refuses an Alpha image, which needs the erased bootloader", () => {

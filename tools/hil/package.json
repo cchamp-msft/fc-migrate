@@ -12,6 +12,8 @@
     "migrate": "tsx src/migrate-run.ts",
     "bootstrap": "tsx src/bootstrap-run.ts",
     "stlink": "tsx src/stlink-readonly.ts",
+    "stlink-dump": "tsx src/stlink-dump.ts",
+    "stlink-write": "tsx src/stlink-write.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

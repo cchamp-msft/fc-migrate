@@ -61,7 +61,10 @@ export interface G4Readings {
   sec2r: number;
   /** First 1 KB of flash from 0x08000000. Undefined while read protection blocks it. */
   flashHead?: Uint8Array;
-  /** First byte of the Betaflight config area at 0x08004000 (0xBE when a config is stored). */
+  /**
+   * The magic byte of the Betaflight config header at 0x08004000: 0xBE when a config is
+   * stored. The header is the config version (one byte) and then this magic.
+   */
   configMagic?: number;
 }
 
