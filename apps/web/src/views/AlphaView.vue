@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ALPHA_BOARDS, ALPHA_TEXTS, type AlphaText } from "@bf-migrate/core";
 import { CircleAlert, CircleCheck, Cpu, FlaskConical, LoaderCircle, Upload } from "lucide-vue-next";
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, shallowRef, watch } from "vue";
 import { ALPHA_PHOTOS } from "../data/alpha-photos";
 import { DEMO_SCENARIOS, createDemoSource, type DemoScenarioId } from "../demo/alpha-probe";
 import { demoAlphaFirmware } from "../demo/alpha-firmware";
@@ -29,9 +29,16 @@ const STAGES: { label: string; steps: AlphaStep[] }[] = [
 ];
 
 const stageIndex = computed(() => STAGES.findIndex((stage) => stage.steps.includes(alpha.step)));
+const PROBE_STAGE = STAGES.findIndex((stage) => stage.steps.includes("probe"));
+/** Steps that must finish before the pilot can go anywhere else. */
+const BUSY: readonly AlphaStep[] = ["connecting", "working"];
+
+/** The furthest stage reached since the chip was last read. Reading a chip again starts it over. */
+const reached = shallowRef<{ readings: unknown; index: number }>({ readings: undefined, index: 0 });
 
 const introChecked = ref(false);
-const wiringChecks = ref<boolean[]>([]);
+// The ticks are the pilot's own checklist: kept when moving between steps, and never required.
+const wiringChecks = ref<boolean[]>(ALPHA_TEXTS.wiring.checks.map(() => false));
 const typed = ref("");
 const scenario = ref<DemoScenarioId>(DEMO_SCENARIOS[0]!.id);
 const resetHeld = ref(false);
@@ -41,15 +48,55 @@ const fileInput = ref<HTMLInputElement>();
 watch(
   () => alpha.step,
   (step) => {
-    if (step === "intro") introChecked.value = false;
-    if (step === "wiring") wiringChecks.value = ALPHA_TEXTS.wiring.checks.map(() => false);
     if (step === "unlock") typed.value = "";
     if (step !== "hold-reset" && step !== "connecting") resetHeld.value = false;
   },
   { immediate: true },
 );
 
-const wiringDone = computed(() => wiringChecks.value.length > 0 && wiringChecks.value.every(Boolean));
+watch(
+  [() => alpha.step, () => alpha.readings],
+  ([, readings]) => {
+    const same = reached.value.readings === readings;
+    reached.value = { readings, index: same ? Math.max(reached.value.index, stageIndex.value) : stageIndex.value };
+  },
+  { immediate: true },
+);
+
+/**
+ * The stages up to choosing the ST-Link always open. The later ones work on the connected
+ * chip, so they open only once the flow has reached them on that chip, and Unlock only while
+ * the chip is still locked.
+ */
+function canOpen(index: number): boolean {
+  if (index === stageIndex.value || BUSY.includes(alpha.step)) return false;
+  if (index <= PROBE_STAGE) return true;
+  if (!alpha.session || index > reached.value.index) return false;
+  return !STAGES[index]!.steps.includes("unlock") || locked.value;
+}
+
+function openStage(index: number): void {
+  const first = STAGES[index]?.steps[0];
+  if (first && canOpen(index)) alpha.goTo(first);
+}
+
+function stageState(index: number): "current" | "open" | "closed" {
+  if (index === stageIndex.value) return "current";
+  return canOpen(index) ? "open" : "closed";
+}
+
+const wiringDone = computed(() => wiringChecks.value.every(Boolean));
+
+/** Continue never waits for the ticks. A confirmation is recorded only when they were ticked. */
+function leaveIntro(): void {
+  if (introChecked.value) alpha.confirm("intro");
+  alpha.goTo("variant");
+}
+
+function leaveWiring(): void {
+  if (wiringDone.value) alpha.confirm("wiring");
+  alpha.goTo("probe");
+}
 const percent = computed(() => (alpha.progress && alpha.progress.total ? Math.round((alpha.progress.done / alpha.progress.total) * 100) : undefined));
 const usbPercent = computed(() => (alpha.usbProgress?.total ? Math.round((alpha.usbProgress.done / alpha.usbProgress.total) * 100) : undefined));
 const locked = computed(() => alpha.classification?.kind === "locked");
@@ -129,16 +176,23 @@ function kb(bytes: number): string {
     </div>
 
     <ol class="stages" aria-label="Progress">
-      <li v-for="(stage, index) in STAGES" :key="stage.label" :data-state="index < stageIndex ? 'done' : index === stageIndex ? 'current' : 'todo'">{{ stage.label }}</li>
+      <li v-for="(stage, index) in STAGES" :key="stage.label">
+        <button type="button" class="stage" :data-state="stageState(index)" :aria-current="index === stageIndex ? 'step' : undefined" :disabled="!canOpen(index)" @click="openStage(index)">{{ stage.label }}</button>
+      </li>
     </ol>
 
     <!-- 1. Before you start -->
     <section v-if="alpha.step === 'intro'" class="card step">
       <h2>{{ ALPHA_TEXTS.intro.title }}</h2>
       <p v-for="text in paragraphs(ALPHA_TEXTS.intro)" :key="text">{{ text }}</p>
+      <h3 class="gives-up">{{ ALPHA_TEXTS.givesUp.title }}</h3>
+      <p>{{ ALPHA_TEXTS.givesUp.paragraphs[0] }}</p>
+      <ul>
+        <li v-for="text in ALPHA_TEXTS.givesUp.paragraphs.slice(1)" :key="text">{{ text }}</li>
+      </ul>
       <label class="check"><input v-model="introChecked" type="checkbox" /> {{ ALPHA_TEXTS.intro.checks[0] }}</label>
       <div class="actions">
-        <button class="btn btn-primary" :disabled="!introChecked" @click="alpha.confirm('intro'), alpha.goTo('variant')">Continue</button>
+        <button class="btn btn-primary" @click="leaveIntro()">Continue</button>
       </div>
     </section>
 
@@ -165,13 +219,17 @@ function kb(bytes: number): string {
       </div>
       <label v-for="(text, index) in ALPHA_TEXTS.wiring.checks" :key="text" class="check"><input v-model="wiringChecks[index]" type="checkbox" /> {{ text }}</label>
       <div class="actions">
-        <button class="btn btn-primary" :disabled="!wiringDone" @click="alpha.confirm('wiring'), alpha.goTo('probe')">Continue</button>
+        <button class="btn btn-primary" @click="leaveWiring()">Continue</button>
       </div>
     </section>
 
     <!-- 3. ST-Link -->
     <section v-else-if="alpha.step === 'probe'" class="card step">
       <h2>{{ ALPHA_TEXTS.probe.title }}</h2>
+      <div class="notice notice-warn power">
+        <CircleAlert :size="18" />
+        <span><strong>{{ ALPHA_TEXTS.usbPower.title }}</strong> {{ ALPHA_TEXTS.usbPower.paragraphs[0] }}</span>
+      </div>
       <p v-for="text in paragraphs(ALPHA_TEXTS.probe)" :key="text">{{ text }}</p>
       <div class="actions">
         <button class="btn btn-primary" :disabled="!isWebUsbAvailable()" @click="selectStlink()">Select ST-Link</button>
@@ -204,6 +262,7 @@ function kb(bytes: number): string {
       <div class="actions">
         <button v-if="alpha.simulated" class="btn" :disabled="resetHeld" @click="pressReset()">{{ resetHeld ? "Holding the reset button" : "Press and hold reset (simulated)" }}</button>
         <button class="btn btn-primary" :disabled="alpha.simulated && !resetHeld" @click="alpha.connect('holdReset')">Connect</button>
+        <button class="btn" :disabled="resetHeld" @click="alpha.connect('hotplug')">Try again without reset</button>
       </div>
     </section>
 
@@ -370,25 +429,45 @@ function kb(bytes: number): string {
 }
 
 .stages li {
-  padding: 0.25rem 0.6rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  color: var(--muted);
   counter-increment: stage;
 }
 
-.stages li::before {
+.stage {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  cursor: default;
+}
+
+.stage::before {
   content: counter(stage) ". ";
 }
 
-.stages li[data-state="current"] {
+.stage[data-state="current"] {
   border-color: var(--accent);
   color: var(--text);
   font-weight: 600;
 }
 
-.stages li[data-state="done"] {
+.stage[data-state="open"] {
   color: var(--text);
+  cursor: pointer;
+}
+
+.stage[data-state="open"]:hover {
+  border-color: var(--accent);
+}
+
+.gives-up {
+  margin: 0.9rem 0 0.4rem;
+  font-size: 1rem;
+}
+
+.power {
+  margin: 0 0 0.75rem;
 }
 
 .step h2 {
