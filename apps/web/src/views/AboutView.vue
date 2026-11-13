@@ -14,7 +14,11 @@ const REPO = "https://github.com/cchamp-msft/fc-migrate";
       </div>
     </header>
 
-    <section class="grid">
+    <section class="grid about-grid">
+      <div class="card risk">
+        <h2>Use at your own risk</h2>
+        <p class="muted">This program comes with ABSOLUTELY NO WARRANTY, to the extent permitted by law. Flashing can leave a board unresponsive until it is recovered over DFU. Remove propellers before connecting a battery, and check your setup before flying.</p>
+      </div>
       <div class="card">
         <h2>Not an official Betaflight project</h2>
         <p class="muted">Betaflight Migrator is not affiliated with or endorsed by the Betaflight project. Firmware and board definitions come from Betaflight's public build service, except for boards it does not build yet (see below).</p>
@@ -39,15 +43,44 @@ const REPO = "https://github.com/cchamp-msft/fc-migrate";
           </li>
         </ul>
       </div>
-      <div class="card">
-        <h2>Use at your own risk</h2>
-        <p class="muted">This program comes with ABSOLUTELY NO WARRANTY, to the extent permitted by law. Flashing can leave a board unresponsive until it is recovered over DFU. Remove propellers before connecting a battery, and check your setup before flying.</p>
-      </div>
     </section>
   </div>
 </template>
 
 <style scoped>
+.risk {
+  grid-column: 1 / -1;
+  border: 2px solid var(--danger);
+  text-align: center;
+}
+
+.risk h2 {
+  font-size: 1.2rem;
+}
+
+/* The notice's text is one grid column wide, centred, with its lines left-justified. */
+.about-grid {
+  container-type: inline-size;
+}
+
+.risk p {
+  font-size: 1rem;
+  margin: 0 auto;
+  text-align: left;
+}
+
+@container (min-width: 35rem) {
+  .risk p {
+    max-width: calc((100cqi - 1rem) / 2);
+  }
+}
+
+@container (min-width: 53rem) {
+  .risk p {
+    max-width: calc((100cqi - 2rem) / 3);
+  }
+}
+
 .links {
   margin: 0.5rem 0 0;
   padding-left: 1.1rem;
