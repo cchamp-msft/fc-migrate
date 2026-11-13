@@ -87,10 +87,11 @@ export function plausibleBetaflightImage(): HexBlock[] {
   ];
 }
 
-/** Betaflight's config area with a stored config: magic 0xBE, then filler. */
+/** Betaflight's config area with a stored config: version 178 (0xB2), magic 0xBE, then filler. */
 function storedConfig(): HexBlock {
   const bytes = pseudoRandom(0x800, 0xbe);
-  bytes[0] = 0xbe;
+  bytes[0] = 0xb2;
+  bytes[1] = 0xbe;
   return { address: 0x08004000, bytes };
 }
 

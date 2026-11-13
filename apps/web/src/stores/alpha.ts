@@ -19,6 +19,7 @@ import {
 } from "@bf-migrate/core";
 import { defineStore } from "pinia";
 import { computed, ref, shallowRef } from "vue";
+import { STM32_DFU_FILTER, waitForAuthorizedDfuDevice } from "../utils/dfu-device";
 import { saveFile } from "../utils/save-file";
 import { useConnectionStore } from "./connection";
 
@@ -56,12 +57,20 @@ export interface ChosenImage {
   sha256: string;
 }
 
-const DFU_FILTER = { vendorId: 0x0483, productId: 0xdf11 };
+export type UsbStep = "idle" | "working" | "permission" | "done" | "failed";
 
 async function sha256Of(text: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
+
+/** Parses and checks a chosen file. Only the simulated board accepts the demo's stand-in. */
+async function readImage(name: string, text: string, forHardware: boolean): Promise<ChosenImage> {
+  const image = parseIntelHex(text);
+  return { name, image, check: checkAlphaImage(image, { forHardware }), sha256: await sha256Of(text) };
+}
+
+const DEMO_ON_HARDWARE = "The demo's stand-in image is not firmware and would lock a real board up. Choose a Betaflight .hex file for this board.";
 
 function describeError(reason: unknown): string {
   if (reason instanceof SessionError) {
@@ -89,7 +98,10 @@ export const useAlphaStore = defineStore("alpha", () => {
   const probeInfo = shallowRef<G4Session["probe"]>();
   const readings = shallowRef<G4Readings>();
   const classification = shallowRef<Classification>();
+  /** The ST-Link flow's image. Cleared whenever the probe changes, so a simulated choice never reaches a real chip. */
   const chosen = shallowRef<ChosenImage>();
+  /** The USB rewrite's image, kept apart from the ST-Link flow's: a board on USB is always real. */
+  const usbChosen = shallowRef<ChosenImage>();
   const confirmations = ref<{ id: string; version: number; at: string }[]>([]);
   const reportSaved = ref(false);
   const clearBootPin = ref(true);
@@ -101,7 +113,7 @@ export const useAlphaStore = defineStore("alpha", () => {
   const resumeAt = ref<AlphaStep>("probe");
   /** True between attaching under reset and the pilot releasing the button. */
   const awaitingRelease = ref(false);
-  const usbStep = ref<"idle" | "working" | "done" | "failed">("idle");
+  const usbStep = ref<UsbStep>("idle");
   const usbMessage = ref("");
   const usbProgress = ref<DfuProgress>();
 
@@ -155,6 +167,8 @@ export const useAlphaStore = defineStore("alpha", () => {
   }
 
   function useSource(next: ProbeSource): void {
+    // An image chosen for one probe (the demo's stand-in for the simulated one) never carries over.
+    chosen.value = undefined;
     source.value = next;
     void connect("hotplug");
   }
@@ -219,11 +233,22 @@ export const useAlphaStore = defineStore("alpha", () => {
 
   async function chooseImage(name: string, text: string): Promise<void> {
     try {
-      const image = parseIntelHex(text);
-      chosen.value = { name, image, check: checkAlphaImage(image), sha256: await sha256Of(text) };
+      chosen.value = await readImage(name, text, !simulated.value);
     } catch (reason) {
       chosen.value = undefined;
       error.value = describeError(reason);
+    }
+  }
+
+  async function chooseUsbImage(name: string, text: string): Promise<void> {
+    usbStep.value = "idle";
+    usbMessage.value = "";
+    try {
+      usbChosen.value = await readImage(name, text, true);
+    } catch (reason) {
+      usbChosen.value = undefined;
+      usbStep.value = "failed";
+      usbMessage.value = describeError(reason);
     }
   }
 
@@ -272,6 +297,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     const image = chosen.value;
     const found = classification.value;
     if (!current || !image?.check.ok || !found) return;
+    if (image.check.demo && !simulated.value) return fail(new Error(DEMO_ON_HARDWARE), "probe");
     confirm(found.kind === "blank" ? "write" : "rewrite");
     const blocks = image.image.data;
     const onProgress = (done: number, total: number) => (progress.value = { done, total });
@@ -304,12 +330,18 @@ export const useAlphaStore = defineStore("alpha", () => {
     fail(new Error("The ST-Link was released when you left this page. Reconnect to carry on; the chip is read again first."), "probe");
   }
 
+  function failUsb(reason: unknown): void {
+    usbStep.value = "failed";
+    usbMessage.value = describeError(reason);
+  }
+
   /** A migrated board connected over USB: flash a new image through its own DFU bootloader. */
   async function flashOverUsb(): Promise<void> {
-    const image = chosen.value;
+    const image = usbChosen.value;
     const identity = connection.identity;
     const snapshot = connection.snapshot;
     if (!image?.check.ok || !identity || !snapshot || !migratedOverUsb.value) return;
+    if (image.check.demo) return failUsb(new Error(DEMO_ON_HARDWARE));
     usbStep.value = "working";
     usbProgress.value = undefined;
     try {
@@ -317,21 +349,44 @@ export const useAlphaStore = defineStore("alpha", () => {
       saveFile(`backup_${identity.board.boardName}_${identity.firmwareVersion}_${new Date().toISOString().slice(0, 10)}_diff.txt`, `${snapshot.diffAll}\n`);
       usbMessage.value = "Restarting the board into its bootloader";
       await connection.enterBootloader();
-      const known = (await navigator.usb.getDevices()).find((device) => device.vendorId === DFU_FILTER.vendorId && device.productId === DFU_FILTER.productId);
-      usbMessage.value = known ? "Writing the firmware" : "Choose the board's bootloader (STM32 BOOTLOADER) in the browser's list";
-      const device = known ?? (await navigator.usb.requestDevice({ filters: [DFU_FILTER] }));
-      usbMessage.value = "Writing the firmware";
-      const flasher = new DfuFlasher(device as unknown as UsbDeviceLike, (update) => (usbProgress.value = update));
-      await flasher.open();
-      await flasher.flash(image.image);
-      usbMessage.value = "Waiting for Betaflight to start";
-      await connection.reconnectAfterFlash();
-      usbStep.value = "done";
-      usbMessage.value = "";
+      const device = await waitForAuthorizedDfuDevice();
+      if (!device) {
+        usbStep.value = "permission";
+        usbMessage.value = "The board is in its bootloader. Your browser needs permission to reach it.";
+        return;
+      }
+      await writeOverDfu(device, image);
     } catch (reason) {
-      usbStep.value = "failed";
-      usbMessage.value = describeError(reason);
+      failUsb(reason);
     }
+  }
+
+  /** Called from the pilot's click, which requestDevice needs; the restart used up the first one. */
+  async function grantDfuPermission(): Promise<void> {
+    const image = usbChosen.value;
+    if (usbStep.value !== "permission" || !image?.check.ok || image.check.demo) return;
+    try {
+      const device = await navigator.usb.requestDevice({ filters: [STM32_DFU_FILTER] });
+      usbStep.value = "working";
+      await writeOverDfu(device, image);
+    } catch (reason) {
+      if (reason instanceof DOMException && reason.name === "NotFoundError") {
+        usbMessage.value = "No bootloader was chosen. Choose STM32 BOOTLOADER in the list. If it is not there, unplug the board, plug it back in and start again.";
+        return;
+      }
+      failUsb(reason);
+    }
+  }
+
+  async function writeOverDfu(device: USBDevice, image: ChosenImage): Promise<void> {
+    usbMessage.value = "Writing the firmware";
+    const flasher = new DfuFlasher(device as unknown as UsbDeviceLike, (update) => (usbProgress.value = update));
+    await flasher.open();
+    await flasher.flash(image.image);
+    usbMessage.value = "Waiting for Betaflight to start";
+    await connection.reconnectAfterFlash();
+    usbStep.value = "done";
+    usbMessage.value = "";
   }
 
   return {
@@ -342,6 +397,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     readings,
     classification,
     chosen,
+    usbChosen,
     confirmations,
     reportSaved,
     clearBootPin,
@@ -363,11 +419,13 @@ export const useAlphaStore = defineStore("alpha", () => {
     chipConfirmed,
     saveReport,
     chooseImage,
+    chooseUsbImage,
     firmwareConfirmed,
     unlock,
     write,
     retry,
     release,
     flashOverUsb,
+    grantDfuPermission,
   };
 });

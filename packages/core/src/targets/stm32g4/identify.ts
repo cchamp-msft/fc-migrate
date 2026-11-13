@@ -82,7 +82,8 @@ export async function readG4(memory: MemoryAccess): Promise<G4Readings> {
     const head = await optional(() => memory.readBlock(FLASH_START, FLASH_HEAD_LENGTH));
     if (head) readings.flashHead = head;
     const magic = await optional(() => memory.read32(CONFIG_AREA));
-    if (magic !== undefined) readings.configMagic = magic & 0xff;
+    // configHeader_t is { eepromConfigVersion, magic_be }, so the magic is the second byte.
+    if (magic !== undefined) readings.configMagic = (magic >>> 8) & 0xff;
   }
   return readings;
 }

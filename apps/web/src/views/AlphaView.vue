@@ -2,6 +2,7 @@
 import { ALPHA_BOARDS, ALPHA_TEXTS, type AlphaText } from "@bf-migrate/core";
 import { CircleAlert, CircleCheck, Cpu, FlaskConical, LoaderCircle, Upload } from "lucide-vue-next";
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from "vue";
+import AlphaImageFacts from "../components/AlphaImageFacts.vue";
 import { ALPHA_PHOTOS } from "../data/alpha-photos";
 import { DEMO_SCENARIOS, createDemoSource, type DemoScenarioId } from "../demo/alpha-probe";
 import { demoAlphaFirmware } from "../demo/alpha-firmware";
@@ -44,6 +45,8 @@ const scenario = ref<DemoScenarioId>(DEMO_SCENARIOS[0]!.id);
 const resetHeld = ref(false);
 const probeError = ref("");
 const fileInput = ref<HTMLInputElement>();
+// The USB rewrite has its own file: it always goes to real hardware, so it never shares the ST-Link flow's choice.
+const usbFileInput = ref<HTMLInputElement>();
 
 watch(
   () => alpha.step,
@@ -98,6 +101,7 @@ function leaveWiring(): void {
   alpha.goTo("probe");
 }
 const percent = computed(() => (alpha.progress && alpha.progress.total ? Math.round((alpha.progress.done / alpha.progress.total) * 100) : undefined));
+const usbBusy = computed(() => alpha.usbStep === "working" || alpha.usbStep === "permission");
 const usbPercent = computed(() => (alpha.usbProgress?.total ? Math.round((alpha.usbProgress.done / alpha.usbProgress.total) * 100) : undefined));
 const locked = computed(() => alpha.classification?.kind === "locked");
 const atLevel0WithFirmware = computed(() => alpha.classification?.kind === "programmed" || alpha.classification?.kind === "unknown");
@@ -135,6 +139,12 @@ async function pickFile(event: Event): Promise<void> {
   if (fileInput.value) fileInput.value.value = "";
 }
 
+async function pickUsbFile(event: Event): Promise<void> {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (file) await alpha.chooseUsbImage(file.name, await file.text());
+  if (usbFileInput.value) usbFileInput.value.value = "";
+}
+
 async function useDemoFirmware(): Promise<void> {
   const { name, text } = demoAlphaFirmware();
   await alpha.chooseImage(name, text);
@@ -161,11 +171,13 @@ function kb(bytes: number): string {
     <section v-if="alpha.migratedOverUsb" class="card">
       <h2>This board is already migrated</h2>
       <p class="muted lead">It runs Betaflight as TMOTORG4ALPHAHD. Betaflight's own firmware list does not carry this board yet, so new firmware comes from a file. It is written over USB, keeping your settings. No ST-Link is needed.</p>
+      <AlphaImageFacts v-if="alpha.usbChosen" :image="alpha.usbChosen" />
       <div class="actions">
-        <button class="btn" :disabled="alpha.usbStep === 'working'" @click="fileInput?.click()"><Upload :size="15" /> Choose a .hex file</button>
-        <button class="btn btn-primary" :disabled="!alpha.chosen?.check.ok || alpha.usbStep === 'working'" @click="alpha.flashOverUsb()">Flash over USB</button>
+        <button class="btn" :disabled="usbBusy" @click="usbFileInput?.click()"><Upload :size="15" /> Choose a .hex file</button>
+        <button v-if="alpha.usbStep === 'permission'" class="btn btn-primary" @click="alpha.grantDfuPermission()">Allow access to the bootloader</button>
+        <button v-else class="btn btn-primary" :disabled="!alpha.usbChosen?.check.ok || usbBusy" @click="alpha.flashOverUsb()">Flash over USB</button>
       </div>
-      <p v-if="alpha.usbMessage" class="muted">{{ alpha.usbMessage }}<template v-if="usbPercent !== undefined"> ({{ usbPercent }}%)</template></p>
+      <p v-if="alpha.usbMessage && alpha.usbStep !== 'failed'" class="muted">{{ alpha.usbMessage }}<template v-if="usbPercent !== undefined"> ({{ usbPercent }}%)</template></p>
       <div v-if="alpha.usbStep === 'done'" class="notice"><CircleCheck :size="18" /><span>The new firmware is running.</span></div>
       <div v-if="alpha.usbStep === 'failed'" class="notice notice-danger"><CircleAlert :size="18" /><span>{{ alpha.usbMessage }}</span></div>
     </section>
@@ -319,20 +331,7 @@ function kb(bytes: number): string {
         <button class="btn" @click="fileInput?.click()"><Upload :size="15" /> Choose a .hex file</button>
         <button v-if="alpha.simulated" class="btn" @click="useDemoFirmware()">Use the demo firmware</button>
       </div>
-      <template v-if="alpha.chosen">
-        <dl class="facts">
-          <dt>File</dt>
-          <dd>{{ alpha.chosen.name }}</dd>
-          <dt>Size</dt>
-          <dd>{{ kb(alpha.chosen.check.bytes) }}</dd>
-          <dt>Board</dt>
-          <dd>{{ alpha.chosen.check.boardName ?? "not named" }}</dd>
-          <dt>SHA-256</dt>
-          <dd class="mono hash">{{ alpha.chosen.sha256 }}</dd>
-        </dl>
-        <div v-for="text in alpha.chosen.check.errors" :key="text" class="notice notice-danger"><CircleAlert :size="18" /><span>{{ text }}</span></div>
-        <div v-for="text in alpha.chosen.check.warnings" :key="text" class="notice notice-warn"><CircleAlert :size="18" /><span>{{ text }}</span></div>
-      </template>
+      <AlphaImageFacts v-if="alpha.chosen" :image="alpha.chosen" />
       <div v-if="alpha.error" class="notice notice-danger"><CircleAlert :size="18" /><span>{{ alpha.error }}</span></div>
       <label v-if="alpha.classification?.bootPinHonoured" class="check">
         <input v-model="alpha.clearBootPin" type="checkbox" />
@@ -405,6 +404,7 @@ function kb(bytes: number): string {
     </section>
 
     <input ref="fileInput" type="file" accept=".hex" hidden @change="pickFile" />
+    <input ref="usbFileInput" type="file" accept=".hex" hidden @change="pickUsbFile" />
   </div>
 </template>
 
@@ -602,10 +602,6 @@ function kb(bytes: number): string {
 .facts dd {
   margin: 0;
   overflow-wrap: anywhere;
-}
-
-.hash {
-  font-size: 0.8rem;
 }
 
 .typed {
