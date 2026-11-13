@@ -75,7 +75,7 @@ export const openStlinkG4Session = (async (device: UsbBulkDeviceLike, options: S
       reattach: () => probe.reattach(),
       close: () => probe.close(),
     };
-    return new SwdG4Session(link, { time, coreHalted, ...(options.timeouts ? { timeouts: options.timeouts } : {}) });
+    return new SwdG4Session(link, { time, coreHalted, allowDemoImage: options.allowDemoImage === true, ...(options.timeouts ? { timeouts: options.timeouts } : {}) });
   } catch (error) {
     await probe.close();
     throw toSessionError(error, "no-target");

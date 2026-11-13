@@ -22,7 +22,8 @@ export function createDemoSource(id: DemoScenarioId): ProbeSource {
   const simulation = createAlphaSimulation(id);
   return {
     simulated: true,
-    open: (mode, onAttached) => openStlinkG4Session(simulation.probe, { mode, onAttached }),
+    // The simulated chip is the only place the demo stand-in may be written.
+    open: (mode, onAttached) => openStlinkG4Session(simulation.probe, { mode, onAttached, allowDemoImage: true }),
     pressReset: () => simulation.chip.pressReset(),
     releaseReset: () => simulation.chip.releaseReset(),
   };

@@ -4,11 +4,13 @@ import {
   DfuError,
   DfuFlasher,
   DfuReadProtectedError,
+  DfuRefusedError,
   DfuVerifyError,
   parseDfuMemoryString,
   type DfuProgress,
 } from "../src/dfu/flasher.js";
 import type { UsbControlSetup, UsbDeviceLike, UsbInTransfer, UsbOutTransfer } from "../src/dfu/usb-device.js";
+import { DEMO_IMAGE_MARKER } from "../src/firmware/demo-image.js";
 import type { HexImage } from "../src/firmware/hex.js";
 
 const DNLOAD = 1;
@@ -708,6 +710,25 @@ describe("flashing", () => {
 
     expect(device.requests).toHaveLength(requestsBefore);
     expect(device.closed).toBe(0);
+    await flasher.flash(image([FLASH_BASE, 16]));
+    expect(device.left).toBe(true);
+  });
+
+  it("refuses the demo's stand-in image before touching the device, and stays open", async () => {
+    const device = f722();
+    const { flasher } = setup(device);
+    await flasher.open();
+    const requestsBefore = device.requests.length;
+
+    const demo = image([FLASH_BASE, 0x400]);
+    demo.data[0]!.bytes.set(new TextEncoder().encode(DEMO_IMAGE_MARKER), 0x200);
+    const error = await caught(flasher.flash(demo));
+    expect(error).toBeInstanceOf(DfuRefusedError);
+    expect((error as Error).message).toContain("demo's stand-in");
+
+    expect(device.requests).toHaveLength(requestsBefore);
+    expect(device.closed).toBe(0);
+    expect(device.left).toBe(false);
     await flasher.flash(image([FLASH_BASE, 16]));
     expect(device.left).toBe(true);
   });
