@@ -20,6 +20,7 @@ export * from "./firmware/versions.js";
 export * from "./migrate/apply.js";
 export * from "./llm/proposals.js";
 export * from "./firmware/hex.js";
+export * from "./firmware/demo-image.js";
 export * from "./dfu/usb-device.js";
 export * from "./dfu/flasher.js";
 export * from "./bootstrap/bootstrap.js";

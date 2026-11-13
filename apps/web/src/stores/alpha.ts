@@ -63,6 +63,7 @@ function describeError(reason: unknown): string {
       usb: "Check the ST-Link's USB cable, then try again.",
       timeout: "Check the wires, then try again.",
       flash: "Try again. The ST-Link can always rewrite an unlocked board.",
+      refused: "Choose a Betaflight .hex file for this board.",
     };
     const sentence = reason.message.endsWith(".") ? reason.message : `${reason.message}.`;
     return `${sentence} ${hint[reason.kind]}`;

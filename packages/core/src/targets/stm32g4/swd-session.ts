@@ -3,6 +3,7 @@
  * them, and the mapping of failures to SessionError kinds. Probe-specific work
  * (opening the probe, re-entering SWD) sits behind {@link DebugLink}.
  */
+import { DEMO_IMAGE_REFUSED, isDemoImage } from "../../firmware/demo-image.js";
 import type { HexBlock } from "../../firmware/hex.js";
 import { haltCore, requestSystemReset, resumeCore, setResetVectorCatch, DHCSR, DHCSR_DBGKEY } from "../../swd/cortex-m.js";
 import { MemoryAccessError, hex32, type MemoryAccess } from "../../swd/memory-access.js";
@@ -30,6 +31,8 @@ export interface SwdG4SessionOptions {
   timeouts?: Partial<FlashTimeouts>;
   /** How long to keep trying to re-enter SWD after an option-byte relaunch or reset. */
   reattachTimeoutMs?: number;
+  /** The simulated chip only: see {@link OpenOptions.allowDemoImage}. */
+  allowDemoImage?: boolean;
 }
 
 const HALT_TIMEOUT_MS = 1000;
@@ -57,6 +60,7 @@ export class SwdG4Session implements G4Session {
   private readonly time: TimeSource;
   private readonly timeouts: FlashTimeouts;
   private readonly reattachTimeoutMs: number;
+  private readonly allowDemoImage: boolean;
   /** True while the core is halted by this session. */
   private halted: boolean;
   private closed = false;
@@ -69,6 +73,7 @@ export class SwdG4Session implements G4Session {
     this.halted = options.coreHalted;
     this.timeouts = { ...DEFAULT_FLASH_TIMEOUTS, ...options.timeouts };
     this.reattachTimeoutMs = options.reattachTimeoutMs ?? DEFAULT_REATTACH_TIMEOUT_MS;
+    this.allowDemoImage = options.allowDemoImage === true;
   }
 
   get probe(): ProbeInfo {
@@ -128,6 +133,7 @@ export class SwdG4Session implements G4Session {
 
   async erase(blocks: readonly HexBlock[], mode: "pages" | "mass", onProgress?: ByteProgress): Promise<void> {
     await this.step("flash", async () => {
+      this.refuseDemoImage(blocks);
       requireLevel0(await this.requireKnownChip());
       await this.prepareForChange();
       if (mode === "mass") {
@@ -140,6 +146,7 @@ export class SwdG4Session implements G4Session {
 
   async program(blocks: readonly HexBlock[], onProgress?: ByteProgress): Promise<void> {
     await this.step("flash", async () => {
+      this.refuseDemoImage(blocks);
       requireLevel0(await this.requireKnownChip());
       await this.prepareForChange();
       await programBlocks(this.memory, this.time, blocks, this.timeouts, onProgress);
@@ -182,6 +189,11 @@ export class SwdG4Session implements G4Session {
       }
     }
     await this.link.close();
+  }
+
+  /** The last gate before the chip's flash: the demo's stand-in never reaches a real board. */
+  private refuseDemoImage(blocks: readonly HexBlock[]): void {
+    if (!this.allowDemoImage && isDemoImage(blocks)) throw new SessionError("refused", `Refused: ${DEMO_IMAGE_REFUSED}`);
   }
 
   /** Runs one session step: refuses after close and maps failures to SessionError. */

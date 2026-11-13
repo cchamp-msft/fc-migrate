@@ -7,6 +7,7 @@
  * The procedure follows the owner's recorded run in fix-thobby-g4-alpha/NOTES.md.
  */
 import type { FcIdentity } from "../fc/identity.js";
+import { isDemoImage } from "../firmware/demo-image.js";
 import type { HexImage } from "../firmware/hex.js";
 import { hex32 } from "../swd/memory-access.js";
 import { decodeOptr, rdpLevelOf, type RdpLevel } from "../targets/stm32g4/option-bytes.js";
@@ -39,12 +40,6 @@ const CONFIG_END = CONFIG_AREA + 4 * PAGE_SIZE;
 const ALPHA_IMAGE_START = 0x08003800;
 const SRAM_START = 0x20000000;
 const SRAM_END = 0x20020000;
-
-/**
- * Carried by the demo's stand-in image. It is not firmware: written to a real board it
- * locks the core up at the first instruction, so only the simulated board accepts it.
- */
-export const DEMO_IMAGE_MARKER = "fc-migrate demo image, not firmware";
 
 /** True when a board connected over USB is a G4 Alpha already running Betaflight. */
 export function isMigratedAlpha(identity: Pick<FcIdentity, "variant" | "board">): boolean {
@@ -204,7 +199,7 @@ export function checkAlphaImage(image: HexImage, options: ImageCheckOptions = {}
   const lowest = Math.min(...image.data.map((block) => block.address));
   const outside = image.data.find((block) => block.address < FLASH_START || block.address + block.bytes.length > FLASH_END);
   const coversSettings = image.data.some((block) => block.address < CONFIG_END && block.address + block.bytes.length > CONFIG_AREA);
-  const demo = contains(image, DEMO_IMAGE_MARKER);
+  const demo = isDemoImage(image.data);
 
   if (image.data.length === 0 || image.bytesTotal === 0) {
     errors.push("The file holds no firmware.");
