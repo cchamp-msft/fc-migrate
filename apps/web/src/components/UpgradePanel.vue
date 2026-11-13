@@ -37,6 +37,7 @@ const clean = computed(() => upgrade.rejected.length === 0 && upgrade.mismatches
     <template v-else-if="upgrade.step === 'permission'">
       <p>{{ upgrade.message }}</p>
       <button class="btn btn-primary" @click="upgrade.grantDfuPermission()">Choose the STM32 bootloader</button>
+      <div class="notice notice-danger"><CircleAlert :size="18" /><span>The board is waiting in its bootloader. Do not close or change this browser tab.</span></div>
       <p class="muted">If nothing is listed, re-plug the board while holding BOOT, then click again.</p>
     </template>
 
@@ -75,7 +76,8 @@ const clean = computed(() => upgrade.rejected.length === 0 && upgrade.mismatches
       <div v-if="upgrade.progress" class="meter" role="progressbar" :aria-valuenow="percent" aria-valuemin="0" aria-valuemax="100">
         <div class="meter-fill" :style="{ width: `${percent ?? 0}%` }" />
       </div>
-      <p v-if="upgrade.progress" class="muted">{{ STAGE_LABELS[upgrade.progress.stage] }} {{ percent }}%. Keep the board plugged in.</p>
+      <p v-if="upgrade.progress" class="muted">{{ STAGE_LABELS[upgrade.progress.stage] }} {{ percent }}%</p>
+      <div class="notice notice-danger"><CircleAlert :size="18" /><span>Do not close or change this browser tab, and keep the board plugged in until the upgrade finishes.</span></div>
     </template>
 
     <p v-if="upgrade.unavailableOptions.length" class="muted">Not offered on {{ props.plan.targetVersion }}, so not included: {{ upgrade.unavailableOptions.join(", ") }}</p>
