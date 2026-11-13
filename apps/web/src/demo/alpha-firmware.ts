@@ -2,8 +2,10 @@
  * A stand-in firmware file for the Alpha Migrate demo. It is laid out like Betaflight's
  * G474 build (code from 0x08000000, the settings area at 0x08004000 left alone, more
  * code from 0x08006000) and carries the strings the image check looks for. It does
- * not run on anything.
+ * not run on anything: its handlers point at text. It carries DEMO_IMAGE_MARKER, so the
+ * image check refuses it for anything but the simulated board.
  */
+import { DEMO_IMAGE_MARKER } from "@bf-migrate/core";
 
 function record(type: number, address: number, data: readonly number[]): string {
   const bytes = [data.length, (address >> 8) & 0xff, address & 0xff, type, ...data];
@@ -33,8 +35,9 @@ export function demoAlphaFirmware(): { name: string; text: string } {
   const code = new Uint8Array(0x2800);
   const view = new DataView(code.buffer);
   view.setUint32(0, 0x20020000, true); // initial stack pointer, the top of SRAM
-  view.setUint32(4, 0x08000201, true); // reset handler, Thumb
-  code.set(new TextEncoder().encode(["Betaflight", "BTFL", "TMOTORG4ALPHAHD", "COMM", "2026.6.2 (demo)", ""].join("\u0000")), 0x200);
+  // Reset, NMI and HardFault, as Thumb addresses inside the image: the shape the check asks for.
+  for (const offset of [4, 8, 12]) view.setUint32(offset, 0x08000201, true);
+  code.set(new TextEncoder().encode(["Betaflight", "BTFL", "TMOTORG4ALPHAHD", "COMM", "2026.6.2 (demo)", DEMO_IMAGE_MARKER, ""].join("\u0000")), 0x200);
 
   // Deterministic filler, so every demo run writes the same bytes.
   const more = new Uint8Array(0x14000);

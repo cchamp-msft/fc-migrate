@@ -72,9 +72,10 @@ Before the site link is shared beyond the demo, publish the source, as GPL-3 req
 - [x] Classification, image checks, report and confirmation texts
 - [x] ST-Link V2 protocol, STM32G4 option bytes and flash, simulated probe and chip
 - [x] Alpha Migrate page, walked through against the simulator
-- [ ] Hardware, read-only first: connect and read the good board (`pnpm --filter @bf-migrate/hil run stlink`), to learn whether hot-plug works on a running Alpha
+- [x] Hardware, read-only first: connect and read the good board (`pnpm --filter @bf-migrate/hil run stlink`). Hot-plug works on a migrated board, running or locked up, with no reset held; a stock Alpha is still untested
+- [x] Hardware: rewrite a migrated board over SWD with the session code (`stlink-write`), keeping its settings, then check it over MSP (`stlink-dump` reads the whole flash for comparison)
 - [ ] Hardware: the bad board as a fixture (set RDP to 0xBB, then run the full migration)
-- [ ] Hardware: G474 DFU flashing through the app for migrated boards
+- [ ] Hardware: G474 DFU flashing through the app for migrated boards. Erase, write and verify are proven; leaving DFU and reconnecting to the new firmware are not yet
 - [ ] Decide the firmware source: a CI-built TMOTORG4ALPHAHD image served from the site, with its GPL source linked
 - [ ] Settle the manufacturer ID (COMM or TMTR) with the config submission
 - [ ] Analog board, once it is mapped

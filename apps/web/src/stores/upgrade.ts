@@ -15,33 +15,12 @@ import {
 import { defineStore } from "pinia";
 import { computed, ref, shallowRef, watch } from "vue";
 import { useConnectionStore } from "./connection";
+import { STM32_DFU_FILTER, waitForAuthorizedDfuDevice } from "../utils/dfu-device";
 import { saveFile } from "../utils/save-file";
 
 export type UpgradeStep = "idle" | "backup" | "build" | "bootloader" | "permission" | "flash" | "reconnect" | "apply" | "review" | "saving" | "done" | "failed";
 
-const STM32_DFU_FILTER = { vendorId: 0x0483, productId: 0xdf11 };
-const DFU_WAIT_MS = 12_000;
-const DFU_POLL_MS = 300;
 const INTERNAL_FLASH_START = 0x08000000;
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function findAuthorizedDfuDevice(): Promise<USBDevice | undefined> {
-  const devices = await navigator.usb.getDevices();
-  return devices.find((device) => device.vendorId === STM32_DFU_FILTER.vendorId && device.productId === STM32_DFU_FILTER.productId);
-}
-
-async function waitForAuthorizedDfuDevice(): Promise<USBDevice | undefined> {
-  const started = Date.now();
-  while (Date.now() - started < DFU_WAIT_MS) {
-    const device = await findAuthorizedDfuDevice();
-    if (device) return device;
-    await delay(DFU_POLL_MS);
-  }
-  return undefined;
-}
 
 /** Runs one firmware upgrade: nothing is saved to the board until the pilot confirms. */
 export const useUpgradeStore = defineStore("upgrade", () => {
