@@ -1,14 +1,46 @@
 /*
  * Design tokens. A theme sets the palette for one family in one mode; components
  * only ever use these variables, so adding a theme needs no component changes.
+ *
+ * The shapes, panels, hairlines and backdrop follow the Jewel Design System
+ * (https://github.com/willchambers/jewel-design-system, MIT, see apps/web/THIRD-PARTY.md).
+ * The colours stay this app's own.
  */
 :root {
-  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-ui: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
-  --radius-s: 6px;
-  --radius-m: 10px;
-  --radius-l: 14px;
   --sidebar-width: 15.5rem;
+
+  /* Type */
+  --tracking-body: -0.006em;
+  --tracking-heading: -0.025em;
+  --tracking-label: 0.12em;
+
+  /* Shapes. A panel is square top-left, just softened top-right where the knockout lines cut
+     through, and rounded along the bottom. Boxes inside a panel are near square; controls are
+     slightly rounded; fields are square. */
+  --radius-panel: 0 2px 10px 10px;
+  --radius-box: 2px;
+  --radius-control: 4px;
+  --radius-pill: 999px;
+  --panel-pad-y: 1.1rem;
+  --panel-pad-x: 1.25rem;
+
+  /* Knockout: two hairlines cut through each panel's top-right corner. */
+  --knockout-offset: 6px;
+  --knockout-width: 1px;
+  --knockout-gap: 2px;
+
+  /* Surfaces. Flat themes use their solid surface; gradient themes (below) turn panels to glass. */
+  --panel-bg: var(--surface);
+  --panel-border: var(--border);
+  --control-border: color-mix(in srgb, var(--text) 24%, transparent);
+  --hover-fill: color-mix(in srgb, var(--text) 6%, transparent);
+  --pressed-fill: color-mix(in srgb, var(--text) 12%, transparent);
+  /* Field edges need 3:1 against the panel, which the panel hairline does not give. */
+  --field-border: color-mix(in srgb, var(--text) 55%, transparent);
+  --field-border-hover: color-mix(in srgb, var(--text) 75%, transparent);
+  --field-fill: color-mix(in srgb, var(--text) 3%, transparent);
 
   --ok: #16a34a;
   --ok-soft: color-mix(in srgb, var(--ok) 14%, transparent);
@@ -16,20 +48,33 @@
   --warn-soft: color-mix(in srgb, var(--warn) 14%, transparent);
   --danger: #dc2626;
   --danger-soft: color-mix(in srgb, var(--danger) 14%, transparent);
+  /* Status text on small labels; light mode darkens these to keep 4.5:1. */
+  --ok-text: var(--ok);
+  --warn-text: var(--warn);
+  --danger-text: var(--danger);
   --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
   --shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 6px 20px rgb(0 0 0 / 0.06);
-  --wash: none;
+
+  /* Backdrop: the slow animated gradient behind the content. Off unless a theme turns it on. */
+  --backdrop-display: none;
+  --backdrop-speed: 40s;
+  --backdrop-intensity: 1;
 }
 
 :root[data-mode="dark"] {
   --ok: #4ade80;
   --warn: #fbbf24;
   --danger: #f87171;
+  --field-border: color-mix(in srgb, var(--text) 40%, transparent);
+  --field-border-hover: color-mix(in srgb, var(--text) 60%, transparent);
   --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
   color-scheme: dark;
 }
 
 :root[data-mode="light"] {
+  --ok-text: #15803d;
+  --warn-text: #b45309;
+  --danger-text: #b91c1c;
   color-scheme: light;
 }
 
@@ -101,7 +146,6 @@
   --sidebar-muted: #ab9bca;
   --sidebar-active: #2d1e4c;
   --sidebar-border: #2e2047;
-  --wash: radial-gradient(60rem 30rem at 85% -10%, rgb(124 58 237 / 0.18), transparent 70%);
 }
 
 /* Deep red */
@@ -137,7 +181,6 @@
   --sidebar-muted: #c59da0;
   --sidebar-active: #3a1a1e;
   --sidebar-border: #3a1c20;
-  --wash: radial-gradient(60rem 30rem at 85% -10%, rgb(220 38 38 / 0.16), transparent 70%);
 }
 
 /* Blue and teal */
@@ -173,7 +216,6 @@
   --sidebar-muted: #8fb4be;
   --sidebar-active: #173440;
   --sidebar-border: #18323d;
-  --wash: radial-gradient(60rem 30rem at 85% -10%, rgb(14 165 233 / 0.16), transparent 70%);
 }
 
 /* Betaflight: the classic Configurator yellow, used boldly. */
@@ -227,7 +269,6 @@
   --sidebar-muted: #fff0dc;
   --sidebar-active: rgb(255 255 255 / 0.24);
   --sidebar-border: rgb(255 255 255 / 0.28);
-  --wash: radial-gradient(70rem 32rem at 90% -12%, rgb(255 138 40 / 0.2), transparent 70%);
 }
 
 :root[data-theme="sunset"][data-mode="dark"] {
@@ -245,5 +286,92 @@
   --sidebar-muted: #f5d9c4;
   --sidebar-active: rgb(255 255 255 / 0.18);
   --sidebar-border: rgb(255 255 255 / 0.2);
-  --wash: radial-gradient(70rem 32rem at 90% -12%, rgb(224 53 122 / 0.2), transparent 70%);
+}
+
+/*
+ * Gradient themes: the colourful themes show a slow animated gradient in their own hues behind
+ * the content, and their panels turn to glass over it. Mono and Betaflight stay flat.
+ * Each sets five backdrop colours (--bd-1 to --bd-5) and the base under them (--bd-base).
+ * Text never sits on the backdrop itself: page headers, notices and controls all carry a panel.
+ */
+:root:is([data-theme="purple"], [data-theme="red"], [data-theme="teal"], [data-theme="sunset"]) {
+  --backdrop-display: block;
+  --panel-bg: color-mix(in srgb, var(--surface) 80%, transparent);
+  --panel-border: color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+:root:is([data-theme="purple"], [data-theme="red"], [data-theme="teal"], [data-theme="sunset"])[data-mode="dark"] {
+  --panel-bg: color-mix(in srgb, var(--surface) 86%, transparent);
+}
+
+:root[data-theme="purple"][data-mode="light"] {
+  --bd-base: #ede9fe;
+  --bd-1: #c4b5fd;
+  --bd-2: #f0abfc;
+  --bd-3: #a5b4fc;
+  --bd-4: #d8b4fe;
+  --bd-5: #f9a8d4;
+}
+
+:root[data-theme="purple"][data-mode="dark"] {
+  --bd-base: #1e0b3d;
+  --bd-1: #6d28d9;
+  --bd-2: #a21caf;
+  --bd-3: #4338ca;
+  --bd-4: #7e22ce;
+  --bd-5: #be185d;
+}
+
+:root[data-theme="red"][data-mode="light"] {
+  --bd-base: #fee2e2;
+  --bd-1: #fca5a5;
+  --bd-2: #fdba74;
+  --bd-3: #fda4af;
+  --bd-4: #f87171;
+  --bd-5: #fcd34d;
+}
+
+:root[data-theme="red"][data-mode="dark"] {
+  --bd-base: #3b0a0e;
+  --bd-1: #b91c1c;
+  --bd-2: #c2410c;
+  --bd-3: #be123c;
+  --bd-4: #dc2626;
+  --bd-5: #b45309;
+}
+
+:root[data-theme="teal"][data-mode="light"] {
+  --bd-base: #dff5f7;
+  --bd-1: #5eead4;
+  --bd-2: #7dd3fc;
+  --bd-3: #93c5fd;
+  --bd-4: #67e8f9;
+  --bd-5: #99f6e4;
+}
+
+:root[data-theme="teal"][data-mode="dark"] {
+  --bd-base: #062a33;
+  --bd-1: #0f766e;
+  --bd-2: #0369a1;
+  --bd-3: #1d4ed8;
+  --bd-4: #0e7490;
+  --bd-5: #0d9488;
+}
+
+:root[data-theme="sunset"][data-mode="light"] {
+  --bd-base: #ffedd5;
+  --bd-1: #fcd34d;
+  --bd-2: #fdba74;
+  --bd-3: #f9a8d4;
+  --bd-4: #c4b5fd;
+  --bd-5: #fb923c;
+}
+
+:root[data-theme="sunset"][data-mode="dark"] {
+  --bd-base: #2a1030;
+  --bd-1: #c97a00;
+  --bd-2: #c24a10;
+  --bd-3: #92205c;
+  --bd-4: #5b2a9e;
+  --bd-5: #e0357a;
 }

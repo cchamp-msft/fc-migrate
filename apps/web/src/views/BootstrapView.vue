@@ -238,8 +238,8 @@ async function restore(backup: TuneBackup): Promise<void> {
   align-items: flex-start;
   gap: 0.6rem;
   padding: 0.65rem 0.8rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-m);
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-box);
   cursor: pointer;
 }
 

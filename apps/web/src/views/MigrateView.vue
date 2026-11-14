@@ -592,15 +592,25 @@ function downloadScript(): void {
 .stat {
   display: flex;
   flex-direction: column;
-  padding: 0.6rem 0.9rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-m);
+  gap: 0.15rem;
+  padding: 0.65rem 0.9rem 0.7rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-box);
 }
 
 .stat strong {
-  font-size: 1.35rem;
-  line-height: 1.2;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: var(--tracking-heading);
+  line-height: 1.1;
+}
+
+.stat span {
+  font-size: 0.7rem;
+  font-weight: 560;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
 .stat[data-attention="true"] {
@@ -691,10 +701,6 @@ code {
 
 .group summary h2 {
   margin: 0;
-}
-
-.group[open] summary {
-  margin-bottom: 0.65rem;
 }
 
 .script {

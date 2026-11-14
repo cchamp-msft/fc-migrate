@@ -1,0 +1,105 @@
+/*
+ * Backdrop: the slow animated gradient behind the content on the gradient themes.
+ * Adapted from the Jewel Design System's lava lamp background
+ * (https://github.com/willchambers/jewel-design-system, MIT, see apps/web/THIRD-PARTY.md).
+ *
+ * One fixed layer of uneven radial gradients. Only registered custom properties animate, so no
+ * layout is touched, and the layer repaints on its own. Each theme sets its colours in tokens.css;
+ * a theme without them never shows the layer (--backdrop-display).
+ */
+
+@property --bd-c1 { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --bd-c2 { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --bd-c3 { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --bd-c4 { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --bd-x1 { syntax: "<percentage>"; inherits: true; initial-value: 18%; }
+@property --bd-y1 { syntax: "<percentage>"; inherits: true; initial-value: 22%; }
+@property --bd-x2 { syntax: "<percentage>"; inherits: true; initial-value: 82%; }
+@property --bd-y2 { syntax: "<percentage>"; inherits: true; initial-value: 12%; }
+@property --bd-x3 { syntax: "<percentage>"; inherits: true; initial-value: 70%; }
+@property --bd-y3 { syntax: "<percentage>"; inherits: true; initial-value: 88%; }
+@property --bd-x4 { syntax: "<percentage>"; inherits: true; initial-value: 8%; }
+@property --bd-y4 { syntax: "<percentage>"; inherits: true; initial-value: 78%; }
+
+.backdrop {
+  --i: calc(var(--backdrop-intensity) * 100%);
+
+  display: var(--backdrop-display);
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  contain: strict;
+  transform: translateZ(0);
+  background-color: var(--bd-base);
+  background-image:
+    radial-gradient(ellipse 58% 72% at var(--bd-x1) var(--bd-y1), color-mix(in oklab, var(--bd-c1) var(--i), transparent) 0%, transparent 68%),
+    radial-gradient(ellipse 44% 56% at var(--bd-x2) var(--bd-y2), color-mix(in oklab, var(--bd-c2) var(--i), transparent) 0%, transparent 72%),
+    radial-gradient(ellipse 70% 48% at var(--bd-x3) var(--bd-y3), color-mix(in oklab, var(--bd-c3) var(--i), transparent) 0%, transparent 70%),
+    radial-gradient(ellipse 38% 64% at var(--bd-x4) var(--bd-y4), color-mix(in oklab, var(--bd-c4) var(--i), transparent) 0%, transparent 74%),
+    radial-gradient(ellipse 120% 90% at 50% 110%, color-mix(in oklab, var(--bd-5) calc(var(--i) * 0.55), transparent) 0%, transparent 60%);
+  animation:
+    backdrop-hue-1 var(--backdrop-speed) linear infinite,
+    backdrop-hue-2 var(--backdrop-speed) linear infinite,
+    backdrop-hue-3 var(--backdrop-speed) linear infinite,
+    backdrop-hue-4 var(--backdrop-speed) linear infinite,
+    backdrop-drift-a calc(var(--backdrop-speed) * 0.75) cubic-bezier(0.2, 0, 0, 1) infinite alternate,
+    backdrop-drift-b calc(var(--backdrop-speed) * 1.15) cubic-bezier(0.2, 0, 0, 1) infinite alternate;
+}
+
+/* Each colour slot walks the theme's five colours, one step apart. */
+@keyframes backdrop-hue-1 {
+  0%, 100% { --bd-c1: var(--bd-1); }
+  20% { --bd-c1: var(--bd-2); }
+  40% { --bd-c1: var(--bd-3); }
+  60% { --bd-c1: var(--bd-4); }
+  80% { --bd-c1: var(--bd-5); }
+}
+
+@keyframes backdrop-hue-2 {
+  0%, 100% { --bd-c2: var(--bd-2); }
+  20% { --bd-c2: var(--bd-3); }
+  40% { --bd-c2: var(--bd-4); }
+  60% { --bd-c2: var(--bd-5); }
+  80% { --bd-c2: var(--bd-1); }
+}
+
+@keyframes backdrop-hue-3 {
+  0%, 100% { --bd-c3: var(--bd-3); }
+  20% { --bd-c3: var(--bd-4); }
+  40% { --bd-c3: var(--bd-5); }
+  60% { --bd-c3: var(--bd-1); }
+  80% { --bd-c3: var(--bd-2); }
+}
+
+@keyframes backdrop-hue-4 {
+  0%, 100% { --bd-c4: var(--bd-4); }
+  20% { --bd-c4: var(--bd-5); }
+  40% { --bd-c4: var(--bd-1); }
+  60% { --bd-c4: var(--bd-2); }
+  80% { --bd-c4: var(--bd-3); }
+}
+
+/* Two drift groups on different periods, so the loop never looks mirrored. */
+@keyframes backdrop-drift-a {
+  0% { --bd-x1: 18%; --bd-y1: 22%; --bd-x3: 70%; --bd-y3: 88%; }
+  50% { --bd-x1: 30%; --bd-y1: 34%; --bd-x3: 58%; --bd-y3: 76%; }
+  100% { --bd-x1: 12%; --bd-y1: 40%; --bd-x3: 78%; --bd-y3: 70%; }
+}
+
+@keyframes backdrop-drift-b {
+  0% { --bd-x2: 82%; --bd-y2: 12%; --bd-x4: 8%; --bd-y4: 78%; }
+  50% { --bd-x2: 70%; --bd-y2: 26%; --bd-x4: 20%; --bd-y4: 64%; }
+  100% { --bd-x2: 88%; --bd-y2: 30%; --bd-x4: 14%; --bd-y4: 90%; }
+}
+
+/* Reduced motion: a still gradient in the theme's first four colours. */
+@media (prefers-reduced-motion: reduce) {
+  .backdrop {
+    --bd-c1: var(--bd-1);
+    --bd-c2: var(--bd-2);
+    --bd-c3: var(--bd-3);
+    --bd-c4: var(--bd-4);
+    animation: none;
+  }
+}

@@ -487,9 +487,9 @@ function kb(bytes: number): string {
 
 .stage {
   padding: 0.25rem 0.6rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: none;
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-pill);
+  background: var(--panel-bg);
   color: var(--muted);
   font: inherit;
   cursor: default;
@@ -598,9 +598,9 @@ function kb(bytes: number): string {
   align-items: flex-start;
   gap: 0.3rem;
   padding: 0.8rem 0.9rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-m);
-  background: var(--surface);
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-box);
+  background: var(--field-fill);
   color: inherit;
   font: inherit;
   text-align: left;
@@ -636,8 +636,8 @@ function kb(bytes: number): string {
   display: block;
   width: 100%;
   height: auto;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-m);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-box);
 }
 
 .photo figcaption {
@@ -647,7 +647,7 @@ function kb(bytes: number): string {
 .demo {
   margin-top: 1.1rem;
   padding-top: 0.9rem;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--panel-border);
 }
 
 .demo h3 {

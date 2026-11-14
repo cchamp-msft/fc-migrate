@@ -78,7 +78,7 @@ async function copy(): Promise<void> {
     <NotConnected v-if="!connection.snapshot" what="its configuration" />
 
     <template v-else>
-      <div class="toolbar">
+      <div class="toolbar card">
         <div class="segmented" role="group" aria-label="Configuration view">
           <button :aria-pressed="source === 'diff'" @click="source = 'diff'">Changes only</button>
           <button :aria-pressed="source === 'dump'" @click="source = 'dump'">Everything</button>

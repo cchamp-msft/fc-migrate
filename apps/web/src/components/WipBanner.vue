@@ -38,7 +38,7 @@ function dismiss(): void {
 <style scoped>
 .wip {
   align-items: center;
-  border-radius: 0;
+  border-width: 0 0 1px;
   padding: 0.55rem 1rem 0.55rem 1.25rem;
 }
 
@@ -60,7 +60,7 @@ function dismiss(): void {
   height: 1.9rem;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-m);
+  border-radius: var(--radius-control);
   background: transparent;
   color: inherit;
   cursor: pointer;

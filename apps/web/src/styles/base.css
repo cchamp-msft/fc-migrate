@@ -15,7 +15,10 @@ body {
   background: var(--bg);
   color: var(--text);
   font: 14px/1.5 var(--font-ui);
+  letter-spacing: var(--tracking-body);
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1,
@@ -26,15 +29,17 @@ p {
 }
 
 h1 {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 650;
-  letter-spacing: -0.01em;
-  line-height: 1.25;
+  letter-spacing: var(--tracking-heading);
+  line-height: 1.1;
+  text-wrap: balance;
 }
 
 h2 {
   font-size: 1rem;
   font-weight: 620;
+  letter-spacing: -0.01em;
 }
 
 a {
@@ -45,6 +50,7 @@ code,
 pre,
 kbd {
   font-family: var(--font-mono);
+  letter-spacing: 0;
 }
 
 :focus-visible {
@@ -55,10 +61,53 @@ kbd {
 .page {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
   max-width: 68rem;
   margin: 0 auto;
-  padding: 1.75rem 2rem 2.5rem;
+  padding: 1.5rem 2rem 2.5rem;
+}
+
+/*
+ * Panels: the page header and every card. Square top-left, rounded along the bottom, with two
+ * knockout hairlines through the top-right corner. On gradient themes they are glass.
+ */
+.page-header,
+.card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-panel);
+  padding: var(--panel-pad-y) var(--panel-pad-x);
+}
+
+/*
+ * The knockout lines are holes cut with a mask: a 225deg gradient starts at the top-right corner,
+ * so each stop is a distance in from it. The mask also clips anything drawn outside the panel,
+ * so popups that must overflow a panel belong outside it.
+ */
+.page-header:not(.no-knockout),
+.card:not(.no-knockout) {
+  --k1: var(--knockout-offset);
+  --k2: calc(var(--k1) + var(--knockout-width));
+  --k3: calc(var(--k2) + var(--knockout-gap));
+  --k4: calc(var(--k3) + var(--knockout-width));
+  --aa: 0.5px;
+
+  -webkit-mask-image: linear-gradient(
+    225deg,
+    #000 0 calc(var(--k1) - var(--aa)),
+    transparent var(--k1) var(--k2),
+    #000 calc(var(--k2) + var(--aa)) calc(var(--k3) - var(--aa)),
+    transparent var(--k3) var(--k4),
+    #000 calc(var(--k4) + var(--aa))
+  );
+  mask-image: linear-gradient(
+    225deg,
+    #000 0 calc(var(--k1) - var(--aa)),
+    transparent var(--k1) var(--k2),
+    #000 calc(var(--k2) + var(--aa)) calc(var(--k3) - var(--aa)),
+    transparent var(--k3) var(--k4),
+    #000 calc(var(--k4) + var(--aa))
+  );
 }
 
 .page-header {
@@ -67,23 +116,22 @@ kbd {
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem 1.5rem;
+  padding-block: 1.25rem;
 }
 
 .page-header p {
   color: var(--muted);
-  margin-top: 0.2rem;
+  margin-top: 0.35rem;
   max-width: 44rem;
 }
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-l);
-  padding: 1.1rem 1.25rem;
-}
-
-.card h2 {
-  margin-bottom: 0.6rem;
+/* A card's heading opens it with a hairline that runs edge to edge under it. */
+.card > h2:first-child,
+details.card[open] > summary {
+  align-self: stretch;
+  margin: 0 calc(-1 * var(--panel-pad-x)) 0.85rem;
+  padding: 0 var(--panel-pad-x) 0.8rem;
+  border-bottom: 1px solid var(--panel-border);
 }
 
 .grid {
@@ -100,25 +148,36 @@ kbd {
   font-family: var(--font-mono);
 }
 
+/* Buttons: outlined by default, filled in the theme accent for the main action. */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  padding: 0.5rem 0.9rem;
-  border-radius: var(--radius-m);
-  border: 1px solid var(--border);
-  background: var(--surface);
+  min-height: 2.25rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--control-border);
+  background: transparent;
   color: var(--text);
   font: inherit;
-  font-weight: 560;
+  font-weight: 550;
+  line-height: 1.2;
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.12s, border-color 0.12s, filter 0.12s;
+  transition:
+    background-color 0.12s,
+    border-color 0.12s,
+    filter 0.12s;
 }
 
 .btn:hover:not(:disabled) {
-  background: var(--surface-2);
+  background: var(--hover-fill);
+  border-color: currentColor;
+}
+
+.btn:active:not(:disabled) {
+  background: var(--pressed-fill);
 }
 
 .btn:disabled {
@@ -128,38 +187,49 @@ kbd {
 
 .btn-primary {
   background: var(--accent);
-  border-color: transparent;
+  border-color: var(--accent);
   color: var(--on-accent);
 }
 
-.btn-primary:hover:not(:disabled) {
+.btn-primary:hover:not(:disabled),
+.btn-primary:active:not(:disabled) {
   background: var(--accent);
+  border-color: var(--accent);
   filter: brightness(1.08);
 }
 
+/* The one filled red button, for the action that can't be undone. */
 .btn-danger {
   background: var(--danger);
-  border-color: transparent;
+  border-color: var(--danger);
   color: #fff;
 }
 
-.btn-danger:hover:not(:disabled) {
+.btn-danger:hover:not(:disabled),
+.btn-danger:active:not(:disabled) {
   background: var(--danger);
+  border-color: var(--danger);
   filter: brightness(1.08);
 }
 
 .btn-s {
-  padding: 0.3rem 0.6rem;
+  min-height: 1.85rem;
+  padding: 0.25rem 0.6rem;
   font-size: 0.86rem;
 }
 
+/* Chips: small outlined pills for categories and build options. */
 .chip {
   display: inline-flex;
   align-items: center;
-  padding: 0.12rem 0.55rem;
-  border-radius: 999px;
-  background: var(--surface-2);
-  font-size: 0.82rem;
+  min-height: 1.5rem;
+  padding: 0.1rem 0.55rem;
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-pill);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
@@ -169,46 +239,53 @@ kbd {
   gap: 0.35rem;
 }
 
+/* Badges: a status word on a hairline pill, in the status colour. */
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
+  min-height: 1.4rem;
   padding: 0.1rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.78rem;
+  border: 1px solid color-mix(in srgb, currentColor 45%, transparent);
+  border-radius: var(--radius-pill);
+  font-size: 0.7rem;
   font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
 .badge-ok {
-  background: var(--ok-soft);
-  color: var(--ok);
+  color: var(--ok-text);
 }
 
 .badge-warn {
-  background: var(--warn-soft);
-  color: var(--warn);
+  color: var(--warn-text);
 }
 
 .badge-danger {
-  background: var(--danger-soft);
-  color: var(--danger);
+  color: var(--danger-text);
 }
 
 .badge-neutral {
-  background: var(--surface-2);
   color: var(--muted);
 }
 
 .facts {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.3rem 1rem;
+  align-items: baseline;
+  gap: 0.35rem 1rem;
   margin: 0;
 }
 
 .facts dt {
   color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 560;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
 .facts dd {
@@ -217,12 +294,17 @@ kbd {
   overflow-wrap: anywhere;
 }
 
+/* Notices: a hairline box whose left edge carries the tone. */
 .notice {
+  --tone: var(--field-border);
+
   display: flex;
   gap: 0.6rem;
   padding: 0.7rem 0.9rem;
-  border-radius: var(--radius-m);
-  background: var(--surface-2);
+  border: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: var(--panel-bg);
+  box-shadow: inset 2px 0 0 var(--tone);
 }
 
 .notice svg {
@@ -230,10 +312,12 @@ kbd {
   margin-top: 0.15rem;
 }
 
-/* Warnings must not read as decoration: a solid edge, a coloured icon, heavier text for danger. */
+/* Warnings must not read as decoration: a solid edge, a tinted box, a coloured icon, heavier text for danger. */
 .notice-warn {
-  background: var(--warn-soft);
-  border-left: 4px solid var(--warn);
+  --tone: var(--warn);
+
+  background: linear-gradient(var(--warn-soft), var(--warn-soft)), var(--panel-bg);
+  box-shadow: inset 4px 0 0 var(--tone);
 }
 
 .notice-warn > svg {
@@ -241,8 +325,10 @@ kbd {
 }
 
 .notice-danger {
-  background: var(--danger-soft);
-  border-left: 4px solid var(--danger);
+  --tone: var(--danger);
+
+  background: linear-gradient(var(--danger-soft), var(--danger-soft)), var(--panel-bg);
+  box-shadow: inset 4px 0 0 var(--tone);
   font-weight: 600;
 }
 
@@ -250,11 +336,14 @@ kbd {
   color: var(--danger);
 }
 
+/* Segmented: a row of pressable options in one hairline box; the chosen one fills with the accent. */
 .segmented {
   display: inline-flex;
-  padding: 3px;
-  border-radius: var(--radius-m);
-  background: var(--surface-2);
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-control);
+  background: var(--panel-bg);
 }
 
 .segmented button {
@@ -262,25 +351,64 @@ kbd {
   background: transparent;
   color: var(--muted);
   font: inherit;
-  font-weight: 560;
-  padding: 0.25rem 0.8rem;
-  border-radius: 7px;
+  font-weight: 550;
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-box);
   cursor: pointer;
+  transition:
+    background-color 0.12s,
+    color 0.12s;
+}
+
+.segmented button:hover {
+  background: var(--hover-fill);
+  color: var(--text);
 }
 
 .segmented button[aria-pressed="true"] {
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.14);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
+/* Fields: square hairline boxes that take a two-pixel accent edge on focus. */
 .input {
+  min-height: 2.25rem;
   padding: 0.42rem 0.7rem;
-  border-radius: var(--radius-m);
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border-radius: 0;
+  border: 1px solid var(--field-border);
+  background: var(--field-fill);
   color: var(--text);
   font: inherit;
+  transition:
+    border-color 0.12s,
+    box-shadow 0.12s;
+}
+
+.input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--field-border-hover);
+}
+
+.input:focus,
+.input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.input:disabled {
+  color: var(--muted);
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
+select.input option {
+  background: var(--surface);
+  color: var(--text);
 }
 
 @media (max-width: 800px) {
