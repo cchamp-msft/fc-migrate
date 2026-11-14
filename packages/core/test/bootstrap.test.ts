@@ -55,9 +55,9 @@ describe("bootstrap plan", () => {
     const plan = planBootstrap(input(), DEFAULTS);
     for (const profile of [0, 1, 2, 3]) {
       expect(changeOf(plan, "throttle_boost", profile)?.to).toBe("0");
-      expect(changeOf(plan, "dyn_idle_min_rpm", profile)?.to).toBe("30");
+      expect(changeOf(plan, "dyn_idle_min_rpm", profile)?.to).toBe("35");
     }
-    expect(changeOf(planBootstrap(input(), { ...DEFAULTS, size: "large" }), "dyn_idle_min_rpm", 2)?.to).toBe("20");
+    expect(changeOf(planBootstrap(input(), { ...DEFAULTS, size: "large" }), "dyn_idle_min_rpm", 2)?.to).toBe("30");
   });
 
   it("returns the active profile's sliders to default and recomputes from them", () => {
@@ -69,8 +69,8 @@ describe("bootstrap plan", () => {
   });
 
   it("sends only values that change", () => {
-    const plan = planBootstrap(input(), DEFAULTS);
-    // Profile 0 on the test board already has dynamic idle at 30.
+    const plan = planBootstrap(input(), { ...DEFAULTS, size: "large" });
+    // Profile 0 on the test board already has dynamic idle at 30, the 4 to 5 inch value.
     expect(changeOf(plan, "dyn_idle_min_rpm", 0)).toMatchObject({ from: "30", changed: false });
     expect(changeOf(plan, "dyn_idle_min_rpm", 1)).toMatchObject({ from: "0", changed: true });
     const profile0 = plan.script.slice(plan.script.indexOf("profile 0"), plan.script.indexOf("profile 1"));
