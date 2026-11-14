@@ -304,10 +304,10 @@ export const ALPHA_TEXTS = {
   },
   givesUp: {
     id: "C1b",
-    version: 1,
+    version: 2,
     title: "What the HD board gives up",
     paragraphs: [
-      "Most of the board carries over: OSD, power and SBUS on the DJI plug, ESC telemetry, the LED strip and the beeper. What you lose:",
+      "Most of the board carries over: OSD, power and SBUS on the DJI plug, ESC telemetry, the LED strip and the beeper. ESC telemetry has one known flaw on the board tested so far. Some of its frames arrive corrupted, so with it turned on the stats screen after a flight can show an impossible maximum current, RPM or temperature. Flying is not affected. What you lose:",
       "The receiver plug, for a CRSF or ELRS receiver. Alpha reads the receiver in software on a pin with no serial port, which Betaflight cannot do. Under Betaflight the receiver goes on the T1 and R1 pads.",
       "DShot2400. Betaflight's RPM filtering needs bidirectional DShot, which on this chip runs at DShot300 with a 4 kHz PID loop.",
       "Alpha itself: its configurator, its updates and any way back.",
