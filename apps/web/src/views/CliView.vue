@@ -273,9 +273,9 @@ function clear(): void {
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  border-radius: var(--radius-l);
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
   font-family: var(--font-mono);
   font-size: 0.86rem;
 }
@@ -292,7 +292,7 @@ function clear(): void {
 
 .composer {
   position: relative;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--panel-border);
 }
 
 .prompt-row {
@@ -353,7 +353,7 @@ function clear(): void {
   list-style: none;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-m);
+  border-radius: var(--radius-box);
   box-shadow: var(--shadow);
 }
 
@@ -362,7 +362,7 @@ function clear(): void {
   justify-content: space-between;
   gap: 1.5rem;
   padding: 0.2rem 0.55rem;
-  border-radius: var(--radius-s);
+  border-radius: var(--radius-box);
   cursor: pointer;
 }
 

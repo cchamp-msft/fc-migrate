@@ -7,6 +7,7 @@ import WipBanner from "./components/WipBanner.vue";
 
 <template>
   <div class="shell">
+    <div class="backdrop" aria-hidden="true" />
     <AppSidebar class="shell-sidebar" />
     <main class="shell-main">
       <FlashingBanner />
@@ -31,8 +32,6 @@ import WipBanner from "./components/WipBanner.vue";
 
 .shell-main {
   overflow: auto;
-  background-image: var(--wash);
-  background-repeat: no-repeat;
 }
 
 .shell-status {

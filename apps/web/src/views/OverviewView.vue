@@ -53,7 +53,7 @@ const configSummary = computed(() => {
 <template>
   <div class="page">
     <template v-if="!connection.identity">
-      <header class="hero">
+      <header class="page-header hero">
         <h1>Upgrade your firmware. Keep your quad.</h1>
         <p>
           Betaflight Migrator reads your flight controller, shows exactly what it runs, and carries your wiring, modes, VTX table, OSD and tune across firmware
@@ -164,14 +164,16 @@ const configSummary = computed(() => {
 
 <style scoped>
 .hero {
-  display: flex;
   flex-direction: column;
-  gap: 0.7rem;
-  padding: 1.5rem 0 0.75rem;
+  flex-wrap: nowrap;
+  gap: 0.8rem;
+  padding: 2rem var(--panel-pad-x) 1.75rem;
 }
 
 .hero h1 {
-  font-size: 2.1rem;
+  font-size: clamp(2rem, 1.4rem + 2vw, 2.9rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
   max-width: 34rem;
 }
 

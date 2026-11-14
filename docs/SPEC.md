@@ -364,6 +364,13 @@ A shared link shows an 8-bit preview: worker bees leaving a grumpy grey queen fo
 
 Themes, each in light and dark: Mono, Deep Purple, Deep Red, Blue Teal, Betaflight, Betaflight Sunset.
 
+The styling follows the Jewel Design System, in the app's own colours:
+- Content sits on panels: square top-left, rounded along the bottom, with two knockout hairlines through the top-right corner. A card's heading has a hairline under it that runs edge to edge.
+- Buttons are outlined, with the main action filled in the theme accent. Fields are square hairline boxes that take an accent edge on focus. Badges are uppercase status words on hairline pills.
+- The type is Inter, bundled with the site.
+
+The colourful themes (Deep Purple, Deep Red, Blue Teal and Betaflight Sunset) run a slow animated gradient in their own hues behind the page, and their panels turn to glass over it. Mono and Betaflight stay flat. Text never sits on the gradient itself: page headers, notices and controls each carry a panel. With reduced motion the gradient holds still.
+
 The CLI:
 - searches settings by fuzzy match;
 - shows allowed values, ranges, defaults and current values as you type;

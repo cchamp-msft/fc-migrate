@@ -30,6 +30,11 @@ const REPO = "https://github.com/cchamp-msft/fc-migrate";
           <li><a :href="REPO" target="_blank" rel="noopener">github.com/cchamp-msft/fc-migrate <ExternalLink :size="13" /></a></li>
           <li><a :href="`${REPO}/blob/main/LICENSE`" target="_blank" rel="noopener">The license (GNU GPL v3) <ExternalLink :size="13" /></a></li>
         </ul>
+        <p class="muted credits">
+          Its look draws on the <a href="https://github.com/willchambers/jewel-design-system" target="_blank" rel="noopener">Jewel Design System</a> (MIT), and it uses the
+          <a href="https://rsms.me/inter/" target="_blank" rel="noopener">Inter</a> typeface (SIL Open Font License).
+          <a :href="`${REPO}/blob/main/apps/web/THIRD-PARTY.md`" target="_blank" rel="noopener">Notices <ExternalLink :size="13" /></a>
+        </p>
       </div>
       <div class="card">
         <h2>Firmware this site serves</h2>
@@ -88,6 +93,11 @@ const REPO = "https://github.com/cchamp-msft/fc-migrate";
 
 .links li + li {
   margin-top: 0.3rem;
+}
+
+.credits {
+  margin-top: 0.75rem;
+  font-size: 0.86rem;
 }
 
 .links a {

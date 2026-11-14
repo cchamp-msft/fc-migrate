@@ -20,6 +20,7 @@ The source is public, as GPL-3 requires, and the docs and `wrangler.toml` carry 
 - [x] pnpm workspace, TypeScript, Vitest, GPL-3.0 license
 - [x] Baseline captures from the RRIOT F722 committed as fixtures
 - [x] Six themes in light and dark, app shell
+- [x] Jewel-style panels and controls, with a gradient backdrop on the colourful themes
 
 ## M2. Connect and inspect
 

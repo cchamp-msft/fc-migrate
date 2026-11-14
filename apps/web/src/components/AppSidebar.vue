@@ -154,11 +154,12 @@ const busyLabel = computed(() => (connection.status === "rebooting" ? "Restartin
 }
 
 .nav-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.6rem;
   padding: 0.45rem 0.6rem;
-  border-radius: var(--radius-m);
+  border-radius: var(--radius-box);
   color: var(--on-sidebar);
   text-decoration: none;
   font-weight: 540;
@@ -171,6 +172,15 @@ const busyLabel = computed(() => (connection.status === "rebooting" ? "Restartin
 .nav-item.router-link-exact-active {
   background: var(--sidebar-active);
   font-weight: 650;
+}
+
+/* The current page also carries a two-pixel edge, so it reads without the fill. */
+.nav-item.router-link-exact-active::before {
+  content: "";
+  position: absolute;
+  inset: 0.45rem auto 0.45rem 0;
+  width: 2px;
+  background: var(--on-sidebar);
 }
 
 .spin {
@@ -213,6 +223,12 @@ const busyLabel = computed(() => (connection.status === "rebooting" ? "Restartin
 
   .nav-item {
     padding: 0.3rem 0.5rem;
+  }
+
+  .nav-item.router-link-exact-active::before {
+    inset: auto 0.5rem 0;
+    width: auto;
+    height: 2px;
   }
 }
 </style>
