@@ -7,13 +7,13 @@ What we are building is in [SPEC.md](SPEC.md). Milestones are in build order.
 ## Next
 
 1. Finish a full Upgrade in the browser on a real board, through the review panel and Save. The first run reached 2026.6.1, but its review panel vanished before Save, a bug now fixed.
-2. Deployment: one Worker, `bf-migrate`, serves the site at https://fc-migrate.com and its API under `/api` from the same origin. `www.fc-migrate.com` is attached too, and a redirect rule on the zone (Rules > Redirect Rules, "www to fc-migrate.com") sends it to the bare domain with the path and query kept. The old https://bf-migrate.oeb.workers.dev address still works until visitors have moved. `pnpm --filter @bf-migrate/worker run deploy` builds the site and deploys both. It was deployed on 2026-11-12 with AI suggestions on; the old `bf-migrate-api` Worker is deleted. `LLM_ENABLED` switches suggestions in the dashboard (Workers > bf-migrate > Settings > Variables and Secrets), and `keep_vars` keeps it across deploys. To set it from the command line, run `wrangler deploy --var LLM_ENABLED:true` from `apps/worker`; `pnpm run deploy -- --var` passes the flag in a form wrangler ignores. The API takes a passphrase and has per-minute and daily limits. Still to do: decide whether to put Cloudflare Access on `/api/*` (the workers.dev address would then have to be turned off, since Access cannot cover it).
+2. Decide whether to put Cloudflare Access on `/api/*`. How the site is deployed, and what Access would change, is in [DEPLOY.md](DEPLOY.md).
 3. Record which build options each schema was captured with. A setting missing from another board's capture is now sent and left to the firmware, but a same-board build with extra options can still have settings dropped.
 4. Test a custom-PID tune and varied configs on hardware, and compare `feature`, `serial` and `aux` lines after apply.
 5. Build the emulator: SITL with OSD, VTX and motor settings re-enabled, in Docker, behind `DryRunEngine`.
 6. Capture a 2026.12 schema.
 
-Before the site link is shared beyond the demo, publish the source, as GPL-3 requires. Before the repo goes public, remove LAN addresses from the docs and `wrangler.toml`, and consider scrubbing the chip ID from the fixtures.
+The source is public, as GPL-3 requires, and the docs and `wrangler.toml` carry no LAN addresses. Still to decide: whether to scrub the test board's chip ID from the fixtures.
 
 ## M1. Foundation
 
@@ -75,17 +75,17 @@ Before the site link is shared beyond the demo, publish the source, as GPL-3 req
 - [x] Hardware, read-only first: connect and read the good board (`pnpm --filter @bf-migrate/hil run stlink`). Hot-plug works on a migrated board, running or locked up, with no reset held; a stock Alpha is still untested
 - [x] Hardware: rewrite a migrated board over SWD with the session code (`stlink-write`), keeping its settings, then check it over MSP (`stlink-dump` reads the whole flash for comparison)
 - [ ] Hardware: the bad board as a fixture (set RDP to 0xBB, then run the full migration)
-- [ ] Hardware: G474 DFU flashing through the app for migrated boards. Erase, write and verify are proven; leaving DFU and reconnecting to the new firmware are not yet
-- [ ] Decide the firmware source: a CI-built TMOTORG4ALPHAHD image served from the site, with its GPL source linked
+- [x] Hardware: G474 DFU flashing through the app for migrated boards: fc-migrate-firmware v2026.6.2-1 written over DFU on a real Alpha HD, and the page reconnected to the board on the new firmware
+- [x] Firmware source: [fc-migrate-firmware](https://github.com/cchamp-msft/fc-migrate-firmware) releases of `TMOTORG4ALPHAHD`, served from the site pinned by SHA-256, with the source linked
 - [ ] Settle the manufacturer ID (COMM or TMTR) with the config submission
 - [ ] Analog board, once it is mapped
 
-
+## M5. Emulator dry-run
 
 - [x] Stock SITL builds and runs in Docker for 4.5.5 and master, answering over TCP
 - [ ] SITL build with OSD, VTX and motor settings re-enabled (stock checks only 18 of this board's 42 changed settings)
 - [ ] `DryRunEngine` service in Docker
-- [ ] Per-version images built by CI, deployable to RKE2
+- [ ] Per-version images built by CI, deployable to a container host (hosting options in [DEPLOY.md](DEPLOY.md))
 
 ## M6. LLM-assisted fixes
 

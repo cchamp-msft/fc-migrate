@@ -8,7 +8,7 @@ compatibility_flags = ["nodejs_compat"]
 keep_vars = true
 
 # The site lives at fc-migrate.com. Custom domains create their own DNS records and
-# certificates. A redirect rule on the zone sends www to the bare domain (see docs/PLAN.md).
+# certificates. A redirect rule on the zone sends www to the bare domain (see docs/DEPLOY.md).
 # The workers.dev address stays on while visitors move over.
 routes = [
   { pattern = "fc-migrate.com", custom_domain = true },
