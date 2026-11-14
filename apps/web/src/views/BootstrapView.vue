@@ -16,8 +16,8 @@ const windResistant = ref(false);
 const confirmingRestore = ref("");
 
 const SIZES: { id: QuadSize; label: string; detail: string }[] = [
-  { id: "small", label: "2 to 3.5 inch", detail: "Dynamic idle 3,000 rpm" },
-  { id: "large", label: "4 to 5 inch", detail: "Dynamic idle 2,000 rpm" },
+  { id: "small", label: "2 to 3.5 inch", detail: "Dynamic idle 3,500 rpm" },
+  { id: "large", label: "4 to 5 inch", detail: "Dynamic idle 3,000 rpm" },
 ];
 
 const FEELS: { id: Feel; label: string; detail: string }[] = [

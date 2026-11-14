@@ -50,7 +50,7 @@ export interface BootstrapPlan {
 }
 
 /** Dynamic idle, in hundreds of rpm. */
-const DYN_IDLE: Record<QuadSize, number> = { small: 30, large: 20 };
+const DYN_IDLE: Record<QuadSize, number> = { small: 35, large: 30 };
 
 /** The sliders that define PIDs, under any release's names. */
 const PID_SLIDER = /^simplified_(master_multiplier|i_gain|d_gain|pi_gain|dmax_gain|d_max_gain|feedforward_gain|pitch_d_gain|pitch_pi_gain|roll_pitch_ratio)$/;

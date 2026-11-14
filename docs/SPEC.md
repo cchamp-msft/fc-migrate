@@ -253,7 +253,7 @@ It never turns bidirectional DShot on itself, because ESC firmware support canno
 
 | Choice | Settings |
 |---|---|
-| Every PID profile | `throttle_boost = 0`; `dyn_idle_min_rpm` 30 (3,000 rpm) for 2 to 3.5 inch, 20 (2,000 rpm) for 4 to 5 inch |
+| Every PID profile | `throttle_boost = 0`; `dyn_idle_min_rpm` 35 (3,500 rpm) for 2 to 3.5 inch, 30 (3,000 rpm) for 4 to 5 inch |
 | Active PID profile | `simplified_pids_mode = RPY`, every PID slider and the D-term filter slider at the firmware default, `simplified_dterm_filter = ON` |
 | Smooth feel | D slider 1.15, D-term filter slider 0.90 |
 | Wind resistant | I slider 1.25, D max slider 0, `thrust_linear` 20% |
