@@ -1,6 +1,6 @@
 # Alpha Migrate: design
 
-Status: research and design, 2026-11-12. The first implementation follows it; see docs/SPEC.md section 8b for what was built and what still needs hardware.
+Status: research and design, 2026-11-12. The first implementation follows it; see docs/SPEC.md section 10 for what was built and what still needs hardware.
 
 Alpha Migrate is a future bf-migrate feature: it moves a T-Motor Pacer G4 Alpha flight controller from FETtec's Alpha firmware to Betaflight over an ST-Link driven from the browser. It also flashes boards that were already migrated, since the board is not in Betaflight's cloud build.
 

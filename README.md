@@ -2,7 +2,7 @@
 
 Unofficial browser tool for upgrading Betaflight firmware and carrying a quad's configuration across versions. Not affiliated with the Betaflight project. Licensed GPL-3.0-or-later.
 
-See [docs/SPEC.md](docs/SPEC.md) for what it does and [docs/PLAN.md](docs/PLAN.md) for progress.
+See [docs/SPEC.md](docs/SPEC.md) for what it does, [docs/PLAN.md](docs/PLAN.md) for progress, and [docs/DEPLOY.md](docs/DEPLOY.md) for hosting.
 
 ## Development
 
