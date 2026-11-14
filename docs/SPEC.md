@@ -360,6 +360,8 @@ Warning and danger notices carry a solid coloured edge, so they never read as de
 
 A work-in-progress notice runs across the top of every page until the visitor dismisses it with its X. The browser remembers the dismissal.
 
+A shared link shows an 8-bit preview: worker bees leaving a grumpy grey queen for a golden one sipping a milkshake. The image is `og-image.jpg`, 1200 by 630, and carries no text.
+
 Themes, each in light and dark: Mono, Deep Purple, Deep Red, Blue Teal, Betaflight, Betaflight Sunset.
 
 The CLI:
