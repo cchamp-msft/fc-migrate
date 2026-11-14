@@ -358,6 +358,8 @@ Layout follows the Configurator: a left column with the logo, connect button and
 
 Warning and danger notices carry a solid coloured edge, so they never read as decoration. Flashing behaviour is in S11.
 
+A work-in-progress notice runs across the top of every page until the visitor dismisses it with its X. The browser remembers the dismissal.
+
 Themes, each in light and dark: Mono, Deep Purple, Deep Red, Blue Teal, Betaflight, Betaflight Sunset.
 
 The CLI:

@@ -2,6 +2,7 @@
 import AppSidebar from "./components/AppSidebar.vue";
 import FlashingBanner from "./components/FlashingBanner.vue";
 import StatusBar from "./components/StatusBar.vue";
+import WipBanner from "./components/WipBanner.vue";
 </script>
 
 <template>
@@ -9,6 +10,7 @@ import StatusBar from "./components/StatusBar.vue";
     <AppSidebar class="shell-sidebar" />
     <main class="shell-main">
       <FlashingBanner />
+      <WipBanner />
       <RouterView />
     </main>
     <StatusBar class="shell-status" />
