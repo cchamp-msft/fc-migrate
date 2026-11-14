@@ -29,6 +29,15 @@ pnpm test
 pnpm build
 ```
 
+## Pull requests
+
+`main` is protected, and keeps a linear history.
+
+- Changes reach `main` only through a pull request. Nobody pushes or force-pushes `main`.
+- Keep each pull request to one coherent commit. To change it, amend the commit and force-push your branch.
+- Pull requests merge by rebase only. The branch must be up to date with `main`, and all five CI checks must pass.
+- Merging does not deploy. The maintainer deploys ([docs/DEPLOY.md](docs/DEPLOY.md)).
+
 ## Continuous integration
 
 CI reports these checks: `lint`, `typecheck`, `test`, `build` and `commitlint`.
