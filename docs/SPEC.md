@@ -278,7 +278,7 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. 
 
 - The pilot chooses the board: HD (`TMOTORG4ALPHAHD`) or Analog (`TMOTORG4ALPHAANALOG`). They have the same chip, so the chip cannot tell them apart. The choice picks:
   - the wiring, firmware and done texts, each with its own id;
-  - the photos;
+  - the photos. Both boards' wiring photos end with the same one: a Flipper Zero wired from its header pins 2, 3 and 8 to the SWD pads;
   - the hosted build, and the board the image check expects.
 
   The board report records the choice. Changing the board drops a chosen image. The intro shows what each board gives up.

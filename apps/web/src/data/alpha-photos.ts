@@ -21,6 +21,13 @@ export interface AlphaPhotos {
 
 const base = `${import.meta.env.BASE_URL}alpha/`;
 
+/** The probe end, the same for both boards: a Flipper Zero's header pins, on the Analog board. */
+const flipperWiring: BoardPhoto = {
+  src: `${base}probe/flipper-dap-link.jpg`,
+  alt: "A Flipper Zero running DAP Link, wired by pins 2, 3 and 8 to the SWD pads of a Pacer G4 Alpha Analog",
+  caption: "With a Flipper Zero: pin 2 to SWCLK, pin 3 to SWDIO, pin 8 to GND, shown on an Analog board. The pin numbers are printed on the case beside the header. The board's blue LEDs wash out the wire colours at its end, so follow each wire from the Flipper.",
+};
+
 const hdPadSide: BoardPhoto = {
   src: `${base}g4-hd/pad-side.jpg`,
   alt: "Pad side of the Pacer G4 Alpha HD with a GND pad and the T1, R1, 5V and ground pads marked",
@@ -41,6 +48,7 @@ export const ALPHA_PHOTOS: Partial<Record<AlphaBoard["id"], AlphaPhotos>> = {
         caption: "Close-up: the two gold pads between the USB-C socket and the chip.",
       },
       hdPadSide,
+      flipperWiring,
     ],
     reset: {
       src: `${base}g4-hd/reset-button.jpg`,
@@ -64,6 +72,7 @@ export const ALPHA_PHOTOS: Partial<Record<AlphaBoard["id"], AlphaPhotos>> = {
         alt: "Close-up of the two SWD pads between the USB-C socket and the chip on the Pacer G4 Alpha Analog",
         caption: "Close-up: the two gold pads between the USB-C socket and the chip.",
       },
+      flipperWiring,
     ],
     reset: {
       src: `${base}g4-analog/reset-button.jpg`,
