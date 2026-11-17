@@ -14,19 +14,39 @@ import { decodeOptr, rdpLevelOf, type RdpLevel } from "../targets/stm32g4/option
 import { CONFIG_AREA, DEV_ID_G47X, FLASH_END, FLASH_SIZE_KB, FLASH_START, PAGE_SIZE } from "../targets/stm32g4/registers.js";
 import type { G4Readings, ProbeInfo } from "../targets/stm32g4/session.js";
 
+export type AlphaBoardId = "hd" | "analog";
+
 export interface AlphaBoard {
-  id: "hd" | "analog";
+  id: AlphaBoardId;
   label: string;
   /** The Betaflight board name a migrated board reports. */
   boardName: string;
   supported: boolean;
   note: string;
+  /**
+   * True when the migrated board comes up as a USB DFU device after `bl`, so new firmware can go
+   * over USB. False means it is rewritten over SWD, as it was migrated.
+   */
+  usbDfu: boolean;
 }
 
 export const ALPHA_BOARDS: readonly AlphaBoard[] = [
-  { id: "hd", label: "Pacer G4 Alpha HD", boardName: "TMOTORG4ALPHAHD", supported: true, note: "Migrated, configured and flown." },
-  { id: "analog", label: "Pacer G4 Alpha Analog", boardName: "TMOTORG4ALPHA", supported: false, note: "Coming soon. Its pins, OSD chip and SWD pads are not mapped yet." },
+  { id: "hd", label: "Pacer G4 Alpha HD", boardName: "TMOTORG4ALPHAHD", supported: true, note: "Migrated, configured and flown.", usbDfu: true },
+  {
+    id: "analog",
+    label: "Pacer G4 Alpha Analog",
+    boardName: "TMOTORG4ALPHAANALOG",
+    supported: true,
+    note: "Migrated and bench-tested on one board, not flown yet. Later firmware updates need the ST-Link too.",
+    // On the first migrated board, `bl` left USB half set up ("Device Descriptor Request Failed"),
+    // twice. The likely cause is the OSD chip on PC10/PC11, which ST's bootloader also listens on.
+    usbDfu: false,
+  },
 ];
+
+export function alphaBoard(id: AlphaBoardId): AlphaBoard {
+  return ALPHA_BOARDS.find((board) => board.id === id)!;
+}
 
 /**
  * Betaflight's reserved ID for community configs of closed-source boards is COMM.
@@ -41,13 +61,15 @@ const ALPHA_IMAGE_START = 0x08003800;
 const SRAM_START = 0x20000000;
 const SRAM_END = 0x20020000;
 
+/** The G4 Alpha board a board connected over USB is, when it already runs Betaflight. */
+export function migratedAlphaBoard(identity: Pick<FcIdentity, "variant" | "board">): AlphaBoard | undefined {
+  if (identity.variant !== "BTFL" || !ALPHA_MANUFACTURER_IDS.includes(identity.board.manufacturerId.toUpperCase())) return undefined;
+  return ALPHA_BOARDS.find((board) => board.supported && board.boardName === identity.board.boardName);
+}
+
 /** True when a board connected over USB is a G4 Alpha already running Betaflight. */
 export function isMigratedAlpha(identity: Pick<FcIdentity, "variant" | "board">): boolean {
-  return (
-    identity.variant === "BTFL" &&
-    ALPHA_BOARDS.some((board) => board.supported && board.boardName === identity.board.boardName) &&
-    ALPHA_MANUFACTURER_IDS.includes(identity.board.manufacturerId.toUpperCase())
-  );
+  return migratedAlphaBoard(identity) !== undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -223,8 +245,13 @@ export function checkAlphaImage(image: HexImage, options: ImageCheckOptions = {}
   if (!contains(image, "Betaflight") && !contains(image, "BTFL")) errors.push("It does not look like Betaflight.");
 
   let boardName: string | undefined;
+  // The two Alpha boards share a chip, so each one's build also names STM32G474.
+  const sibling = ALPHA_BOARDS.find((other) => other.id !== board.id && contains(image, other.boardName));
   if (contains(image, board.boardName)) boardName = board.boardName;
-  else if (contains(image, "STM32G474")) {
+  else if (sibling) {
+    boardName = sibling.boardName;
+    warnings.push(`This is the build for the ${sibling.label}, not the ${board.label}. The two boards wire their OSD differently, so the OSD would not work.`);
+  } else if (contains(image, "STM32G474")) {
     boardName = "STM32G474";
     warnings.push("This is Betaflight's generic G474 build. It needs the board's pin script pasted in the CLI afterwards, and it lacks the battery-voltage and ESC-telemetry fixes.");
   } else warnings.push(`This image does not name ${board.boardName}. Firmware for another board has the wrong pins and may not fly.`);
@@ -240,6 +267,8 @@ export interface BoardReport {
   tool: "Betaflight Migrator, Alpha Migrate";
   savedAt: string;
   simulated: boolean;
+  /** The board the pilot said it is. Both boards have the same chip, so the chip cannot tell them apart. */
+  board?: string;
   probe: ProbeInfo;
   chip: { devId: string; flashSizeKb?: number; uid?: string };
   optionBytes: Record<string, string>;
@@ -248,12 +277,13 @@ export interface BoardReport {
 }
 
 /** Everything readable from the board before it changes. It stays on the pilot's computer. */
-export function buildBoardReport(input: { probe: ProbeInfo; readings: G4Readings; classification: Classification; confirmations: BoardReport["confirmations"]; simulated: boolean; at?: Date }): BoardReport {
+export function buildBoardReport(input: { probe: ProbeInfo; readings: G4Readings; classification: Classification; confirmations: BoardReport["confirmations"]; simulated: boolean; board?: AlphaBoard; at?: Date }): BoardReport {
   const { readings, classification } = input;
   return {
     tool: "Betaflight Migrator, Alpha Migrate",
     savedAt: (input.at ?? new Date()).toISOString(),
     simulated: input.simulated,
+    board: input.board?.boardName,
     probe: input.probe,
     chip: { devId: `0x${readings.devId.toString(16)}`, flashSizeKb: readings.flashSizeKb, uid: readings.uid },
     optionBytes: {
@@ -292,13 +322,12 @@ export interface AlphaText {
 export const ALPHA_TEXTS = {
   intro: {
     id: "C1",
-    version: 1,
+    version: 2,
     title: "Alpha Migrate changes your flight controller for good",
     paragraphs: [
-      "It replaces the Alpha firmware on a T-Motor Pacer G4 Alpha HD with Betaflight. This is an unofficial community procedure. T-Motor, FETtec and Betaflight do not support it. One step erases the whole chip, and after it the board can never run Alpha again.",
+      "It replaces the Alpha firmware on a T-Motor Pacer G4 Alpha, HD or Analog, with Betaflight. This is an unofficial community procedure. T-Motor, FETtec and Betaflight do not support it. One step erases the whole chip, and after it the board can never run Alpha again.",
       "You need an ST-Link V2 (or V2-1), three wires soldered to the board, and Chrome or Edge.",
       "Before you start, write down any Alpha settings you want to keep, such as rates, the motor output map and the receiver protocol. They cannot be copied off the board.",
-      "Only the HD version is supported. Analog is coming soon.",
     ],
     checks: ["I understand that one step cannot be undone, and that this board will never run Alpha again."],
   },
@@ -313,6 +342,19 @@ export const ALPHA_TEXTS = {
       "Alpha itself: its configurator, its updates and any way back.",
     ],
   },
+  givesUpAnalog: {
+    id: "C1c",
+    version: 1,
+    title: "What the Analog board gives up",
+    paragraphs: [
+      "One Analog board has been migrated and checked on the bench: the OSD through the board's own OSD chip, SmartAudio VTX control on T3, the receiver on T1 and R1, ESC telemetry, motor order and battery voltage. Its beeper and LEDs are untested, and it has not flown yet. What you lose:",
+      "The receiver group's SIG and TLM pads, for a CRSF or ELRS receiver. On the HD board they reach no serial port Betaflight can use, and this board is likely the same. Under Betaflight the receiver goes on the T1 and R1 pads, which worked on the tested board.",
+      "Firmware updates over USB. On the tested board, Betaflight's bootloader command left USB stuck instead of starting the USB bootloader, so later updates go through the ST-Link and this page again.",
+      "Updates to the OSD chip. They go through Alpha, so update it to 0.1.18 in FETtec's configurator before you start: the tested board ran 0.1.18.",
+      "Betaflight's logo on the boot screen. The OSD chip's font does not have it, so letters stand in.",
+      "Alpha itself: its configurator, its updates and any way back.",
+    ],
+  },
   wiring: {
     id: "C2",
     version: 2,
@@ -322,6 +364,20 @@ export const ALPHA_TEXTS = {
       "Unplug the battery. The board runs from its USB-C for the whole job.",
       "Unplug the receiver and the DJI cable. The ST-Link's clock wire uses the same pin as the receiver's signal and the DJI SBUS wire.",
       "Solder GND first, to the upper gold pad on the right edge (or any GND pad on the other side). Then ST-Link SWCLK to the lower gold pad beside the USB-C socket, and SWDIO to the upper one.",
+      "Leave the ST-Link's 3.3V and RST pins unconnected.",
+    ],
+  },
+  wiringAnalog: {
+    id: "C2c",
+    version: 1,
+    title: "Wire the ST-Link",
+    paragraphs: [
+      "Tick each step off as you go, if it helps. Continue does not wait for the ticks.",
+    ],
+    checks: [
+      "Unplug the battery. The board runs from its USB-C for the whole job.",
+      "Unplug the receiver. On the HD board the receiver's signal pin is the ST-Link's clock pin.",
+      "Solder GND first, to the upper gold pad on the right edge. Then ST-Link SWCLK to the lower gold pad beside the USB-C socket, and SWDIO to the upper one.",
       "Leave the ST-Link's 3.3V and RST pins unconnected.",
     ],
   },
@@ -373,6 +429,15 @@ export const ALPHA_TEXTS = {
       "It is not an official Betaflight cloud build. The file is checked before anything is written.",
     ],
   },
+  firmwareAnalog: {
+    id: "C6c",
+    version: 1,
+    title: "Choose the firmware",
+    paragraphs: [
+      "Choose a Betaflight .hex file built for TMOTORG4ALPHAANALOG. The official cloud build does not have this board. fc-migrate's build carries the HD build's two fixes, a steady battery voltage reading and a working ESC telemetry port, plus a third for the OSD: the board's OSD chip clears its screen the moment Betaflight asks, so stock Betaflight makes it flicker.",
+      "The file is checked before anything is written.",
+    ],
+  },
   bootPin: {
     id: "C6b",
     version: 1,
@@ -414,6 +479,29 @@ export const ALPHA_TEXTS = {
       "Then connect over USB to set the board up. Later firmware updates go over USB; the ST-Link is only needed to recover a board that will not start.",
     ],
   },
+  doneAnalog: {
+    id: "C9c",
+    version: 1,
+    title: "Betaflight is on the board",
+    paragraphs: [
+      "Before you fly, unsolder or unplug the ST-Link wires. On the HD board the clock wire shares a pin with the receiver's signal pin.",
+      "Wire your receiver to T1 and R1.",
+      "Then connect over USB to set the board up. Set vcd_video_system to PAL or NTSC to match your camera: Auto gives the shorter NTSC screen. Betaflight turns on only the warnings at first, so add the OSD elements you want, and load a VTX table before changing channel or power.",
+      "Check the board orientation before the first flight: tilt the quad and watch the model in Configurator's Setup tab. This board's gyro alignment is carried over from the HD board and has not been checked.",
+      "Later firmware updates go through the ST-Link and this page again. A rewrite keeps your settings.",
+    ],
+  },
 } as const satisfies Record<string, AlphaText>;
 
 export type AlphaTextKey = keyof typeof ALPHA_TEXTS;
+
+/** Texts that differ by board. A key not listed here is the same for every board. */
+const BOARD_TEXTS: Record<AlphaBoardId, Partial<Record<AlphaTextKey, AlphaTextKey>>> = {
+  hd: {},
+  analog: { givesUp: "givesUpAnalog", wiring: "wiringAnalog", firmware: "firmwareAnalog", done: "doneAnalog" },
+};
+
+/** The key of the text a board shows in place of `key`. */
+export function alphaTextKey(key: AlphaTextKey, board: AlphaBoardId): AlphaTextKey {
+  return BOARD_TEXTS[board][key] ?? key;
+}

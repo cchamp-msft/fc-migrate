@@ -79,7 +79,9 @@ The source is public, as GPL-3 requires, and the docs and `wrangler.toml` carry 
 - [x] Hardware: G474 DFU flashing through the app for migrated boards: fc-migrate-firmware v2026.6.2-1 written over DFU on a real Alpha HD, and the page reconnected to the board on the new firmware
 - [x] Firmware source: [fc-migrate-firmware](https://github.com/cchamp-msft/fc-migrate-firmware) releases of `TMOTORG4ALPHAHD`, served from the site pinned by SHA-256, with the source linked
 - [ ] Settle the manufacturer ID (COMM or TMTR) with the config submission
-- [ ] Analog board, once it is mapped
+- [x] Analog board: board choice, its own texts, image check and report entry; a migrated Analog board is rewritten over SWD, not USB DFU
+- [x] Analog board: SWD pad and reset button photos
+- [ ] Analog board: host fc-migrate-firmware's release of `TMOTORG4ALPHAANALOG`, pinned by SHA-256
 
 ## M5. Emulator dry-run
 

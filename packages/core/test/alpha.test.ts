@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ALPHA_TEXTS, activeProtections, buildBoardReport, checkAlphaImage, classifyBoard, isMigratedAlpha } from "../src/alpha/alpha.js";
+import { ALPHA_BOARDS, ALPHA_TEXTS, activeProtections, alphaBoard, alphaTextKey, buildBoardReport, checkAlphaImage, classifyBoard, isMigratedAlpha, migratedAlphaBoard } from "../src/alpha/alpha.js";
 import { DEMO_IMAGE_MARKER } from "../src/firmware/demo-image.js";
 import type { HexImage } from "../src/firmware/hex.js";
 import type { G4Readings } from "../src/targets/stm32g4/session.js";
@@ -107,20 +107,41 @@ describe("checking a firmware image", () => {
     expect(checkAlphaImage(image([{ address: 0x08000000, head: true, text: "Betaflight SPEEDYBEEF405" }])).warnings[0]).toContain("does not name");
     expect(checkAlphaImage(image([{ address: 0x08000000, head: true, text: "BTFL TMOTORG4ALPHAHD", size: 0x5000 }])).coversSettings).toBe(true);
   });
+
+  it("checks against the chosen board, and names the other Alpha board's build", () => {
+    const analog = alphaBoard("analog");
+    expect(checkAlphaImage(image([{ address: 0x08000000, head: true, text: "Betaflight STM32G474 TMOTORG4ALPHAANALOG" }]), { board: analog })).toMatchObject({ ok: true, warnings: [], boardName: "TMOTORG4ALPHAANALOG" });
+
+    const hdOnAnalog = checkAlphaImage(image([{ address: 0x08000000, head: true, text: "Betaflight STM32G474 TMOTORG4ALPHAHD" }]), { board: analog });
+    expect(hdOnAnalog.boardName).toBe("TMOTORG4ALPHAHD");
+    expect(hdOnAnalog.warnings).toHaveLength(1);
+    expect(hdOnAnalog.warnings[0]).toContain("build for the Pacer G4 Alpha HD, not the Pacer G4 Alpha Analog");
+
+    const analogOnHd = checkAlphaImage(image([{ address: 0x08000000, head: true, text: "Betaflight STM32G474 TMOTORG4ALPHAANALOG" }]));
+    expect(analogOnHd.warnings[0]).toContain("build for the Pacer G4 Alpha Analog, not the Pacer G4 Alpha HD");
+  });
 });
 
 describe("recognising a migrated board over USB", () => {
   const identity = (boardName: string, manufacturerId: string, variant = "BTFL") => ({ variant, board: { boardName, manufacturerId } }) as Parameters<typeof isMigratedAlpha>[0];
 
-  it("accepts the HD board under either manufacturer ID", () => {
+  it("accepts both boards under either manufacturer ID", () => {
     expect(isMigratedAlpha(identity("TMOTORG4ALPHAHD", "COMM"))).toBe(true);
     expect(isMigratedAlpha(identity("TMOTORG4ALPHAHD", "TMTR"))).toBe(true);
+    expect(isMigratedAlpha(identity("TMOTORG4ALPHAANALOG", "COMM"))).toBe(true);
+    expect(isMigratedAlpha(identity("TMOTORG4ALPHAANALOG", "TMTR"))).toBe(true);
   });
 
-  it("rejects other boards, the unsupported Analog board, and other firmware", () => {
+  it("rejects other boards, the old Analog placeholder name, and other firmware", () => {
     expect(isMigratedAlpha(identity("RRIOT_F722", "COMM"))).toBe(false);
     expect(isMigratedAlpha(identity("TMOTORG4ALPHA", "COMM"))).toBe(false);
     expect(isMigratedAlpha(identity("TMOTORG4ALPHAHD", "COMM", "INAV"))).toBe(false);
+  });
+
+  it("says which board it is, and that only the HD takes firmware over USB", () => {
+    expect(migratedAlphaBoard(identity("TMOTORG4ALPHAHD", "COMM"))).toMatchObject({ id: "hd", usbDfu: true });
+    expect(migratedAlphaBoard(identity("TMOTORG4ALPHAANALOG", "TMTR"))).toMatchObject({ id: "analog", usbDfu: false });
+    expect(migratedAlphaBoard(identity("RRIOT_F722", "COMM"))).toBeUndefined();
   });
 });
 
@@ -131,6 +152,21 @@ describe("board report and texts", () => {
     expect(report.optionBytes.OPTR).toBe("0xFBEFF800");
     expect(report.classification).toMatchObject({ kind: "locked", rdpLevel: 1 });
     expect(report.savedAt).toBe("1970-01-01T00:00:00.000Z");
+  });
+
+  it("records the board the pilot chose", () => {
+    const current = readings();
+    const report = buildBoardReport({ probe: { model: "ST-Link/V2", firmware: "V2J39S7" }, readings: current, classification: classifyBoard(current), confirmations: [], simulated: true, board: alphaBoard("analog") });
+    expect(report.board).toBe("TMOTORG4ALPHAANALOG");
+  });
+
+  it("gives each text its own id, and swaps in the Analog board's own texts", () => {
+    const ids = Object.values(ALPHA_TEXTS).map((text) => text.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(alphaTextKey("wiring", "hd")).toBe("wiring");
+    expect(alphaTextKey("wiring", "analog")).toBe("wiringAnalog");
+    expect(alphaTextKey("unlock", "analog")).toBe("unlock");
+    expect(ALPHA_BOARDS.every((board) => board.supported)).toBe(true);
   });
 
   it("asks for a typed word before the one-way step, and nowhere else", () => {

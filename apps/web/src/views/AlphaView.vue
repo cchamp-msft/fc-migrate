@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ALPHA_BOARDS, ALPHA_TEXTS, type AlphaText } from "@bf-migrate/core";
+import { ALPHA_BOARDS, ALPHA_TEXTS, alphaTextKey, type AlphaText, type AlphaTextKey } from "@bf-migrate/core";
 import { ChevronDown, ChevronRight, CircleAlert, CircleCheck, Cpu, FlaskConical, LoaderCircle, PackageCheck, TriangleAlert, Upload } from "lucide-vue-next";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import AlphaImageFacts from "../components/AlphaImageFacts.vue";
 import { ALPHA_PHOTOS } from "../data/alpha-photos";
-import { ALPHA_HD_FIRMWARE } from "../data/hosted-firmware";
+import { HOSTED_ALPHA_FIRMWARE } from "../data/hosted-firmware";
 import { DEMO_SCENARIOS, createDemoSource, type DemoScenarioId } from "../demo/alpha-probe";
 import { demoAlphaFirmware } from "../demo/alpha-firmware";
 import { useAlphaStore, type AlphaStep } from "../stores/alpha";
@@ -12,8 +12,26 @@ import { chooseStlink, isWebUsbAvailable } from "../transport/web-usb-stlink";
 
 const alpha = useAlphaStore();
 
-// Only the HD board can be chosen today, so its photos are the ones shown.
-const photos = ALPHA_PHOTOS.hd;
+// The chosen board's photos.
+const photos = computed(() => ALPHA_PHOTOS[alpha.boardId]);
+
+/** The text the chosen board shows for `key`. */
+function boardText(key: AlphaTextKey): AlphaText {
+  return ALPHA_TEXTS[alphaTextKey(key, alpha.boardId)];
+}
+const wiringText = computed(() => boardText("wiring"));
+const firmwareText = computed(() => boardText("firmware"));
+const doneText = computed(() => boardText("done"));
+/** What each supported board gives up, all shown before the pilot chooses one. */
+const GIVES_UP: readonly AlphaText[] = ALPHA_BOARDS.filter((board) => board.supported).map((board) => ALPHA_TEXTS[alphaTextKey("givesUp", board.id)]);
+/** This site's build for the chosen board, and for a migrated board on USB. */
+const hosted = computed(() => HOSTED_ALPHA_FIRMWARE[alpha.boardId]);
+const usbHosted = computed(() => (alpha.usbBoard ? HOSTED_ALPHA_FIRMWARE[alpha.usbBoard.id] : undefined));
+
+/** A migrated board that has no USB bootloader goes through the SWD steps for the board it reports. */
+function rewriteOverSwd(): void {
+  if (alpha.usbBoard) alpha.chooseBoard(alpha.usbBoard.id);
+}
 
 // Leaving the page must not keep the ST-Link claimed or a chip halted under reset.
 onBeforeUnmount(() => alpha.release());
@@ -36,7 +54,7 @@ const BUSY: readonly AlphaStep[] = ["connecting", "working"];
 
 const introChecked = ref(false);
 // The ticks are the pilot's own checklist: kept when moving between steps, and never required.
-const wiringChecks = ref<boolean[]>(ALPHA_TEXTS.wiring.checks.map(() => false));
+const wiringChecks = ref<boolean[]>((wiringText.value.checks ?? []).map(() => false));
 const typed = ref("");
 const scenario = ref<DemoScenarioId>(DEMO_SCENARIOS[0]!.id);
 const resetHeld = ref(false);
@@ -52,6 +70,12 @@ watch(
     if (step !== "hold-reset" && step !== "connecting") resetHeld.value = false;
   },
   { immediate: true },
+);
+
+// Each board has its own wiring checklist.
+watch(
+  () => alpha.boardId,
+  () => (wiringChecks.value = (wiringText.value.checks ?? []).map(() => false)),
 );
 
 /**
@@ -120,7 +144,7 @@ const writeNeeds = computed(() => {
  * They stay open while an ST-Link session is in use.
  */
 const showMigration = ref(false);
-const migrationFoldable = computed(() => alpha.migratedOverUsb && !alpha.session && !BUSY.includes(alpha.step));
+const migrationFoldable = computed(() => alpha.migratedOverUsb && alpha.usbFlashable && !alpha.session && !BUSY.includes(alpha.step));
 const migrationHidden = computed(() => migrationFoldable.value && !showMigration.value);
 
 function paragraphs(text: AlphaText): readonly string[] {
@@ -163,7 +187,7 @@ async function pickUsbFile(event: Event): Promise<void> {
 }
 
 async function useDemoFirmware(): Promise<void> {
-  const { name, text } = demoAlphaFirmware();
+  const { name, text } = demoAlphaFirmware(alpha.board.boardName);
   await alpha.chooseImage(name, text);
 }
 
@@ -181,19 +205,19 @@ function kb(bytes: number): string {
     <header class="page-header">
       <div>
         <h1>Alpha Migrate</h1>
-        <p>Replace the closed Alpha firmware on a T-Motor Pacer G4 Alpha HD with Betaflight, through an ST-Link wired to the board.</p>
+        <p>Replace the closed Alpha firmware on a T-Motor Pacer G4 Alpha, HD or Analog, with Betaflight, through an ST-Link wired to the board.</p>
       </div>
     </header>
 
-    <section v-if="alpha.migratedOverUsb" class="card">
+    <section v-if="alpha.migratedOverUsb && alpha.usbFlashable" class="card">
       <h2>This board is already migrated</h2>
       <p class="muted lead">
-        It runs Betaflight as TMOTORG4ALPHAHD. Betaflight's own firmware list does not carry this board yet, so new firmware is fc-migrate's build or a file, written over USB with no ST-Link. The settings area is left alone, so a build of the same Betaflight version keeps your settings. A different version may reset them on first start: to move settings to a new version, use
+        It runs Betaflight as {{ alpha.usbBoard?.boardName }}. Betaflight's own firmware list does not carry this board yet, so new firmware is fc-migrate's build or a file, written over USB with no ST-Link. The settings area is left alone, so a build of the same Betaflight version keeps your settings. A different version may reset them on first start: to move settings to a new version, use
         <RouterLink to="/migrate">Migrate</RouterLink>, which sends them back and checks them.
       </p>
       <AlphaImageFacts v-if="alpha.usbChosen" :image="alpha.usbChosen" />
       <div class="actions">
-        <button class="btn" :disabled="usbBusy || alpha.hostedLoading" @click="alpha.chooseHosted('usb')"><PackageCheck :size="15" /> Use fc-migrate's build ({{ ALPHA_HD_FIRMWARE.release }})</button>
+        <button v-if="usbHosted" class="btn" :disabled="usbBusy || alpha.hostedLoading" @click="alpha.chooseHosted('usb')"><PackageCheck :size="15" /> Use fc-migrate's build ({{ usbHosted.release }})</button>
         <button class="btn" :disabled="usbBusy || alpha.hostedLoading" @click="usbFileInput?.click()"><Upload :size="15" /> Choose a .hex file</button>
         <button v-if="alpha.usbStep === 'permission'" class="btn btn-primary" @click="alpha.grantDfuPermission()">Allow access to the bootloader</button>
         <button v-else class="btn btn-primary" :disabled="!alpha.usbChosen?.check.ok || usbBusy" @click="alpha.flashOverUsb()">Flash over USB</button>
@@ -202,6 +226,16 @@ function kb(bytes: number): string {
       <p v-if="alpha.usbMessage && alpha.usbStep !== 'failed'" class="muted">{{ alpha.usbMessage }}<template v-if="usbPercent !== undefined"> ({{ usbPercent }}%)</template></p>
       <div v-if="alpha.usbStep === 'done'" class="notice"><CircleCheck :size="18" /><span>The new firmware is running.</span></div>
       <div v-if="alpha.usbStep === 'failed'" class="notice notice-danger"><CircleAlert :size="18" /><span>{{ alpha.usbMessage }}</span></div>
+    </section>
+
+    <section v-else-if="alpha.migratedOverUsb && alpha.usbBoard" class="card">
+      <h2>This board is already migrated</h2>
+      <p class="muted lead">
+        It runs Betaflight as {{ alpha.usbBoard.boardName }}. This board does not come up as a USB bootloader, so new firmware goes over SWD: wire the ST-Link and follow the steps below. A rewrite of the same Betaflight version keeps your settings.
+      </p>
+      <div class="actions">
+        <button class="btn btn-primary" :disabled="BUSY.includes(alpha.step)" @click="rewriteOverSwd()">Rewrite it over SWD</button>
+      </div>
     </section>
 
     <button v-if="migrationFoldable" class="btn fold" :aria-expanded="showMigration" @click="showMigration = !showMigration">
@@ -225,11 +259,13 @@ function kb(bytes: number): string {
     <section v-if="alpha.step === 'intro'" class="card step">
       <h2>{{ ALPHA_TEXTS.intro.title }}</h2>
       <p v-for="text in paragraphs(ALPHA_TEXTS.intro)" :key="text">{{ text }}</p>
-      <h3 class="gives-up">{{ ALPHA_TEXTS.givesUp.title }}</h3>
-      <p>{{ ALPHA_TEXTS.givesUp.paragraphs[0] }}</p>
-      <ul>
-        <li v-for="text in ALPHA_TEXTS.givesUp.paragraphs.slice(1)" :key="text">{{ text }}</li>
-      </ul>
+      <template v-for="givesUp in GIVES_UP" :key="givesUp.id">
+        <h3 class="gives-up">{{ givesUp.title }}</h3>
+        <p>{{ givesUp.paragraphs[0] }}</p>
+        <ul>
+          <li v-for="text in givesUp.paragraphs.slice(1)" :key="text">{{ text }}</li>
+        </ul>
+      </template>
       <label class="check"><input v-model="introChecked" type="checkbox" /> {{ ALPHA_TEXTS.intro.checks[0] }}</label>
       <div class="actions">
         <button class="btn btn-primary" @click="leaveIntro()">Continue</button>
@@ -239,7 +275,7 @@ function kb(bytes: number): string {
     <section v-else-if="alpha.step === 'variant'" class="card step">
       <h2>Which board is it?</h2>
       <div class="boards">
-        <button v-for="board in ALPHA_BOARDS" :key="board.id" class="board" :disabled="!board.supported" @click="alpha.goTo('wiring')">
+        <button v-for="board in ALPHA_BOARDS" :key="board.id" class="board" :disabled="!board.supported" :aria-pressed="alpha.boardId === board.id" @click="alpha.chooseBoard(board.id)">
           <Cpu :size="20" />
           <strong>{{ board.label }}</strong>
           <span class="muted">{{ board.note }}</span>
@@ -249,15 +285,15 @@ function kb(bytes: number): string {
 
     <!-- 2. Wiring -->
     <section v-else-if="alpha.step === 'wiring'" class="card step">
-      <h2>{{ ALPHA_TEXTS.wiring.title }}</h2>
-      <p v-for="text in paragraphs(ALPHA_TEXTS.wiring)" :key="text" class="muted">{{ text }}</p>
+      <h2>{{ wiringText.title }}</h2>
+      <p v-for="text in paragraphs(wiringText)" :key="text" class="muted">{{ text }}</p>
       <div v-if="photos" class="photos">
         <figure v-for="photo in photos.wiring" :key="photo.src" class="photo">
           <a :href="photo.src" target="_blank" rel="noopener"><img :src="photo.src" :alt="photo.alt" loading="lazy" /></a>
           <figcaption class="muted small">{{ photo.caption }}</figcaption>
         </figure>
       </div>
-      <label v-for="(text, index) in ALPHA_TEXTS.wiring.checks" :key="text" class="check"><input v-model="wiringChecks[index]" type="checkbox" /> {{ text }}</label>
+      <label v-for="(text, index) in wiringText.checks" :key="text" class="check"><input v-model="wiringChecks[index]" type="checkbox" /> {{ text }}</label>
       <div class="actions">
         <button class="btn btn-primary" @click="leaveWiring()">Continue</button>
       </div>
@@ -364,10 +400,14 @@ function kb(bytes: number): string {
 
     <!-- 6. Firmware -->
     <section v-else-if="alpha.step === 'firmware'" class="card step">
-      <h2>{{ ALPHA_TEXTS.firmware.title }}</h2>
-      <p v-for="text in paragraphs(ALPHA_TEXTS.firmware)" :key="text">{{ text }}</p>
+      <h2>{{ firmwareText.title }}</h2>
+      <p v-for="text in paragraphs(firmwareText)" :key="text">{{ text }}</p>
+      <p v-if="!hosted" class="muted small">
+        fc-migrate's build for this board is not released yet. Choose a .hex file built from
+        <a href="https://github.com/cchamp-msft/fc-migrate-firmware" target="_blank" rel="noopener">fc-migrate-firmware</a>.
+      </p>
       <div class="actions">
-        <button class="btn" :disabled="alpha.hostedLoading" @click="alpha.chooseHosted('stlink')"><PackageCheck :size="15" /> Use fc-migrate's build ({{ ALPHA_HD_FIRMWARE.release }})</button>
+        <button v-if="hosted" class="btn" :disabled="alpha.hostedLoading" @click="alpha.chooseHosted('stlink')"><PackageCheck :size="15" /> Use fc-migrate's build ({{ hosted.release }})</button>
         <button class="btn" @click="fileInput?.click()"><Upload :size="15" /> Choose a .hex file</button>
         <button v-if="alpha.simulated" class="btn" @click="useDemoFirmware()">Use the demo firmware</button>
       </div>
@@ -433,8 +473,8 @@ function kb(bytes: number): string {
 
     <!-- 9. Done -->
     <section v-else-if="alpha.step === 'done'" class="card step">
-      <h2><CircleCheck :size="18" /> {{ ALPHA_TEXTS.done.title }}</h2>
-      <p v-for="text in paragraphs(ALPHA_TEXTS.done)" :key="text">{{ text }}</p>
+      <h2><CircleCheck :size="18" /> {{ doneText.title }}</h2>
+      <p v-for="text in paragraphs(doneText)" :key="text">{{ text }}</p>
       <figure v-if="photos?.receiver" class="photo photo-single">
         <img :src="photos.receiver.src" :alt="photos.receiver.alt" loading="lazy" />
         <figcaption class="muted small">{{ photos.receiver.caption }}</figcaption>
@@ -607,7 +647,8 @@ function kb(bytes: number): string {
   cursor: pointer;
 }
 
-.board:hover:not(:disabled) {
+.board:hover:not(:disabled),
+.board[aria-pressed="true"] {
   border-color: var(--accent);
 }
 
