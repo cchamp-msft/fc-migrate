@@ -306,7 +306,11 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. 
 - Both probe types sit behind the same `G4Session`, so the chip checks, the option-byte rules and the one-way gate are shared (S4 to S6). Each probe layer only moves 32-bit words over SWD.
 - CMSIS-DAP uses the v2 bulk interface only. The session looks for a vendor-class interface whose name contains CMSIS-DAP, so a device that merely shares the IDs is refused before anything is sent to it. The Flipper Zero's DAP Link app uses ST's virtual COM port IDs (0483:5740), which most STM32 USB serial devices share, flight controllers included.
 - Neither probe layer drives the target's reset pin. The CMSIS-DAP layer has no encoder for DAP_ResetTarget or DAP_SWJ_Pins at all.
-- Tested on hardware: the ST-Link V2 clone (the first board), and the Flipper Zero by the owner's OpenOCD run on the analog board (the same SWD sequence, outside this app). This app's own CMSIS-DAP code has run only against the simulator so far. The Raspberry Pi debugprobe is offered but untried.
+- Tested on hardware:
+  - the ST-Link V2 clone: the first board, end to end;
+  - the Flipper Zero, read-only through this app's own code: the harness's `dap` script and the page in Chrome on Windows both read an Analog board at Level 0, hot-plugged, on 2026-11-17. Chrome lists it as "Combined VCP and CMSIS-DAP Adapter";
+  - the Flipper Zero's unlock and write: proven only by the owner's OpenOCD run on the Analog board, which uses the same SWD sequence outside this app.
+- The Raspberry Pi debugprobe is offered but untried.
 
 **Connecting and classifying**
 

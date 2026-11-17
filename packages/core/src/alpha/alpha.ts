@@ -387,12 +387,12 @@ export const ALPHA_TEXTS = {
   },
   probe: {
     id: "C3",
-    version: 2,
+    version: 3,
     title: "Choose the probe",
     paragraphs: [
       "Click Select probe and choose yours in your browser's list. Only one program can use a probe at a time, so close STM32CubeProgrammer and OpenOCD first.",
       'ST-Link: it is listed as "STM32 STLink". If the list is empty, the driver is missing: install ST\'s STSW-LINK009 driver and plug the ST-Link in again.',
-      "Flipper Zero: start the DAP Link app before you choose it. The list can also show flight controllers, which share the Flipper's USB IDs. On Windows, if the Flipper cannot be opened, ST's COM port driver may hold it: in Device Manager, set its driver to USB Composite Device and plug it in again.",
+      "Flipper Zero: start the DAP Link app before you choose it. It is listed as \"Combined VCP and CMSIS-DAP Adapter\". A flight controller plugged in at the same time is listed too, under its Betaflight name, because it shares the Flipper's USB IDs. On Windows, if the Flipper cannot be opened, ST's COM port driver may hold it: in Device Manager, set its driver to USB Composite Device and plug it in again.",
       "Raspberry Pi Pico running debugprobe: offered, but not yet tried on this board.",
     ],
   },
