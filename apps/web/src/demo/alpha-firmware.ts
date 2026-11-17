@@ -31,13 +31,14 @@ export function toIntelHex(blocks: readonly { address: number; bytes: Uint8Array
   return `${lines.join("\n")}\n`;
 }
 
-export function demoAlphaFirmware(): { name: string; text: string } {
+/** The demo's stand-in image, naming the board it is for. */
+export function demoAlphaFirmware(boardName = "TMOTORG4ALPHAHD"): { name: string; text: string } {
   const code = new Uint8Array(0x2800);
   const view = new DataView(code.buffer);
   view.setUint32(0, 0x20020000, true); // initial stack pointer, the top of SRAM
   // Reset, NMI and HardFault, as Thumb addresses inside the image: the shape the check asks for.
   for (const offset of [4, 8, 12]) view.setUint32(offset, 0x08000201, true);
-  code.set(new TextEncoder().encode(["Betaflight", "BTFL", "TMOTORG4ALPHAHD", "COMM", "2026.6.2 (demo)", DEMO_IMAGE_MARKER, ""].join("\u0000")), 0x200);
+  code.set(new TextEncoder().encode(["Betaflight", "BTFL", boardName, "COMM", "2026.6.2 (demo)", DEMO_IMAGE_MARKER, ""].join("\u0000")), 0x200);
 
   // Deterministic filler, so every demo run writes the same bytes.
   const more = new Uint8Array(0x14000);
@@ -46,5 +47,5 @@ export function demoAlphaFirmware(): { name: string; text: string } {
     seed = (seed * 1103515245 + 12345) >>> 0;
     more[i] = seed >>> 24;
   }
-  return { name: "betaflight_2026.6.2_TMOTORG4ALPHAHD_demo.hex", text: toIntelHex([{ address: 0x08000000, bytes: code }, { address: 0x08006000, bytes: more }]) };
+  return { name: `betaflight_2026.6.2_${boardName}_demo.hex`, text: toIntelHex([{ address: 0x08000000, bytes: code }, { address: 0x08006000, bytes: more }]) };
 }

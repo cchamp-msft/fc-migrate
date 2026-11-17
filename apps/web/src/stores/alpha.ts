@@ -1,10 +1,13 @@
 import {
   ALPHA_TEXTS,
+  alphaBoard,
+  alphaTextKey,
   buildBoardReport,
   classifyBoard,
   DfuFlasher,
-  isMigratedAlpha,
+  migratedAlphaBoard,
   SessionError,
+  type AlphaBoardId,
   type AlphaTextKey,
   type Classification,
   type ConnectMode,
@@ -15,7 +18,7 @@ import {
 } from "@bf-migrate/core";
 import { defineStore } from "pinia";
 import { computed, ref, shallowRef } from "vue";
-import { ALPHA_HD_FIRMWARE } from "../data/hosted-firmware";
+import { HOSTED_ALPHA_FIRMWARE } from "../data/hosted-firmware";
 import { STM32_DFU_FILTER, waitForAuthorizedDfuDevice } from "../utils/dfu-device";
 import { loadHostedAlphaImage, readAlphaImage, type ChosenImage } from "../utils/firmware-image";
 import { saveFile } from "../utils/save-file";
@@ -53,6 +56,7 @@ export type { ChosenImage };
 export type UsbStep = "idle" | "working" | "permission" | "done" | "failed";
 
 const DEMO_ON_HARDWARE = "The demo's stand-in image is not firmware and would lock a real board up. Choose a Betaflight .hex file for this board.";
+const NO_USB_DFU = "This board does not come up as a USB bootloader, so its firmware is rewritten over SWD with the ST-Link steps below. A rewrite keeps your settings.";
 
 function describeError(reason: unknown): string {
   if (reason instanceof SessionError) {
@@ -75,6 +79,8 @@ function describeError(reason: unknown): string {
 export const useAlphaStore = defineStore("alpha", () => {
   const connection = useConnectionStore();
   const step = ref<AlphaStep>("intro");
+  /** The board the pilot chose. Both boards have the same chip, so the chip cannot tell them apart. */
+  const boardId = ref<AlphaBoardId>("hd");
   const source = shallowRef<ProbeSource>();
   const session = shallowRef<G4Session>();
   /** Kept after the session closes, for the report. */
@@ -103,10 +109,16 @@ export const useAlphaStore = defineStore("alpha", () => {
   const usbProgress = ref<DfuProgress>();
 
   const simulated = computed(() => source.value?.simulated ?? false);
-  const migratedOverUsb = computed(() => !!connection.identity && !connection.isDemo && isMigratedAlpha(connection.identity));
+  const board = computed(() => alphaBoard(boardId.value));
+  /** The migrated Alpha board connected over USB, if any. */
+  const usbBoard = computed(() => (connection.identity && !connection.isDemo ? migratedAlphaBoard(connection.identity) : undefined));
+  const migratedOverUsb = computed(() => !!usbBoard.value);
+  /** True when the board on USB can take new firmware through its own DFU bootloader. */
+  const usbFlashable = computed(() => usbBoard.value?.usbDfu === true);
 
+  /** Records a confirmation of the text the chosen board shows for `key`. */
   function confirm(key: AlphaTextKey): void {
-    const text = ALPHA_TEXTS[key];
+    const text = ALPHA_TEXTS[alphaTextKey(key, boardId.value)];
     confirmations.value = [...confirmations.value, { id: text.id, version: text.version, at: new Date().toISOString() }];
   }
 
@@ -143,7 +155,15 @@ export const useAlphaStore = defineStore("alpha", () => {
     message.value = "";
     progress.value = undefined;
     error.value = "";
+    boardId.value = "hd";
     step.value = "intro";
+  }
+
+  /** The image is checked against the board, so changing the board drops it. */
+  function chooseBoard(id: AlphaBoardId): void {
+    if (id !== boardId.value) chosen.value = undefined;
+    boardId.value = id;
+    goTo("wiring");
   }
 
   function goTo(next: AlphaStep): void {
@@ -210,7 +230,7 @@ export const useAlphaStore = defineStore("alpha", () => {
   function saveReport(): void {
     const probe = probeInfo.value;
     if (!probe || !readings.value || !classification.value) return;
-    const report = buildBoardReport({ probe, readings: readings.value, classification: classification.value, confirmations: confirmations.value, simulated: simulated.value });
+    const report = buildBoardReport({ probe, readings: readings.value, classification: classification.value, confirmations: confirmations.value, simulated: simulated.value, board: board.value });
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");
     saveFile(`g4-alpha-report_${simulated.value ? "SIMULATED_" : ""}${readings.value.uid ?? "unknown"}_${stamp}.json`, `${JSON.stringify(report, null, 2)}\n`, "application/json");
     reportSaved.value = true;
@@ -218,7 +238,7 @@ export const useAlphaStore = defineStore("alpha", () => {
 
   async function chooseImage(name: string, text: string): Promise<void> {
     try {
-      chosen.value = await readAlphaImage(name, text, !simulated.value);
+      chosen.value = await readAlphaImage(name, text, !simulated.value, board.value);
     } catch (reason) {
       chosen.value = undefined;
       error.value = describeError(reason);
@@ -227,7 +247,9 @@ export const useAlphaStore = defineStore("alpha", () => {
 
   /** Loads this site's release for the board, for the ST-Link flow or the USB rewrite. */
   async function chooseHosted(target: "stlink" | "usb"): Promise<void> {
-    const firmware = ALPHA_HD_FIRMWARE;
+    const forBoard = target === "usb" ? usbBoard.value : board.value;
+    const firmware = forBoard && HOSTED_ALPHA_FIRMWARE[forBoard.id];
+    if (!firmware) return;
     hostedLoading.value = true;
     if (target === "usb") {
       usbStep.value = "idle";
@@ -254,7 +276,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     usbStep.value = "idle";
     usbMessage.value = "";
     try {
-      usbChosen.value = await readAlphaImage(name, text, true);
+      usbChosen.value = await readAlphaImage(name, text, true, usbBoard.value);
     } catch (reason) {
       usbChosen.value = undefined;
       usbStep.value = "failed";
@@ -354,6 +376,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     const identity = connection.identity;
     const snapshot = connection.snapshot;
     if (!image?.check.ok || !identity || !snapshot || !migratedOverUsb.value) return;
+    if (!usbFlashable.value) return failUsb(new Error(NO_USB_DFU));
     if (image.check.demo) return failUsb(new Error(DEMO_ON_HARDWARE));
     usbStep.value = "working";
     usbProgress.value = undefined;
@@ -404,6 +427,8 @@ export const useAlphaStore = defineStore("alpha", () => {
 
   return {
     step,
+    boardId,
+    board,
     source,
     session,
     probeInfo,
@@ -420,7 +445,9 @@ export const useAlphaStore = defineStore("alpha", () => {
     error,
     simulated,
     awaitingRelease,
+    usbBoard,
     migratedOverUsb,
+    usbFlashable,
     usbStep,
     usbMessage,
     usbProgress,
@@ -428,6 +455,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     confirm,
     goTo,
     reset,
+    chooseBoard,
     useSource,
     connect,
     chipConfirmed,

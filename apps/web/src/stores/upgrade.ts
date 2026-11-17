@@ -2,6 +2,7 @@ import {
   applyScript,
   BuildApi,
   DfuFlasher,
+  migratedAlphaBoard,
   parseConfig,
   parseIntelHex,
   selectBuildOptions,
@@ -79,6 +80,8 @@ export const useUpgradeStore = defineStore("upgrade", () => {
     const snapshot = connection.snapshot;
     const link = connection.link;
     if (!identity || !snapshot || !link) return fail(new Error("The board is not connected."));
+    // Checked here as well as on the page: this flow flashes over USB, which such a board cannot take.
+    if (migratedAlphaBoard(identity)?.usbDfu === false) return fail(new Error("This board does not come up as a USB bootloader. Rewrite its firmware over SWD on the Alpha Migrate page."));
 
     try {
       step.value = "backup";

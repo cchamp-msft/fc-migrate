@@ -52,4 +52,23 @@ export const ALPHA_PHOTOS: Partial<Record<AlphaBoard["id"], AlphaPhotos>> = {
       caption: "Wire the receiver to the orange pads: T1 to its RX, R1 to its TX, plus 5V and -. Not the receiver plug.",
     },
   },
+  analog: {
+    wiring: [
+      {
+        src: `${base}g4-analog/swd-pads.jpg`,
+        alt: "Component side of the Pacer G4 Alpha Analog with the SWDIO, SWCLK and GND pads marked",
+        caption: "Component side: SWDIO to the upper pad beside the USB-C socket, SWCLK to the lower one, GND to the upper pad on the right edge.",
+      },
+      {
+        src: `${base}g4-analog/swd-pads-closeup.jpg`,
+        alt: "Close-up of the two SWD pads between the USB-C socket and the chip on the Pacer G4 Alpha Analog",
+        caption: "Close-up: the two gold pads between the USB-C socket and the chip.",
+      },
+    ],
+    reset: {
+      src: `${base}g4-analog/reset-button.jpg`,
+      alt: "The reset button above the USB-C socket on the Pacer G4 Alpha Analog, marked in yellow",
+      caption: "The reset button, above the USB-C socket.",
+    },
+  },
 };

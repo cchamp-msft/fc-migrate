@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
   BuildApi,
-  isMigratedAlpha,
+  migratedAlphaBoard,
   parseConfig,
   planMigration,
   releaseLineOf,
@@ -21,7 +21,7 @@ import AiSuggestions from "../components/AiSuggestions.vue";
 import AlphaImageFacts from "../components/AlphaImageFacts.vue";
 import NotConnected from "../components/NotConnected.vue";
 import UpgradePanel from "../components/UpgradePanel.vue";
-import { ALPHA_HD_FIRMWARE } from "../data/hosted-firmware";
+import { HOSTED_ALPHA_FIRMWARE } from "../data/hosted-firmware";
 import { loadSchema } from "../data/schemas";
 import { useConnectionStore } from "../stores/connection";
 import { useStandardsStore } from "../stores/standards";
@@ -105,7 +105,10 @@ const onlyRebuild = computed(() => targets.value.length > 0 && targets.value.eve
  * A G4 Alpha migrated to Betaflight. Betaflight's cloud build does not carry it yet, so
  * its firmware is this site's own release, or the pilot's file.
  */
-const alphaFirmware = computed(() => (connection.identity && isMigratedAlpha(connection.identity) ? ALPHA_HD_FIRMWARE : undefined));
+const alphaBoard = computed(() => (connection.identity ? migratedAlphaBoard(connection.identity) : undefined));
+/** An Alpha board with no USB bootloader. This page flashes over USB, so it cannot upgrade it. */
+const alphaNoUsb = computed(() => alphaBoard.value?.usbDfu === false);
+const alphaFirmware = computed(() => (alphaBoard.value && !alphaNoUsb.value ? HOSTED_ALPHA_FIRMWARE[alphaBoard.value.id] : undefined));
 const alphaImage = shallowRef<ChosenImage>();
 const alphaError = ref("");
 const alphaLoading = ref(false);
@@ -132,7 +135,7 @@ async function pickFile(event: Event): Promise<void> {
   if (!file) return;
   alphaError.value = "";
   try {
-    alphaImage.value = await readAlphaImage(file.name, await file.text(), true);
+    alphaImage.value = await readAlphaImage(file.name, await file.text(), true, alphaBoard.value);
   } catch (error) {
     alphaImage.value = undefined;
     alphaError.value = error instanceof Error ? error.message : String(error);
@@ -155,9 +158,10 @@ watch(
     alphaImage.value = undefined;
     alphaError.value = "";
     if (!board) return;
-    const alpha = alphaFirmware.value;
-    if (alpha) {
-      // The cloud build does not know this board, so the release list is this site's own.
+    // The cloud build does not know an Alpha board, so the release list is this site's own.
+    if (alphaBoard.value) {
+      const alpha = alphaFirmware.value;
+      if (!alpha) return;
       releases.value = [{ release: alpha.betaflight, label: `fc-migrate ${alpha.release}`, type: "Stable" }];
       await useHostedBuild();
       return;
@@ -337,6 +341,14 @@ function downloadScript(): void {
     <NotConnected v-else-if="!connection.identity" what="its migration options" />
 
     <template v-else>
+      <section v-if="alphaNoUsb && alphaBoard" class="card alpha">
+        <h2><Cpu :size="18" /> T-Motor {{ alphaBoard.label }}, migrated to Betaflight</h2>
+        <p class="muted">
+          This board does not come up as a USB bootloader, so this page cannot flash it. Rewrite its firmware over SWD on the
+          <RouterLink to="/alpha">Alpha Migrate</RouterLink> page, which keeps saved settings.
+        </p>
+      </section>
+
       <div v-if="!sourceLine" class="notice notice-warn">
         <CircleAlert :size="18" />
         <span>Betaflight {{ connection.identity.firmwareVersion }} is not supported yet. Migration starts from 4.5.</span>
@@ -353,7 +365,7 @@ function downloadScript(): void {
             <option v-for="release in targets" :key="release.release" :value="release.release">{{ releaseLabel(release) }}</option>
           </select>
         </label>
-        <label v-if="!alphaFirmware" class="unstable"><input v-model="showUnstable" type="checkbox" /> Include unstable releases</label>
+        <label v-if="!alphaBoard" class="unstable"><input v-model="showUnstable" type="checkbox" /> Include unstable releases</label>
         <span v-if="plan" class="muted steps">{{ plan.steps.length ? plan.steps.join(", then ") : "Same release line, no conversions" }}</span>
       </section>
 
@@ -367,7 +379,7 @@ function downloadScript(): void {
       </div>
 
       <section v-if="sourceLine && alphaFirmware" class="card alpha">
-        <h2><Cpu :size="18" /> T-Motor Pacer G4 Alpha HD, migrated to Betaflight</h2>
+        <h2><Cpu :size="18" /> T-Motor {{ alphaBoard?.label }}, migrated to Betaflight</h2>
         <p class="muted">
           Betaflight's cloud build does not carry this board yet, so its firmware is fc-migrate's own build:
           <a :href="alphaFirmware.releaseUrl" target="_blank" rel="noopener">{{ alphaFirmware.release }}</a>, Betaflight {{ alphaFirmware.betaflight }}

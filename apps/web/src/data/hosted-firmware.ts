@@ -1,3 +1,5 @@
+import type { AlphaBoardId } from "@bf-migrate/core";
+
 /**
  * Firmware this site serves for boards Betaflight's cloud build does not carry yet. Each
  * file is a release of fc-migrate-firmware, copied byte for byte into `public/` and pinned
@@ -39,4 +41,12 @@ export const ALPHA_HD_FIRMWARE: HostedFirmware = {
   releaseUrl: `${REPO}/releases/tag/v2026.6.2-1`,
   sourceUrl: `${REPO}/tree/v2026.6.2-1`,
   betaflightSourceUrl: "https://github.com/betaflight/betaflight/tree/2026.6.2",
+};
+
+/**
+ * This site's build for each Alpha board, where there is one. The Analog board's build is in
+ * fc-migrate-firmware but not released yet, so its pilots choose a file until a release is pinned here.
+ */
+export const HOSTED_ALPHA_FIRMWARE: Partial<Record<AlphaBoardId, HostedFirmware>> = {
+  hd: ALPHA_HD_FIRMWARE,
 };

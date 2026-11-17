@@ -33,7 +33,7 @@ The GPL asks this of anyone who conveys the program.
 | Source firmware | Betaflight 4.5.x (4.5.3 is the floor if a 4.5 build proves awkward). A board can also be rebuilt on the release it already runs. |
 | Target firmware | 2025.12.x and 2026.6.x. 2026.12 alpha behind an "unstable" toggle. |
 | Older sources (4.3, 4.4) | Later, as added rule packs (section 7.4). |
-| Other firmware | FETtec Alpha on the T-Motor Pacer G4 Alpha HD. The Analog board once it is mapped. |
+| Other firmware | FETtec Alpha on the T-Motor Pacer G4 Alpha HD and Analog. |
 | Browsers | Chrome and Edge (WebSerial and WebUSB). HTTPS or localhost only. |
 | MCUs | STM32 F4, F7 and H7 over DFU first, since those are what the DFU port covers. STM32G474 for Alpha boards, over SWD and DFU. |
 
@@ -161,6 +161,8 @@ The target can be any newer release on a line migration understands. It can also
 
 Either way it goes through the same image check. Its build options are fixed by the build. The pilot's file gets a warning when it does not name the target version the settings are planned for.
 
+A migrated Analog board is the exception: it did not come up as a USB DFU device after `bl`, so the Migrate page offers no firmware for it and points to Alpha Migrate, and the upgrade flow refuses to start on it.
+
 ### 7.2 What each line becomes
 
 | Outcome | Meaning |
@@ -274,7 +276,12 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. 
 
 **Steps and navigation**
 
-- Only the HD board (`TMOTORG4ALPHAHD`) is supported. Analog is listed and disabled until it is mapped.
+- The pilot chooses the board: HD (`TMOTORG4ALPHAHD`) or Analog (`TMOTORG4ALPHAANALOG`). They have the same chip, so the chip cannot tell them apart. The choice picks:
+  - the wiring, firmware and done texts, each with its own id;
+  - the photos;
+  - the hosted build, and the board the image check expects.
+
+  The board report records the choice. Changing the board drops a chosen image. The intro shows what each board gives up.
 - The steps are:
   1. intro;
   2. board;
@@ -312,15 +319,16 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. 
 
 **Firmware and the image check**
 
-- Firmware is this site's own build or the pilot's file. The page links the site's release and its source.
+- Firmware is this site's own build for the chosen board or the pilot's file. The page links the site's release and its source. Until fc-migrate-firmware releases the Analog build, the Analog board has only the file choice.
 - Every image is checked before writing. It must stay inside main flash, start at 0x08000000 with a valid vector table, and look like Betaflight (design section 6.7).
-- Alpha images are refused. Generic G474 builds and images for other boards get a warning.
+- Alpha images are refused. Generic G474 builds and images for other boards get a warning. So does the other Alpha board's build, by name: the two boards wire their OSD differently.
 
 **Rewriting a migrated board**
 
 - A rewrite of an unlocked board erases only the pages the image uses. It keeps saved settings unless the pilot turns that off.
 - If the BOOT0 pin is honoured, the app offers to switch it off (S4). A DJI air unit on R3 can hold it high.
-- A board already migrated and connected over USB is flashed through its own DFU bootloader, with no ST-Link.
+- A migrated HD board connected over USB is flashed through its own DFU bootloader, with no ST-Link.
+- A migrated Analog board did not come up as a USB DFU device after `bl` (seen twice on the first one), so it is rewritten over SWD. On USB it gets a button that opens the ST-Link steps for the Analog board, and the store refuses a USB flash for it.
 - That board's file is chosen separately from the ST-Link flow's. It is shown before writing: name, board, size and SHA-256.
 - When the browser has no permission for the bootloader yet, the pilot grants it with a click, since the restart has used up the first one.
 
