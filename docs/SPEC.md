@@ -161,7 +161,7 @@ The target can be any newer release on a line migration understands. It can also
 
 Either way it goes through the same image check. Its build options are fixed by the build. The pilot's file gets a warning when it does not name the target version the settings are planned for.
 
-A migrated Analog board is the exception: it did not come up as a USB DFU device after `bl`, so the Migrate page offers no firmware for it and points to Alpha Migrate, and the upgrade flow refuses to start on it.
+A migrated Analog board starts its USB bootloader only on fc-migrate-firmware v2026.6.2-3 or later. Earlier builds leave USB stuck after `bl`: the board's OSD chip polls on a pin ST's bootloader also listens on, so the bootloader takes that serial port and switches USB off. The page says so, and that a board on an older build needs one rewrite over SWD on Alpha Migrate.
 
 ### 7.2 What each line becomes
 
@@ -331,7 +331,7 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. 
 
 **Firmware and the image check**
 
-- Firmware is this site's own build for the chosen board or the pilot's file. The page links the site's release and its source. The Analog build is fc-migrate-firmware v2026.6.2-2. Its source was booted on the first Analog board; release builds are not byte-reproducible, so the hosted file itself is a CI build of that source.
+- Firmware is this site's own build for the chosen board or the pilot's file. The page links the site's release and its source. The Analog build is fc-migrate-firmware v2026.6.2-3, the first that starts the USB bootloader on `bl`. Its source was booted on the first Analog board and reached DFU there 15 times out of 15; release builds are not byte-reproducible, so the hosted file itself is a CI build of that source.
 - Every image is checked before writing. It must stay inside main flash, start at 0x08000000 with a valid vector table, and look like Betaflight (design section 6.7).
 - Alpha images are refused. Generic G474 builds and images for other boards get a warning. So does the other Alpha board's build, by name: the two boards wire their OSD differently.
 
@@ -339,8 +339,9 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. 
 
 - A rewrite of an unlocked board erases only the pages the image uses. It keeps saved settings unless the pilot turns that off.
 - If the BOOT0 pin is honoured, the app offers to switch it off (S4). A DJI air unit on R3 can hold it high.
-- A migrated HD board connected over USB is flashed through its own DFU bootloader, with no probe.
-- A migrated Analog board did not come up as a USB DFU device after `bl` (seen twice on the first one), so it is rewritten over SWD. On USB it gets a button that opens the probe steps for the Analog board, and the store refuses a USB flash for it.
+- A migrated board connected over USB is flashed through its own DFU bootloader, with no probe.
+- An Analog board does that only on fc-migrate-firmware v2026.6.2-3 or later (`usbDfuFrom`). On an older build it shows up as an unknown USB device after `bl`, so the USB card says to replug it and rewrite it once over SWD, and so does the message when no bootloader can be chosen.
+- A board with no USB bootloader at all (`usbDfu` false; none at present) gets a button that opens its probe steps, and the store refuses a USB flash for it.
 - That board's file is chosen separately from the probe flow's. It is shown before writing: name, board, size and SHA-256.
 - When the browser has no permission for the bootloader yet, the pilot grants it with a click, since the restart has used up the first one.
 

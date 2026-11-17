@@ -407,7 +407,9 @@ export const useAlphaStore = defineStore("alpha", () => {
       await writeOverDfu(device, image);
     } catch (reason) {
       if (reason instanceof DOMException && reason.name === "NotFoundError") {
-        usbMessage.value = "No bootloader was chosen. Choose STM32 BOOTLOADER in the list. If it is not there, unplug the board, plug it back in and start again.";
+        const since = usbBoard.value?.usbDfuFrom;
+        const oldBuild = since ? ` An ${usbBoard.value!.label} on a build older than fc-migrate's ${since} never shows up there: rewrite it once over SWD with the probe steps instead.` : "";
+        usbMessage.value = `No bootloader was chosen. Choose STM32 BOOTLOADER in the list. If it is not there, unplug the board, plug it back in and start again.${oldBuild}`;
         return;
       }
       failUsb(reason);

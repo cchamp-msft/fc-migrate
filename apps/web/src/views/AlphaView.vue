@@ -218,6 +218,9 @@ function kb(bytes: number): string {
         It runs Betaflight as {{ alpha.usbBoard?.boardName }}. Betaflight's own firmware list does not carry this board yet, so new firmware is fc-migrate's build or a file, written over USB with no probe. The settings area is left alone, so a build of the same Betaflight version keeps your settings. A different version may reset them on first start: to move settings to a new version, use
         <RouterLink to="/migrate">Migrate</RouterLink>, which sends them back and checks them.
       </p>
+      <p v-if="alpha.usbBoard?.usbDfuFrom" class="muted small">
+        The {{ alpha.usbBoard.label }} starts its USB bootloader on fc-migrate's build {{ alpha.usbBoard.usbDfuFrom }} or later. On an older build it shows up as an unknown USB device instead: unplug it and plug it back in, then rewrite it once over SWD with the probe steps below.
+      </p>
       <AlphaImageFacts v-if="alpha.usbChosen" :image="alpha.usbChosen" />
       <div class="actions">
         <button v-if="usbHosted" class="btn" :disabled="usbBusy || alpha.hostedLoading" @click="alpha.chooseHosted('usb')"><PackageCheck :size="15" /> Use fc-migrate's build ({{ usbHosted.release }})</button>
