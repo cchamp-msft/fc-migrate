@@ -272,7 +272,7 @@ The slider values are starting points from the owner's flying, not computed resu
 
 ## 10. Alpha Migrate
 
-Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. It works through an ST-Link V2 (or V2-1) driven from the browser over WebUSB. It follows the procedure that converted the first board. The research, citations and open questions are in [research/alpha-migrate-design.md](research/alpha-migrate-design.md).
+Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. It works through a debug probe driven from the browser over WebUSB: an ST-Link V2 (or V2-1), or a CMSIS-DAP v2 probe such as a Flipper Zero running its DAP Link app. It follows the procedure that converted the first board. The research, citations and open questions are in [research/alpha-migrate-design.md](research/alpha-migrate-design.md).
 
 **Steps and navigation**
 
@@ -286,7 +286,7 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. 
   1. intro;
   2. board;
   3. wiring checklist;
-  4. choose the ST-Link;
+  4. choose the probe;
   5. connect;
   6. confirm the chip;
   7. save the report;
@@ -298,7 +298,15 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. 
 - The intro and wiring ticks are a checklist, not a gate. Continue works without them, and a confirmation is recorded only when they were ticked.
 - The stage numbers are buttons. Every stage opens at any time, except while the chip is being connected or written.
 - A button whose action needs something not yet done stays grey and lists what is still needed (S6).
-- On a migrated board connected over USB, the ST-Link steps fold away behind a toggle, unless an ST-Link session is in use.
+- On a migrated board connected over USB, the probe steps fold away behind a toggle, unless a probe session is in use.
+
+**Probes**
+
+- One Select probe button opens the browser's chooser with every supported probe's USB IDs. An ST-Link's IDs open the ST-Link session; any other device is opened as CMSIS-DAP.
+- Both probe types sit behind the same `G4Session`, so the chip checks, the option-byte rules and the one-way gate are shared (S4 to S6). Each probe layer only moves 32-bit words over SWD.
+- CMSIS-DAP uses the v2 bulk interface only. The session looks for a vendor-class interface whose name contains CMSIS-DAP, so a device that merely shares the IDs is refused before anything is sent to it. The Flipper Zero's DAP Link app uses ST's virtual COM port IDs (0483:5740), which most STM32 USB serial devices share, flight controllers included.
+- Neither probe layer drives the target's reset pin. The CMSIS-DAP layer has no encoder for DAP_ResetTarget or DAP_SWJ_Pins at all.
+- Tested on hardware: the ST-Link V2 clone (the first board), and the Flipper Zero by the owner's OpenOCD run on the analog board (the same SWD sequence, outside this app). This app's own CMSIS-DAP code has run only against the simulator so far. The Raspberry Pi debugprobe is offered but untried.
 
 **Connecting and classifying**
 
@@ -327,14 +335,15 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. 
 
 - A rewrite of an unlocked board erases only the pages the image uses. It keeps saved settings unless the pilot turns that off.
 - If the BOOT0 pin is honoured, the app offers to switch it off (S4). A DJI air unit on R3 can hold it high.
-- A migrated HD board connected over USB is flashed through its own DFU bootloader, with no ST-Link.
-- A migrated Analog board did not come up as a USB DFU device after `bl` (seen twice on the first one), so it is rewritten over SWD. On USB it gets a button that opens the ST-Link steps for the Analog board, and the store refuses a USB flash for it.
-- That board's file is chosen separately from the ST-Link flow's. It is shown before writing: name, board, size and SHA-256.
+- A migrated HD board connected over USB is flashed through its own DFU bootloader, with no probe.
+- A migrated Analog board did not come up as a USB DFU device after `bl` (seen twice on the first one), so it is rewritten over SWD. On USB it gets a button that opens the probe steps for the Analog board, and the store refuses a USB flash for it.
+- That board's file is chosen separately from the probe flow's. It is shown before writing: name, board, size and SHA-256.
 - When the browser has no permission for the bootloader yet, the pilot grants it with a click, since the restart has used up the first one.
 
 **Simulator**
 
 - A simulated ST-Link and chip, with scenarios for each board state, lets anyone walk through the procedure with no hardware.
+- A simulated CMSIS-DAP probe runs the same scenarios in the tests. It models the debug port strictly (line reset, power-up, sticky errors, the 1 KB address wrap), so a probe layer that skips a step fails there.
 - A SIMULATED banner stays up, and saved reports are marked (S8).
 
 ## 11. AI suggestions

@@ -8,10 +8,36 @@ import type { HexBlock } from "../../firmware/hex.js";
 /** Progress through a long step, in bytes. */
 export type ByteProgress = (done: number, total: number) => void;
 
+/** One endpoint of an interface, as WebUSB's USBEndpoint describes it. */
+export interface UsbProbeEndpointLike {
+  readonly endpointNumber: number;
+  readonly direction: "in" | "out";
+  readonly type: "bulk" | "interrupt" | "isochronous";
+  readonly packetSize: number;
+}
+
+/** One alternate setting of an interface, as WebUSB's USBAlternateInterface describes it. */
+export interface UsbProbeAlternateLike {
+  readonly alternateSetting: number;
+  readonly interfaceClass: number;
+  /** The interface's string descriptor. CMSIS-DAP v2 requires it to contain "CMSIS-DAP". */
+  readonly interfaceName?: string | null;
+  readonly endpoints: readonly UsbProbeEndpointLike[];
+}
+
+/** The active configuration's interfaces, as WebUSB's USBConfiguration lists them. */
+export interface UsbProbeConfigurationLike {
+  readonly interfaces: readonly { readonly interfaceNumber: number; readonly alternates: readonly UsbProbeAlternateLike[] }[];
+}
+
 /** A USB device with bulk endpoints, as WebUSB and node-usb's WebUSB class provide. */
 export interface UsbBulkDeviceLike {
   readonly vendorId: number;
   readonly productId: number;
+  /** The product string, when the device has one. */
+  readonly productName?: string | null | undefined;
+  /** The active configuration. A probe layer that has to find its interface reads it after open(). */
+  readonly configuration?: UsbProbeConfigurationLike | null | undefined;
   readonly opened: boolean;
   open(): Promise<void>;
   close(): Promise<void>;
@@ -23,9 +49,9 @@ export interface UsbBulkDeviceLike {
 }
 
 export interface ProbeInfo {
-  /** For example "ST-Link/V2" or "ST-Link/V2-1". */
+  /** For example "ST-Link/V2", "ST-Link/V2-1", or a CMSIS-DAP probe's vendor and product strings. */
   model: string;
-  /** For example "V2J39S7". */
+  /** For example "V2J39S7", or "CMSIS-DAP 2.0.0" when a CMSIS-DAP probe names no firmware of its own. */
   firmware: string;
   /** Target voltage the probe measures, informational only. Undefined when it cannot tell. */
   targetVolts?: number;
@@ -132,5 +158,5 @@ export interface OpenOptions {
   allowDemoImage?: boolean;
 }
 
-/** Opens a session on a probe the user already chose. Implemented by the ST-Link layer. */
+/** Opens a session on a probe the user already chose. Implemented by the ST-Link and CMSIS-DAP layers. */
 export type OpenG4Session = (device: UsbBulkDeviceLike, options: OpenOptions) => Promise<G4Session>;

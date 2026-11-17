@@ -37,7 +37,7 @@ Betaflight Migrator, served at https://fc-migrate.com. It's a browser app that u
 - **Keep `packages/core` platform free.** Hardware goes through `ByteTransport` and `UsbDeviceLike` (SPEC.md section 4).
 - **Never push to `main`, and never deploy.** Land work through a pull request, as CONTRIBUTING.md describes. Leave merging and deploying to the maintainer unless they ask.
 - **Be careful with real hardware.**
-  - These only read: `pnpm hil`, and the harness's `stlink` and `stlink-dump` scripts.
+  - These only read: `pnpm hil`, and the harness's `stlink`, `stlink-dump` and `dap` scripts.
   - These write to a real flight controller: `flash`, `migrate`, `bootstrap` and `stlink-write`. Run them only when the maintainer asks for that run.
   - Without hardware, use the demo board and the simulated ST-Link in `pnpm dev`.
 - **This repository is public.** Keep secrets, LAN addresses, home-network details and personal paths out of code, docs, fixtures and commit messages. Local secrets go in `apps/worker/.dev.vars`, which is git-ignored.

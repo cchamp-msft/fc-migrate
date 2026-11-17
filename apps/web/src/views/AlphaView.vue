@@ -8,7 +8,7 @@ import { HOSTED_ALPHA_FIRMWARE } from "../data/hosted-firmware";
 import { DEMO_SCENARIOS, createDemoSource, type DemoScenarioId } from "../demo/alpha-probe";
 import { demoAlphaFirmware } from "../demo/alpha-firmware";
 import { useAlphaStore, type AlphaStep } from "../stores/alpha";
-import { chooseStlink, isWebUsbAvailable } from "../transport/web-usb-stlink";
+import { chooseProbe, isWebUsbAvailable } from "../transport/web-usb-probe";
 
 const alpha = useAlphaStore();
 
@@ -33,13 +33,13 @@ function rewriteOverSwd(): void {
   if (alpha.usbBoard) alpha.chooseBoard(alpha.usbBoard.id);
 }
 
-// Leaving the page must not keep the ST-Link claimed or a chip halted under reset.
+// Leaving the page must not keep the probe claimed or a chip halted under reset.
 onBeforeUnmount(() => alpha.release());
 
 const STAGES: { label: string; steps: AlphaStep[] }[] = [
   { label: "Before you start", steps: ["intro", "variant"] },
   { label: "Wiring", steps: ["wiring"] },
-  { label: "ST-Link", steps: ["probe", "connecting", "hold-reset"] },
+  { label: "Probe", steps: ["probe", "connecting", "hold-reset"] },
   { label: "Chip", steps: ["confirm-chip", "stopped"] },
   { label: "Report", steps: ["report"] },
   { label: "Firmware", steps: ["firmware"] },
@@ -60,7 +60,7 @@ const scenario = ref<DemoScenarioId>(DEMO_SCENARIOS[0]!.id);
 const resetHeld = ref(false);
 const probeError = ref("");
 const fileInput = ref<HTMLInputElement>();
-// The USB rewrite has its own file: it always goes to real hardware, so it never shares the ST-Link flow's choice.
+// The USB rewrite has its own file: it always goes to real hardware, so it never shares the probe flow's choice.
 const usbFileInput = ref<HTMLInputElement>();
 
 watch(
@@ -115,7 +115,7 @@ const usbPercent = computed(() => (alpha.usbProgress?.total ? Math.round((alpha.
 const locked = computed(() => alpha.classification?.kind === "locked");
 const atLevel0WithFirmware = computed(() => alpha.classification?.kind === "programmed" || alpha.classification?.kind === "unknown");
 
-const NEED_PROBE = "Connect the ST-Link to the board (stage 3).";
+const NEED_PROBE = "Connect the probe to the board (stage 3).";
 const NEED_FIRMWARE = "Choose the firmware (stage 6).";
 
 /** What the one-way step still needs. Its button stays grey until this is empty. */
@@ -140,8 +140,8 @@ const writeNeeds = computed(() => {
 });
 
 /**
- * A migrated board on USB needs only the card at the top, so the ST-Link steps fold away.
- * They stay open while an ST-Link session is in use.
+ * A migrated board on USB needs only the card at the top, so the probe steps fold away.
+ * They stay open while a probe session is in use.
  */
 const showMigration = ref(false);
 const migrationFoldable = computed(() => alpha.migratedOverUsb && alpha.usbFlashable && !alpha.session && !BUSY.includes(alpha.step));
@@ -151,12 +151,15 @@ function paragraphs(text: AlphaText): readonly string[] {
   return text.paragraphs;
 }
 
-async function selectStlink(): Promise<void> {
+async function selectProbe(): Promise<void> {
   probeError.value = "";
   try {
-    alpha.useSource(await chooseStlink());
+    alpha.useSource(await chooseProbe());
   } catch (reason) {
-    probeError.value = reason instanceof DOMException && reason.name === "NotFoundError" ? "No ST-Link was chosen. If the list was empty, install ST's STSW-LINK009 driver and plug the ST-Link in again." : String(reason);
+    probeError.value =
+      reason instanceof DOMException && reason.name === "NotFoundError"
+        ? "No probe was chosen. If the list was empty: for an ST-Link, install ST's STSW-LINK009 driver; for a Flipper Zero, start its DAP Link app. Then plug the probe in again."
+        : String(reason);
   }
 }
 
@@ -205,14 +208,14 @@ function kb(bytes: number): string {
     <header class="page-header">
       <div>
         <h1>Alpha Migrate</h1>
-        <p>Replace the closed Alpha firmware on a T-Motor Pacer G4 Alpha, HD or Analog, with Betaflight, through an ST-Link wired to the board.</p>
+        <p>Replace the closed Alpha firmware on a T-Motor Pacer G4 Alpha, HD or Analog, with Betaflight, through a debug probe wired to the board: an ST-Link, or a Flipper Zero.</p>
       </div>
     </header>
 
     <section v-if="alpha.migratedOverUsb && alpha.usbFlashable" class="card">
       <h2>This board is already migrated</h2>
       <p class="muted lead">
-        It runs Betaflight as {{ alpha.usbBoard?.boardName }}. Betaflight's own firmware list does not carry this board yet, so new firmware is fc-migrate's build or a file, written over USB with no ST-Link. The settings area is left alone, so a build of the same Betaflight version keeps your settings. A different version may reset them on first start: to move settings to a new version, use
+        It runs Betaflight as {{ alpha.usbBoard?.boardName }}. Betaflight's own firmware list does not carry this board yet, so new firmware is fc-migrate's build or a file, written over USB with no probe. The settings area is left alone, so a build of the same Betaflight version keeps your settings. A different version may reset them on first start: to move settings to a new version, use
         <RouterLink to="/migrate">Migrate</RouterLink>, which sends them back and checks them.
       </p>
       <AlphaImageFacts v-if="alpha.usbChosen" :image="alpha.usbChosen" />
@@ -231,7 +234,7 @@ function kb(bytes: number): string {
     <section v-else-if="alpha.migratedOverUsb && alpha.usbBoard" class="card">
       <h2>This board is already migrated</h2>
       <p class="muted lead">
-        It runs Betaflight as {{ alpha.usbBoard.boardName }}. This board does not come up as a USB bootloader, so new firmware goes over SWD: wire the ST-Link and follow the steps below. A rewrite of the same Betaflight version keeps your settings.
+        It runs Betaflight as {{ alpha.usbBoard.boardName }}. This board does not come up as a USB bootloader, so new firmware goes over SWD: wire the probe and follow the steps below. A rewrite of the same Betaflight version keeps your settings.
       </p>
       <div class="actions">
         <button class="btn btn-primary" :disabled="BUSY.includes(alpha.step)" @click="rewriteOverSwd()">Rewrite it over SWD</button>
@@ -240,13 +243,13 @@ function kb(bytes: number): string {
 
     <button v-if="migrationFoldable" class="btn fold" :aria-expanded="showMigration" @click="showMigration = !showMigration">
       <component :is="showMigration ? ChevronDown : ChevronRight" :size="16" />
-      {{ showMigration ? "Hide the ST-Link migration steps" : "Migrating another Alpha still on its original firmware? Show the ST-Link steps" }}
+      {{ showMigration ? "Hide the probe migration steps" : "Migrating another Alpha still on its original firmware? Show the probe steps" }}
     </button>
 
     <template v-if="!migrationHidden">
     <div v-if="alpha.simulated" class="notice notice-warn simulated">
       <FlaskConical :size="18" />
-      <span><strong>SIMULATED.</strong> No hardware is involved. This walks through the real procedure against a simulated ST-Link and chip.</span>
+      <span><strong>SIMULATED.</strong> No hardware is involved. This walks through the real procedure against a simulated probe and chip.</span>
     </div>
 
     <ol class="stages" aria-label="Progress">
@@ -299,7 +302,7 @@ function kb(bytes: number): string {
       </div>
     </section>
 
-    <!-- 3. ST-Link -->
+    <!-- 3. Probe -->
     <section v-else-if="alpha.step === 'probe'" class="card step">
       <h2>{{ ALPHA_TEXTS.probe.title }}</h2>
       <div class="notice notice-warn power">
@@ -308,12 +311,12 @@ function kb(bytes: number): string {
       </div>
       <p v-for="text in paragraphs(ALPHA_TEXTS.probe)" :key="text">{{ text }}</p>
       <div class="actions">
-        <button class="btn btn-primary" :disabled="!isWebUsbAvailable()" @click="selectStlink()">Select ST-Link</button>
+        <button class="btn btn-primary" :disabled="!isWebUsbAvailable()" @click="selectProbe()">Select probe</button>
         <span v-if="!isWebUsbAvailable()" class="muted small">This browser has no WebUSB. Use Chrome or Edge.</span>
       </div>
       <div v-if="probeError" class="notice notice-warn"><CircleAlert :size="18" /><span>{{ probeError }}</span></div>
       <div class="demo">
-        <h3><FlaskConical :size="16" /> No ST-Link? Try a simulated board</h3>
+        <h3><FlaskConical :size="16" /> No probe? Try a simulated board</h3>
         <div class="actions">
           <select v-model="scenario" class="input" aria-label="Simulated board">
             <option v-for="option in DEMO_SCENARIOS" :key="option.id" :value="option.id">{{ option.label }}</option>
@@ -347,7 +350,7 @@ function kb(bytes: number): string {
       <h2>{{ ALPHA_TEXTS.confirmChip.title }}</h2>
       <p v-for="text in paragraphs(ALPHA_TEXTS.confirmChip)" :key="text" class="muted">{{ text }}</p>
       <dl class="facts">
-        <dt>ST-Link</dt>
+        <dt>Probe</dt>
         <dd>{{ alpha.probeInfo?.model }}, firmware {{ alpha.probeInfo?.firmware }}</dd>
         <dt>Chip</dt>
         <dd>ID 0x{{ alpha.readings.devId.toString(16) }}<template v-if="alpha.readings.devId === 0x469"> (STM32G47x)</template>, {{ alpha.readings.flashSizeKb ?? "unknown" }} KB flash</dd>
@@ -370,7 +373,7 @@ function kb(bytes: number): string {
 
     <section v-else-if="alpha.step === 'confirm-chip'" class="card step">
       <h2>{{ ALPHA_TEXTS.confirmChip.title }}</h2>
-      <p class="muted">No chip has been read yet. Connect the ST-Link in stage 3, and the chip's details appear here.</p>
+      <p class="muted">No chip has been read yet. Connect the probe in stage 3, and the chip's details appear here.</p>
       <div class="actions">
         <button class="btn btn-primary" disabled>Yes, this is the board</button>
         <button class="btn" @click="alpha.goTo('probe')">Go to stage 3</button>
@@ -468,7 +471,7 @@ function kb(bytes: number): string {
     <section v-else-if="alpha.step === 'working'" class="card step">
       <h2><LoaderCircle :size="18" class="spin" /> {{ alpha.message }}</h2>
       <progress v-if="percent !== undefined" :value="percent" max="100" class="bar">{{ percent }}%</progress>
-      <div class="notice notice-danger"><TriangleAlert :size="18" /><span>Do not close or change this browser tab. Keep the USB cable and the ST-Link connected. This step cannot be cancelled.</span></div>
+      <div class="notice notice-danger"><TriangleAlert :size="18" /><span>Do not close or change this browser tab. Keep the USB cable and the probe connected. This step cannot be cancelled.</span></div>
     </section>
 
     <!-- 9. Done -->
@@ -487,7 +490,7 @@ function kb(bytes: number): string {
     <section v-else-if="alpha.step === 'failed'" class="card step">
       <h2><CircleAlert :size="18" /> Stopped</h2>
       <div class="notice notice-danger"><CircleAlert :size="18" /><span>{{ alpha.error }}</span></div>
-      <p class="muted">Nothing runs until you choose. The ST-Link can always reach an unlocked board, so a write can be retried.</p>
+      <p class="muted">Nothing runs until you choose. The probe can always reach an unlocked board, so a write can be retried.</p>
       <div class="actions">
         <button class="btn btn-primary" @click="alpha.retry()">Try again</button>
         <button v-if="alpha.readings" class="btn" @click="alpha.saveReport()">Save the board report</button>

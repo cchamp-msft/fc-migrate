@@ -2,7 +2,7 @@
  * Alpha Migrate: replacing the closed Alpha firmware on a T-Motor Pacer G4 Alpha with
  * Betaflight, over SWD. This module is pure: it classifies what the chip reports, checks
  * firmware images, and holds every warning the pilot must confirm. Hardware access lives
- * in the ST-Link layer behind `G4Session`.
+ * in the probe layers behind `G4Session`.
  *
  * The procedure follows the owner's recorded run in fix-thobby-g4-alpha/NOTES.md.
  */
@@ -37,7 +37,7 @@ export const ALPHA_BOARDS: readonly AlphaBoard[] = [
     label: "Pacer G4 Alpha Analog",
     boardName: "TMOTORG4ALPHAANALOG",
     supported: true,
-    note: "Migrated and bench-tested on one board, not flown yet. Later firmware updates need the ST-Link too.",
+    note: "Migrated and bench-tested on one board, not flown yet. Later firmware updates need the probe too.",
     // On the first migrated board, `bl` left USB half set up ("Device Descriptor Request Failed"),
     // twice. The likely cause is the OSD chip on PC10/PC11, which ST's bootloader also listens on.
     usbDfu: false,
@@ -322,11 +322,11 @@ export interface AlphaText {
 export const ALPHA_TEXTS = {
   intro: {
     id: "C1",
-    version: 2,
+    version: 3,
     title: "Alpha Migrate changes your flight controller for good",
     paragraphs: [
       "It replaces the Alpha firmware on a T-Motor Pacer G4 Alpha, HD or Analog, with Betaflight. This is an unofficial community procedure. T-Motor, FETtec and Betaflight do not support it. One step erases the whole chip, and after it the board can never run Alpha again.",
-      "You need an ST-Link V2 (or V2-1), three wires soldered to the board, and Chrome or Edge.",
+      "You need a debug probe, three wires soldered to the board, and Chrome or Edge. The probe can be an ST-Link V2 (or V2-1), or a Flipper Zero running its DAP Link app.",
       "Before you start, write down any Alpha settings you want to keep, such as rates, the motor output map and the receiver protocol. They cannot be copied off the board.",
     ],
     checks: ["I understand that one step cannot be undone, and that this board will never run Alpha again."],
@@ -344,12 +344,12 @@ export const ALPHA_TEXTS = {
   },
   givesUpAnalog: {
     id: "C1c",
-    version: 1,
+    version: 2,
     title: "What the Analog board gives up",
     paragraphs: [
       "One Analog board has been migrated and checked on the bench: the OSD through the board's own OSD chip, SmartAudio VTX control on T3, the receiver on T1 and R1, ESC telemetry, motor order and battery voltage. Its beeper and LEDs are untested, and it has not flown yet. What you lose:",
       "The receiver group's SIG and TLM pads, for a CRSF or ELRS receiver. On the HD board they reach no serial port Betaflight can use, and this board is likely the same. Under Betaflight the receiver goes on the T1 and R1 pads, which worked on the tested board.",
-      "Firmware updates over USB. On the tested board, Betaflight's bootloader command left USB stuck instead of starting the USB bootloader, so later updates go through the ST-Link and this page again.",
+      "Firmware updates over USB. On the tested board, Betaflight's bootloader command left USB stuck instead of starting the USB bootloader, so later updates go through the probe and this page again.",
       "Updates to the OSD chip. They go through Alpha, so update it to 0.1.18 in FETtec's configurator before you start: the tested board ran 0.1.18.",
       "Betaflight's logo on the boot screen. The OSD chip's font does not have it, so letters stand in.",
       "Alpha itself: its configurator, its updates and any way back.",
@@ -357,51 +357,57 @@ export const ALPHA_TEXTS = {
   },
   wiring: {
     id: "C2",
-    version: 2,
-    title: "Wire the ST-Link",
-    paragraphs: ["Tick each step off as you go, if it helps. Continue does not wait for the ticks."],
+    version: 3,
+    title: "Wire the probe",
+    paragraphs: [
+      "Tick each step off as you go, if it helps. Continue does not wait for the ticks.",
+      "On an ST-Link, go by the labels printed on it. On a Flipper Zero running DAP Link, SWCLK is pin 2 (A7), SWDIO is pin 3 (A6), and GND is pin 8, 11 or 18. On a Raspberry Pi Pico running debugprobe, SWCLK is GP2, SWDIO is GP3, and GND is any GND pin.",
+    ],
     checks: [
       "Unplug the battery. The board runs from its USB-C for the whole job.",
-      "Unplug the receiver and the DJI cable. The ST-Link's clock wire uses the same pin as the receiver's signal and the DJI SBUS wire.",
-      "Solder GND first, to the upper gold pad on the right edge (or any GND pad on the other side). Then ST-Link SWCLK to the lower gold pad beside the USB-C socket, and SWDIO to the upper one.",
-      "Leave the ST-Link's 3.3V and RST pins unconnected.",
+      "Unplug the receiver and the DJI cable. The probe's clock wire uses the same pin as the receiver's signal and the DJI SBUS wire.",
+      "Solder GND first, to the upper gold pad on the right edge (or any GND pad on the other side). Then the probe's SWCLK to the lower gold pad beside the USB-C socket, and SWDIO to the upper one. Check that GND is still attached before plugging anything in: a probe that loses GND while its other wires stay on can be damaged.",
+      "Leave the probe's 3.3V and reset pins unconnected.",
     ],
   },
   wiringAnalog: {
     id: "C2c",
-    version: 1,
-    title: "Wire the ST-Link",
+    version: 2,
+    title: "Wire the probe",
     paragraphs: [
       "Tick each step off as you go, if it helps. Continue does not wait for the ticks.",
+      "On an ST-Link, go by the labels printed on it. On a Flipper Zero running DAP Link, SWCLK is pin 2 (A7), SWDIO is pin 3 (A6), and GND is pin 8, 11 or 18. On a Raspberry Pi Pico running debugprobe, SWCLK is GP2, SWDIO is GP3, and GND is any GND pin.",
     ],
     checks: [
       "Unplug the battery. The board runs from its USB-C for the whole job.",
-      "Unplug the receiver. On the HD board the receiver's signal pin is the ST-Link's clock pin.",
-      "Solder GND first, to the upper gold pad on the right edge. Then ST-Link SWCLK to the lower gold pad beside the USB-C socket, and SWDIO to the upper one.",
-      "Leave the ST-Link's 3.3V and RST pins unconnected.",
+      "Unplug the receiver. On the HD board the receiver's signal pin is the probe's clock pin.",
+      "Solder GND first, to the upper gold pad on the right edge. Then the probe's SWCLK to the lower gold pad beside the USB-C socket, and SWDIO to the upper one. Check that GND is still attached before plugging anything in: a probe that loses GND while its other wires stay on can be damaged.",
+      "Leave the probe's 3.3V and reset pins unconnected.",
     ],
   },
   probe: {
     id: "C3",
-    version: 1,
-    title: "Choose the ST-Link",
+    version: 2,
+    title: "Choose the probe",
     paragraphs: [
-      'Click Select ST-Link and choose "STM32 STLink" in your browser\'s list. If the list is empty, the ST-Link driver is missing: install ST\'s STSW-LINK009 driver and plug the ST-Link in again.',
-      "Close STM32CubeProgrammer first. Only one program can use the ST-Link at a time.",
+      "Click Select probe and choose yours in your browser's list. Only one program can use a probe at a time, so close STM32CubeProgrammer and OpenOCD first.",
+      'ST-Link: it is listed as "STM32 STLink". If the list is empty, the driver is missing: install ST\'s STSW-LINK009 driver and plug the ST-Link in again.',
+      "Flipper Zero: start the DAP Link app before you choose it. The list can also show flight controllers, which share the Flipper's USB IDs. On Windows, if the Flipper cannot be opened, ST's COM port driver may hold it: in Device Manager, set its driver to USB Composite Device and plug it in again.",
+      "Raspberry Pi Pico running debugprobe: offered, but not yet tried on this board.",
     ],
   },
   usbPower: {
     id: "C3b",
-    version: 1,
+    version: 2,
     title: "Plug the board's USB-C into the computer first.",
-    paragraphs: ["The ST-Link's 3.3V wire is not connected, so the ST-Link does not power the board, and without power it cannot find the chip. Keep the cable in until Alpha Migrate says it is done."],
+    paragraphs: ["The probe's 3.3V wire is not connected, so the probe does not power the board, and without power it cannot find the chip. Keep the cable in until Alpha Migrate says it is done."],
   },
   holdReset: {
     id: "C4a",
-    version: 2,
+    version: 3,
     title: "Connect while holding reset",
     paragraphs: [
-      "The ST-Link could not reach the chip. Check the three wires and that the board's USB-C is plugged in. A board still running Alpha may also be using the ST-Link's clock pin.",
+      "The probe could not reach the chip. Check the three wires and that the board's USB-C is plugged in. A board still running Alpha may also be using the probe's clock pin.",
       "Press and hold the reset button beside the USB-C socket, then click Connect while still holding it. When the app says Connected, release the button.",
     ],
   },
@@ -446,14 +452,14 @@ export const ALPHA_TEXTS = {
   },
   unlock: {
     id: "C7",
-    version: 1,
+    version: 2,
     title: "Erase the board and remove read protection",
     paragraphs: [
       "This step cannot be undone.",
       "The chip erases all of its flash: the Alpha firmware, your Alpha settings, and FETtec's bootloader.",
       "FETtec's bootloader has never been published and cannot be read off a locked chip, so no one can put it back. This board will never run Alpha or update from the Alpha configurator again.",
-      "Until the next step finishes, the board does nothing when plugged into USB. That is expected. The ST-Link can always finish the job.",
-      "Keep the USB cable and the ST-Link connected until the app says it is done.",
+      "Until the next step finishes, the board does nothing when plugged into USB. That is expected. The probe can always finish the job.",
+      "Keep the USB cable and the probe connected until the app says it is done.",
     ],
     typed: "ERASE",
   },
@@ -471,24 +477,24 @@ export const ALPHA_TEXTS = {
   },
   done: {
     id: "C9",
-    version: 1,
+    version: 2,
     title: "Betaflight is on the board",
     paragraphs: [
-      "Before you fly, unsolder or unplug the ST-Link wires. The clock wire shares a pin with the receiver plug and the DJI SBUS wire.",
+      "Before you fly, unsolder or unplug the probe's wires. The clock wire shares a pin with the receiver plug and the DJI SBUS wire.",
       "Wire your receiver to T1 and R1. The receiver plug cannot carry CRSF under Betaflight.",
-      "Then connect over USB to set the board up. Later firmware updates go over USB; the ST-Link is only needed to recover a board that will not start.",
+      "Then connect over USB to set the board up. Later firmware updates go over USB; the probe is only needed to recover a board that will not start.",
     ],
   },
   doneAnalog: {
     id: "C9c",
-    version: 1,
+    version: 2,
     title: "Betaflight is on the board",
     paragraphs: [
-      "Before you fly, unsolder or unplug the ST-Link wires. On the HD board the clock wire shares a pin with the receiver's signal pin.",
+      "Before you fly, unsolder or unplug the probe's wires. On the HD board the clock wire shares a pin with the receiver's signal pin.",
       "Wire your receiver to T1 and R1.",
       "Then connect over USB to set the board up. Set vcd_video_system to PAL or NTSC to match your camera: Auto gives the shorter NTSC screen. Betaflight turns on only the warnings at first, so add the OSD elements you want, and load a VTX table before changing channel or power.",
       "Check the board orientation before the first flight: tilt the quad and watch the model in Configurator's Setup tab. This board's gyro alignment is carried over from the HD board and has not been checked.",
-      "Later firmware updates go through the ST-Link and this page again. A rewrite keeps your settings.",
+      "Later firmware updates go through the probe and this page again. A rewrite keeps your settings.",
     ],
   },
 } as const satisfies Record<string, AlphaText>;

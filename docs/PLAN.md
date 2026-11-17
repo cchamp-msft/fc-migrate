@@ -75,6 +75,9 @@ The source is public, as GPL-3 requires, and the docs and `wrangler.toml` carry 
 - [x] Alpha Migrate page, walked through against the simulator
 - [x] Hardware, read-only first: connect and read the good board (`pnpm --filter @bf-migrate/hil run stlink`). Hot-plug works on a migrated board, running or locked up, with no reset held; a stock Alpha is still untested
 - [x] Hardware: rewrite a migrated board over SWD with the session code (`stlink-write`), keeping its settings, then check it over MSP (`stlink-dump` reads the whole flash for comparison)
+- [x] CMSIS-DAP v2 probes (Flipper Zero DAP Link, Raspberry Pi debugprobe) behind the same session, with a simulated probe
+- [ ] Hardware, read-only: read a board through a Flipper Zero, from the harness (`pnpm --filter @bf-migrate/hil run dap`) and from the page in Chrome on Windows
+- [ ] Hardware: a Pico running debugprobe
 - [ ] Hardware: the bad board as a fixture (set RDP to 0xBB, then run the full migration)
 - [x] Hardware: G474 DFU flashing through the app for migrated boards: fc-migrate-firmware v2026.6.2-1 written over DFU on a real Alpha HD, and the page reconnected to the board on the new firmware
 - [x] Firmware source: [fc-migrate-firmware](https://github.com/cchamp-msft/fc-migrate-firmware) releases of `TMOTORG4ALPHAHD`, served from the site pinned by SHA-256, with the source linked

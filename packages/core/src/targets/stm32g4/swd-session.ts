@@ -198,7 +198,7 @@ export class SwdG4Session implements G4Session {
 
   /** Runs one session step: refuses after close and maps failures to SessionError. */
   private async step<T>(faultKind: SessionErrorKind, task: () => Promise<T>): Promise<T> {
-    if (this.closed) throw new SessionError("usb", "The ST-Link session is closed.");
+    if (this.closed) throw new SessionError("usb", "The probe session is closed.");
     try {
       return await task();
     } catch (error) {

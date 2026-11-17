@@ -11,7 +11,7 @@ export interface BoardPhoto {
 }
 
 export interface AlphaPhotos {
-  /** Where to solder the ST-Link. */
+  /** Where to solder the probe. */
   wiring: BoardPhoto[];
   /** The reset button, for the hold-reset connect. */
   reset?: BoardPhoto;
@@ -24,7 +24,7 @@ const base = `${import.meta.env.BASE_URL}alpha/`;
 const hdPadSide: BoardPhoto = {
   src: `${base}g4-hd/pad-side.jpg`,
   alt: "Pad side of the Pacer G4 Alpha HD with a GND pad and the T1, R1, 5V and ground pads marked",
-  caption: "Pad side: the green pad is another place for the ST-Link's GND. The orange pads are where the receiver goes under Betaflight, not the receiver plug: T1 to its RX, R1 to its TX, plus 5V and -.",
+  caption: "Pad side: the green pad is another place for the probe's GND. The orange pads are where the receiver goes under Betaflight, not the receiver plug: T1 to its RX, R1 to its TX, plus 5V and -.",
 };
 
 export const ALPHA_PHOTOS: Partial<Record<AlphaBoard["id"], AlphaPhotos>> = {

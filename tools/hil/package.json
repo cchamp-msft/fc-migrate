@@ -13,6 +13,7 @@
     "bootstrap": "tsx src/bootstrap-run.ts",
     "stlink": "tsx src/stlink-readonly.ts",
     "stlink-dump": "tsx src/stlink-dump.ts",
+    "dap": "tsx src/dap-readonly.ts",
     "stlink-write": "tsx src/stlink-write.ts",
     "typecheck": "tsc --noEmit"
   },
