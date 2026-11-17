@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ExternalLink } from "lucide-vue-next";
-import { ALPHA_HD_FIRMWARE } from "../data/hosted-firmware";
+import { ALPHA_ANALOG_FIRMWARE, ALPHA_HD_FIRMWARE } from "../data/hosted-firmware";
 
 const REPO = "https://github.com/cchamp-msft/fc-migrate";
 </script>
@@ -45,6 +45,11 @@ const REPO = "https://github.com/cchamp-msft/fc-migrate";
             T-Motor Pacer G4 Alpha HD: <a :href="ALPHA_HD_FIRMWARE.releaseUrl" target="_blank" rel="noopener">{{ ALPHA_HD_FIRMWARE.release }}</a>, from
             <a :href="ALPHA_HD_FIRMWARE.sourceUrl" target="_blank" rel="noopener">its source</a> and
             <a :href="ALPHA_HD_FIRMWARE.betaflightSourceUrl" target="_blank" rel="noopener">Betaflight {{ ALPHA_HD_FIRMWARE.betaflight }}</a>
+          </li>
+          <li>
+            T-Motor Pacer G4 Alpha Analog: <a :href="ALPHA_ANALOG_FIRMWARE.releaseUrl" target="_blank" rel="noopener">{{ ALPHA_ANALOG_FIRMWARE.release }}</a>, from
+            <a :href="ALPHA_ANALOG_FIRMWARE.sourceUrl" target="_blank" rel="noopener">its source</a> and
+            <a :href="ALPHA_ANALOG_FIRMWARE.betaflightSourceUrl" target="_blank" rel="noopener">Betaflight {{ ALPHA_ANALOG_FIRMWARE.betaflight }}</a>
           </li>
         </ul>
       </div>

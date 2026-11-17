@@ -85,7 +85,8 @@ The source is public, as GPL-3 requires, and the docs and `wrangler.toml` carry 
 - [ ] Settle the manufacturer ID (COMM or TMTR) with the config submission
 - [x] Analog board: board choice, its own texts, image check and report entry; a migrated Analog board is rewritten over SWD, not USB DFU
 - [x] Analog board: SWD pad and reset button photos
-- [ ] Analog board: host fc-migrate-firmware's release of `TMOTORG4ALPHAANALOG`, pinned by SHA-256
+- [x] Analog board: host fc-migrate-firmware's release of `TMOTORG4ALPHAANALOG`, pinned by SHA-256 (v2026.6.2-2)
+- [x] Hardware: boot the hosted v2026.6.2-2 Analog file itself on a board: written by Alpha Migrate through a Flipper Zero on 2026-11-17, settings kept, OSD steady
 
 ## M5. Emulator dry-run
 

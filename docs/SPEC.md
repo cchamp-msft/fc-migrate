@@ -331,7 +331,7 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. 
 
 **Firmware and the image check**
 
-- Firmware is this site's own build for the chosen board or the pilot's file. The page links the site's release and its source. Until fc-migrate-firmware releases the Analog build, the Analog board has only the file choice.
+- Firmware is this site's own build for the chosen board or the pilot's file. The page links the site's release and its source. The Analog build is fc-migrate-firmware v2026.6.2-2. Its source was booted on the first Analog board; release builds are not byte-reproducible, so the hosted file itself is a CI build of that source.
 - Every image is checked before writing. It must stay inside main flash, start at 0x08000000 with a valid vector table, and look like Betaflight (design section 6.7).
 - Alpha images are refused. Generic G474 builds and images for other boards get a warning. So does the other Alpha board's build, by name: the two boards wire their OSD differently.
 
