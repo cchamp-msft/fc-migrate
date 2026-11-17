@@ -90,7 +90,7 @@ The source is public, as GPL-3 requires, and the docs and `wrangler.toml` carry 
 - [x] Analog board: host fc-migrate-firmware's release of `TMOTORG4ALPHAANALOG`, pinned by SHA-256 (v2026.6.2-2, now v2026.6.2-3)
 - [x] Hardware: boot the hosted v2026.6.2-2 Analog file itself on a board: written by Alpha Migrate through a Flipper Zero on 2026-11-17, settings kept, OSD steady
 - [x] Analog board: USB DFU after `bl`, from fc-migrate-firmware v2026.6.2-3, which starves ST's bootloader USARTs before the jump. Its source, built locally, reached DFU 15 times out of 15 on the first board (probe attached, removed, and on USB alone), and a DFU write kept the settings
-- [ ] Hardware: write the hosted v2026.6.2-3 Analog file over USB from the page, and `bl` again on it
+- [x] Hardware: write the hosted v2026.6.2-3 Analog file over USB from the page, and `bl` again on it: done on the first Analog board on 2026-11-17 from fc-migrate.com, settings kept, revision cff7b3565 reported; `bl` then reached DFU 5 times out of 5
 
 ## M5. Emulator dry-run
 
