@@ -386,6 +386,10 @@ function downloadScript(): void {
           (<a :href="alphaFirmware.sourceUrl" target="_blank" rel="noopener">source</a>), served from this site and checked against its published SHA-256.
           You can load your own .hex instead. Its build options are fixed: {{ alphaFirmware.options.join(", ") }}.
         </p>
+        <p v-if="alphaBoard?.usbDfuFrom" class="muted">
+          The {{ alphaBoard.label }} starts its USB bootloader on fc-migrate's build {{ alphaBoard.usbDfuFrom }} or later. On an older build it shows up as an unknown USB device
+          instead: unplug it and plug it back in, then rewrite it once over SWD on the <RouterLink to="/alpha">Alpha Migrate</RouterLink> page.
+        </p>
         <AlphaImageFacts v-if="alphaImage" :image="alphaImage" />
         <div class="actions">
           <button class="btn" :disabled="alphaLoading || !!alphaImage?.hosted" @click="useHostedBuild()"><PackageCheck :size="15" /> Use fc-migrate's build</button>

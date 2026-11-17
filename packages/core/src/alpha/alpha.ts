@@ -28,6 +28,11 @@ export interface AlphaBoard {
    * over USB. False means it is rewritten over SWD, as it was migrated.
    */
   usbDfu: boolean;
+  /**
+   * For a board whose USB bootloader needs a fix in the firmware: the first fc-migrate-firmware
+   * release that has it. A board on an older build needs one more rewrite over SWD first.
+   */
+  usbDfuFrom?: string;
 }
 
 export const ALPHA_BOARDS: readonly AlphaBoard[] = [
@@ -37,10 +42,12 @@ export const ALPHA_BOARDS: readonly AlphaBoard[] = [
     label: "Pacer G4 Alpha Analog",
     boardName: "TMOTORG4ALPHAANALOG",
     supported: true,
-    note: "Migrated and bench-tested on one board, not flown yet. Later firmware updates need the probe too.",
-    // On the first migrated board, `bl` left USB half set up ("Device Descriptor Request Failed"),
-    // twice. The likely cause is the OSD chip on PC10/PC11, which ST's bootloader also listens on.
-    usbDfu: false,
+    note: "Migrated and bench-tested on one board, not flown yet.",
+    // The OSD chip polls on PC11, which ST's bootloader also listens on as USART3, so after `bl` the
+    // bootloader took the USART and switched USB off. fc-migrate-firmware v2026.6.2-3 starves the
+    // bootloader's USARTs before the jump: 15 of 15 `bl` runs reached DFU on the first board.
+    usbDfu: true,
+    usbDfuFrom: "v2026.6.2-3",
   },
 ];
 
@@ -344,12 +351,11 @@ export const ALPHA_TEXTS = {
   },
   givesUpAnalog: {
     id: "C1c",
-    version: 2,
+    version: 3,
     title: "What the Analog board gives up",
     paragraphs: [
-      "One Analog board has been migrated and checked on the bench: the OSD through the board's own OSD chip, SmartAudio VTX control on T3, the receiver on T1 and R1, ESC telemetry, motor order and battery voltage. Its beeper and LEDs are untested, and it has not flown yet. What you lose:",
+      "One Analog board has been migrated and checked on the bench: the OSD through the board's own OSD chip, SmartAudio VTX control on T3, the receiver on T1 and R1, ESC telemetry, motor order, battery voltage and firmware updates over USB. Its beeper and LEDs are untested, and it has not flown yet. What you lose:",
       "The receiver group's SIG and TLM pads, for a CRSF or ELRS receiver. On the HD board they reach no serial port Betaflight can use, and this board is likely the same. Under Betaflight the receiver goes on the T1 and R1 pads, which worked on the tested board.",
-      "Firmware updates over USB. On the tested board, Betaflight's bootloader command left USB stuck instead of starting the USB bootloader, so later updates go through the probe and this page again.",
       "Updates to the OSD chip. They go through Alpha, so update it to 0.1.18 in FETtec's configurator before you start: the tested board ran 0.1.18.",
       "Betaflight's logo on the boot screen. The OSD chip's font does not have it, so letters stand in.",
       "Alpha itself: its configurator, its updates and any way back.",
@@ -437,10 +443,10 @@ export const ALPHA_TEXTS = {
   },
   firmwareAnalog: {
     id: "C6c",
-    version: 1,
+    version: 2,
     title: "Choose the firmware",
     paragraphs: [
-      "Choose a Betaflight .hex file built for TMOTORG4ALPHAANALOG. The official cloud build does not have this board. fc-migrate's build carries the HD build's two fixes, a steady battery voltage reading and a working ESC telemetry port, plus a third for the OSD: the board's OSD chip clears its screen the moment Betaflight asks, so stock Betaflight makes it flicker.",
+      "Choose a Betaflight .hex file built for TMOTORG4ALPHAANALOG. The official cloud build does not have this board. fc-migrate's build carries the HD build's two fixes, a steady battery voltage reading and a working ESC telemetry port, plus two for this board. The board's OSD chip clears its screen the moment Betaflight asks, so stock Betaflight makes it flicker. And the OSD chip talks on a pin that ST's USB bootloader also listens on, so with stock Betaflight the bootloader command leaves USB stuck. fc-migrate's build from v2026.6.2-3 on starts the USB bootloader, so later updates need no probe.",
       "The file is checked before anything is written.",
     ],
   },
@@ -487,14 +493,14 @@ export const ALPHA_TEXTS = {
   },
   doneAnalog: {
     id: "C9c",
-    version: 2,
+    version: 3,
     title: "Betaflight is on the board",
     paragraphs: [
       "Before you fly, unsolder or unplug the probe's wires. On the HD board the clock wire shares a pin with the receiver's signal pin.",
       "Wire your receiver to T1 and R1.",
       "Then connect over USB to set the board up. Set vcd_video_system to PAL or NTSC to match your camera: Auto gives the shorter NTSC screen. Betaflight turns on only the warnings at first, so add the OSD elements you want, and load a VTX table before changing channel or power.",
       "Check the board orientation before the first flight: tilt the quad and watch the model in Configurator's Setup tab. This board's gyro alignment is carried over from the HD board and has not been checked.",
-      "Later firmware updates go through the probe and this page again. A rewrite keeps your settings.",
+      "Later firmware updates go over USB with no probe, from this page or the Migrate page, as long as the board runs fc-migrate's build v2026.6.2-3 or later. On another build, the bootloader command can leave USB stuck: unplug the board, plug it back in, and rewrite it once more through the probe. A rewrite keeps your settings.",
     ],
   },
 } as const satisfies Record<string, AlphaText>;

@@ -44,20 +44,21 @@ export const ALPHA_HD_FIRMWARE: HostedFirmware = {
 };
 
 /**
- * The Analog board's release. Release builds are not byte-reproducible, so this is a CI build of
- * the source that was booted on the first Analog board, not the bytes flashed there.
+ * The Analog board's release, the first that starts the USB bootloader on `bl`. Release builds are
+ * not byte-reproducible, so this is a CI build of the source that was booted on the first Analog
+ * board and reached DFU there 15 times out of 15, not the bytes flashed there.
  */
 export const ALPHA_ANALOG_FIRMWARE: HostedFirmware = {
-  release: "v2026.6.2-2",
+  release: "v2026.6.2-3",
   betaflight: "2026.6.2",
-  revision: "8f849dc3e",
+  revision: "cff7b3565",
   boardName: "TMOTORG4ALPHAANALOG",
   options: ["USE_SERIALRX", "USE_SERIALRX_CRSF", "USE_SERIALRX_SBUS", "USE_TELEMETRY", "USE_TELEMETRY_CRSF", "USE_OSD_SD", "USE_DSHOT", "USE_LED_STRIP", "USE_PINIO", "USE_VTX"],
-  path: "firmware/v2026.6.2-2/betaflight_2026.6.2_STM32G474_TMOTORG4ALPHAANALOG.hex",
+  path: "firmware/v2026.6.2-3/betaflight_2026.6.2_STM32G474_TMOTORG4ALPHAANALOG.hex",
   fileName: "betaflight_2026.6.2_STM32G474_TMOTORG4ALPHAANALOG.hex",
-  sha256: "4b4affc3b339ea1e345c872720cbc5a3cc0f6af8c8c11dc7cd6404ccb10aa672",
-  releaseUrl: `${REPO}/releases/tag/v2026.6.2-2`,
-  sourceUrl: `${REPO}/tree/v2026.6.2-2`,
+  sha256: "ea680d84a4cbe69215784b5fdc571b79c5e545fb465203bc49aca8ccb3af4eca",
+  releaseUrl: `${REPO}/releases/tag/v2026.6.2-3`,
+  sourceUrl: `${REPO}/tree/v2026.6.2-3`,
   betaflightSourceUrl: "https://github.com/betaflight/betaflight/tree/2026.6.2",
 };
 

@@ -138,9 +138,10 @@ describe("recognising a migrated board over USB", () => {
     expect(isMigratedAlpha(identity("TMOTORG4ALPHAHD", "COMM", "INAV"))).toBe(false);
   });
 
-  it("says which board it is, and that only the HD takes firmware over USB", () => {
+  it("says which board it is, and that both take firmware over USB, the Analog from v2026.6.2-3", () => {
     expect(migratedAlphaBoard(identity("TMOTORG4ALPHAHD", "COMM"))).toMatchObject({ id: "hd", usbDfu: true });
-    expect(migratedAlphaBoard(identity("TMOTORG4ALPHAANALOG", "TMTR"))).toMatchObject({ id: "analog", usbDfu: false });
+    expect(migratedAlphaBoard(identity("TMOTORG4ALPHAHD", "COMM"))?.usbDfuFrom).toBeUndefined();
+    expect(migratedAlphaBoard(identity("TMOTORG4ALPHAANALOG", "TMTR"))).toMatchObject({ id: "analog", usbDfu: true, usbDfuFrom: "v2026.6.2-3" });
     expect(migratedAlphaBoard(identity("RRIOT_F722", "COMM"))).toBeUndefined();
   });
 });
