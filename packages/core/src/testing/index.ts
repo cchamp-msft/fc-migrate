@@ -12,6 +12,7 @@ export {
   type SimulatedProtection,
 } from "./simulated-g4.js";
 export { SimulatedStlink, type SimulatedStlinkOptions } from "./simulated-stlink.js";
+export { SimulatedCmsisDap, type SimulatedCmsisDapOptions } from "./simulated-cmsis-dap.js";
 export {
   ALPHA_SCENARIOS,
   createAlphaSimulation,

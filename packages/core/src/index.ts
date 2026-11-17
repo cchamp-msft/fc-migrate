@@ -27,4 +27,5 @@ export * from "./bootstrap/bootstrap.js";
 export * from "./targets/stm32g4/session.js";
 export * from "./targets/stm32g4/index.js";
 export * from "./stlink/index.js";
+export * from "./cmsis-dap/index.js";
 export * from "./alpha/alpha.js";

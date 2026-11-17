@@ -7,3 +7,4 @@ export { decodeOptr, planOptrChange, rdpLevelOf, OptrPlanError, type DecodedOptr
 export { pagesTouched, pageAt, doubleWordRuns, DEFAULT_FLASH_TIMEOUTS, type FlashPage, type FlashTimeouts } from "./flash.js";
 export { formatUid } from "./identify.js";
 export { SwdG4Session, toSessionError, type DebugLink, type SwdG4SessionOptions } from "./swd-session.js";
+export { openG4OnProbe, type ProbeSessionOptions, type SwdProbe } from "./open-on-probe.js";

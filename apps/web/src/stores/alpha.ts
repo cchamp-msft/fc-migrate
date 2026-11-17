@@ -24,7 +24,7 @@ import { loadHostedAlphaImage, readAlphaImage, type ChosenImage } from "../utils
 import { saveFile } from "../utils/save-file";
 import { useConnectionStore } from "./connection";
 
-/** Where the ST-Link session comes from: a real probe the user chose, or the demo simulator. */
+/** Where the probe session comes from: a real probe the user chose, or the demo simulator. */
 export interface ProbeSource {
   simulated: boolean;
   /** `onAttached` fires in `holdReset` mode once the pilot can let go of the button. */
@@ -56,17 +56,17 @@ export type { ChosenImage };
 export type UsbStep = "idle" | "working" | "permission" | "done" | "failed";
 
 const DEMO_ON_HARDWARE = "The demo's stand-in image is not firmware and would lock a real board up. Choose a Betaflight .hex file for this board.";
-const NO_USB_DFU = "This board does not come up as a USB bootloader, so its firmware is rewritten over SWD with the ST-Link steps below. A rewrite keeps your settings.";
+const NO_USB_DFU = "This board does not come up as a USB bootloader, so its firmware is rewritten over SWD with the probe steps below. A rewrite keeps your settings.";
 
 function describeError(reason: unknown): string {
   if (reason instanceof SessionError) {
     const hint: Record<SessionError["kind"], string> = {
       "no-target": "Check the three wires and that the board has USB power. A permanently locked chip (Level 2) looks the same, and nothing can recover it.",
       "wrong-chip": "Nothing has been changed.",
-      "probe-firmware": "Update the ST-Link with ST's ST-LinkUpgrade tool, then try again.",
-      usb: "Check the ST-Link's USB cable, then try again.",
+      "probe-firmware": "On an ST-Link, update it with ST's ST-LinkUpgrade tool. On a Flipper Zero, start its DAP Link app. Then try again.",
+      usb: "Check the probe's USB cable, then try again.",
       timeout: "Check the wires, then try again.",
-      flash: "Try again. The ST-Link can always rewrite an unlocked board.",
+      flash: "Try again. The probe can always rewrite an unlocked board.",
       refused: "Choose a Betaflight .hex file for this board.",
     };
     const sentence = reason.message.endsWith(".") ? reason.message : `${reason.message}.`;
@@ -87,9 +87,9 @@ export const useAlphaStore = defineStore("alpha", () => {
   const probeInfo = shallowRef<G4Session["probe"]>();
   const readings = shallowRef<G4Readings>();
   const classification = shallowRef<Classification>();
-  /** The ST-Link flow's image. Cleared whenever the probe changes, so a simulated choice never reaches a real chip. */
+  /** The probe flow's image. Cleared whenever the probe changes, so a simulated choice never reaches a real chip. */
   const chosen = shallowRef<ChosenImage>();
-  /** The USB rewrite's image, kept apart from the ST-Link flow's: a board on USB is always real. */
+  /** The USB rewrite's image, kept apart from the probe flow's: a board on USB is always real. */
   const usbChosen = shallowRef<ChosenImage>();
   const confirmations = ref<{ id: string; version: number; at: string }[]>([]);
   const reportSaved = ref(false);
@@ -123,7 +123,7 @@ export const useAlphaStore = defineStore("alpha", () => {
   }
 
   /**
-   * Stops the flow and lets go of the ST-Link, which also lets a chip halted under
+   * Stops the flow and lets go of the probe, which also lets a chip halted under
    * reset run again. A retry reconnects and reads the chip afresh.
    */
   function fail(reason: unknown, retryAt: AlphaStep): void {
@@ -245,7 +245,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     }
   }
 
-  /** Loads this site's release for the board, for the ST-Link flow or the USB rewrite. */
+  /** Loads this site's release for the board, for the probe flow or the USB rewrite. */
   async function chooseHosted(target: "stlink" | "usb"): Promise<void> {
     const forBoard = target === "usb" ? usbBoard.value : board.value;
     const firmware = forBoard && HOSTED_ALPHA_FIRMWARE[forBoard.id];
@@ -345,7 +345,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     if (!(await run("Writing Betaflight", () => current.program(blocks, onProgress), "write"))) return;
     let mismatch: number | undefined;
     if (!(await run("Checking what was written", async () => void (mismatch = await current.verify(blocks, onProgress)), "write"))) return;
-    if (mismatch !== undefined) return fail(new Error(`The flash differs from the file at 0x${mismatch.toString(16)}. Write again; the ST-Link can always retry.`), "write");
+    if (mismatch !== undefined) return fail(new Error(`The flash differs from the file at 0x${mismatch.toString(16)}. Write again; the probe can always retry.`), "write");
     if (!(await run("Starting Betaflight", () => current.resetAndRun(), "write"))) return;
     confirm("done");
     await closeSession();
@@ -359,10 +359,10 @@ export const useAlphaStore = defineStore("alpha", () => {
     goTo("probe");
   }
 
-  /** Called when the pilot leaves the page: never keep the ST-Link claimed or the chip halted. */
+  /** Called when the pilot leaves the page: never keep the probe claimed or the chip halted. */
   function release(): void {
     if (!session.value || step.value === "working") return;
-    fail(new Error("The ST-Link was released when you left this page. Reconnect to carry on; the chip is read again first."), "probe");
+    fail(new Error("The probe was released when you left this page. Reconnect to carry on; the chip is read again first."), "probe");
   }
 
   function failUsb(reason: unknown): void {
