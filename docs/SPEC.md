@@ -295,8 +295,9 @@ Replaces the closed Alpha firmware on a T-Motor Pacer G4 Alpha with Betaflight. 
   10. write;
   11. done.
 - Every warning text has an id and a version. The board report records which ones the pilot confirmed.
-- The intro and wiring ticks are a checklist, not a gate. Continue works without them, and a confirmation is recorded only when they were ticked.
-- The stage numbers are buttons. Every stage opens at any time, except while the chip is being connected or written.
+- The intro's tick (C1) is a gate. Nothing past the intro opens until it is ticked, and the store sends any other step back to the intro until then. It is recorded once, and stays ticked until the page is reloaded: Start over keeps it, and the new run's report still has it. From then on the first stage opens on the board choice, which links back to the intro.
+- The wiring ticks are a checklist, not a gate. Continue works without them, and a confirmation is recorded only when they were ticked.
+- The stage numbers are buttons. Once the intro is ticked, every stage opens at any time, except while the chip is being connected or written.
 - A button whose action needs something not yet done stays grey and lists what is still needed (S6).
 - On a migrated board connected over USB, the probe steps fold away behind a toggle, unless a probe session is in use.
 
