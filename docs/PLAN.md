@@ -73,6 +73,7 @@ The source is public, as GPL-3 requires, and the docs and `wrangler.toml` carry 
 - [x] Classification, image checks, report and confirmation texts
 - [x] ST-Link V2 protocol, STM32G4 option bytes and flash, simulated probe and chip
 - [x] Alpha Migrate page, walked through against the simulator
+- [x] The intro's confirmation gates every other stage; once ticked, stage 1 opens on the board choice
 - [x] Hardware, read-only first: connect and read the good board (`pnpm --filter @bf-migrate/hil run stlink`). Hot-plug works on a migrated board, running or locked up, with no reset held; a stock Alpha is still untested
 - [x] Hardware: rewrite a migrated board over SWD with the session code (`stlink-write`), keeping its settings, then check it over MSP (`stlink-dump` reads the whole flash for comparison)
 - [x] CMSIS-DAP v2 probes (Flipper Zero DAP Link, Raspberry Pi debugprobe) behind the same session, with a simulated probe

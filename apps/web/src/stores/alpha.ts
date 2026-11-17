@@ -92,6 +92,11 @@ export const useAlphaStore = defineStore("alpha", () => {
   /** The USB rewrite's image, kept apart from the probe flow's: a board on USB is always real. */
   const usbChosen = shallowRef<ChosenImage>();
   const confirmations = ref<{ id: string; version: number; at: string }[]>([]);
+  /**
+   * True once the pilot has ticked the opening confirmation (C1) since the page was loaded.
+   * Every other step waits for it; after it, the first stage opens on the board choice.
+   */
+  const acknowledged = ref(false);
   const reportSaved = ref(false);
   const clearBootPin = ref(true);
   const keepSettings = ref(true);
@@ -141,6 +146,15 @@ export const useAlphaStore = defineStore("alpha", () => {
     await current?.close().catch(() => undefined);
   }
 
+  /** Records C1 the first time the pilot ticks it, then moves on to the board choice. */
+  function acknowledge(): void {
+    if (!acknowledged.value) {
+      acknowledged.value = true;
+      confirm("intro");
+    }
+    goTo("variant");
+  }
+
   async function reset(): Promise<void> {
     await closeSession();
     source.value = undefined;
@@ -148,7 +162,8 @@ export const useAlphaStore = defineStore("alpha", () => {
     readings.value = undefined;
     classification.value = undefined;
     chosen.value = undefined;
-    confirmations.value = [];
+    // The opening confirmation still stands, so a new run's report keeps it.
+    confirmations.value = confirmations.value.filter((entry) => entry.id === ALPHA_TEXTS.intro.id);
     reportSaved.value = false;
     clearBootPin.value = true;
     keepSettings.value = true;
@@ -156,7 +171,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     progress.value = undefined;
     error.value = "";
     boardId.value = "hd";
-    step.value = "intro";
+    step.value = acknowledged.value ? "variant" : "intro";
   }
 
   /** The image is checked against the board, so changing the board drops it. */
@@ -168,7 +183,8 @@ export const useAlphaStore = defineStore("alpha", () => {
 
   function goTo(next: AlphaStep): void {
     error.value = "";
-    step.value = next;
+    // Until the opening confirmation is ticked, the intro is the only step.
+    step.value = acknowledged.value || next === "intro" ? next : "intro";
   }
 
   function useSource(next: ProbeSource): void {
@@ -439,6 +455,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     chosen,
     usbChosen,
     confirmations,
+    acknowledged,
     reportSaved,
     clearBootPin,
     keepSettings,
@@ -455,6 +472,7 @@ export const useAlphaStore = defineStore("alpha", () => {
     usbProgress,
     hostedLoading,
     confirm,
+    acknowledge,
     goTo,
     reset,
     chooseBoard,

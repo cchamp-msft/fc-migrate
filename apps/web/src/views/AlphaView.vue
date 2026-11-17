@@ -52,7 +52,8 @@ const stageIndex = computed(() => STAGES.findIndex((stage) => stage.steps.includ
 /** Steps that must finish before the pilot can go anywhere else. */
 const BUSY: readonly AlphaStep[] = ["connecting", "working"];
 
-const introChecked = ref(false);
+// Once ticked, the opening confirmation stays ticked until the page is reloaded.
+const introChecked = ref(alpha.acknowledged);
 // The ticks are the pilot's own checklist: kept when moving between steps, and never required.
 const wiringChecks = ref<boolean[]>((wiringText.value.checks ?? []).map(() => false));
 const typed = ref("");
@@ -79,16 +80,18 @@ watch(
 );
 
 /**
- * Every stage opens at any time, done or not, except while the chip is being connected
- * or written. Inside a stage, a button whose action needs something not yet done stays
- * grey and says what is missing; the store checks the same things again.
+ * No stage opens until the opening confirmation is ticked. After that, every stage opens at
+ * any time, done or not, except while the chip is being connected or written. Inside a stage,
+ * a button whose action needs something not yet done stays grey and says what is missing; the
+ * store checks the same things again.
  */
 function canOpen(index: number): boolean {
-  return index !== stageIndex.value && !BUSY.includes(alpha.step);
+  return alpha.acknowledged && index !== stageIndex.value && !BUSY.includes(alpha.step);
 }
 
+/** Once the opening confirmation is ticked, the first stage is the board choice. */
 function openStage(index: number): void {
-  const first = STAGES[index]?.steps[0];
+  const first = index === 0 && alpha.acknowledged ? "variant" : STAGES[index]?.steps[0];
   if (first && canOpen(index)) alpha.goTo(first);
 }
 
@@ -99,12 +102,12 @@ function stageState(index: number): "current" | "open" | "closed" {
 
 const wiringDone = computed(() => wiringChecks.value.every(Boolean));
 
-/** Continue never waits for the ticks. A confirmation is recorded only when they were ticked. */
+/** Every step waits for the opening confirmation; the store records it once. */
 function leaveIntro(): void {
-  if (introChecked.value) alpha.confirm("intro");
-  alpha.goTo("variant");
+  if (introChecked.value) alpha.acknowledge();
 }
 
+/** The wiring ticks are the pilot's own checklist: Continue never waits for them. */
 function leaveWiring(): void {
   if (wiringDone.value) alpha.confirm("wiring");
   alpha.goTo("probe");
@@ -272,14 +275,16 @@ function kb(bytes: number): string {
           <li v-for="text in givesUp.paragraphs.slice(1)" :key="text">{{ text }}</li>
         </ul>
       </template>
-      <label class="check"><input v-model="introChecked" type="checkbox" /> {{ ALPHA_TEXTS.intro.checks[0] }}</label>
+      <label class="check"><input v-model="introChecked" type="checkbox" :disabled="alpha.acknowledged" /> {{ ALPHA_TEXTS.intro.checks[0] }}</label>
       <div class="actions">
-        <button class="btn btn-primary" @click="leaveIntro()">Continue</button>
+        <button class="btn btn-primary" :disabled="!introChecked" @click="leaveIntro()">Continue</button>
+        <span v-if="!introChecked" class="muted small">Tick the box to go on. Every step waits for it.</span>
       </div>
     </section>
 
     <section v-else-if="alpha.step === 'variant'" class="card step">
       <h2>Which board is it?</h2>
+      <p class="muted small">What each board gives up is in the <button type="button" class="link" @click="alpha.goTo('intro')">introduction</button>.</p>
       <div class="boards">
         <button v-for="board in ALPHA_BOARDS" :key="board.id" class="board" :disabled="!board.supported" :aria-pressed="alpha.boardId === board.id" @click="alpha.chooseBoard(board.id)">
           <Cpu :size="20" />
@@ -558,6 +563,16 @@ function kb(bytes: number): string {
 
 .stage[data-state="open"]:hover {
   border-color: var(--accent);
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .gives-up {
